@@ -307,8 +307,7 @@ def get_dataset(set_name, subset_name):
     #         df.to_pickle('/public/ckchan666/6520/xtreme/tatoeba.tel/cache.pd')
     #     return {'validation':Dataset.from_pandas(df,split ='validation')}
     from nlp import load_dataset
-    data_dir  = '/gpfs1/scratch/ckchan666/xtreme' if subset_name is not None and 'PAN-X' in subset_name else None
-    return load_dataset(set_name, subset_name, ignore_verifications=True,data_dir  =  data_dir,cache_dir='/gpfs1/scratch/ckchan666/xtreme')
+    return load_dataset(set_name, subset_name, ignore_verifications=True,cache_dir='/gpfs1/scratch/ckchan666/xtreme')
 
 def summary():
     for task in TASK:
