@@ -287,28 +287,28 @@ def sanity_check():
 
 
 def get_dataset(set_name, subset_name):
-    if subset_name == 'tatoeba.tel':
-        import os
-        import pandas as pd
-        from nlp import Dataset
-        if os.path.exists('/public/ckchan666/6520/xtreme/tatoeba.tel/'):
-            df = pd.read_pickle('/public/ckchan666/6520/xtreme/tatoeba.tel/cache.pd')
-        else:
-            os.mkdir('/public/ckchan666/6520/xtreme/tatoeba.tel/')
-            import requests
-            import io
-            url="https://raw.githubusercontent.com/facebookresearch/LASER/master/data/tatoeba/v1/tatoeba.tel-eng.eng"
-            s=requests.get(url).content
-            eng=pd.read_csv(io.StringIO(s.decode('utf-8')),sep = '\n',names=['target_sentence'], encoding='utf8')
-            url="https://raw.githubusercontent.com/facebookresearch/LASER/master/data/tatoeba/v1/tatoeba.tel-eng.tel"
-            s=requests.get(url).content
-            tel=pd.read_csv(io.StringIO(s.decode('utf-8')),sep = '\n',names=['source_sentence'], encoding='utf8')
-            df = pd.concat((eng,tel), axis=1)
-            df.to_pickle('/public/ckchan666/6520/xtreme/tatoeba.tel/cache.pd')
-        return {'validation':Dataset.from_pandas(df,split ='validation')}
-    from nlp import load_dataset
-    data_dir  = '/public/ckchan666/6520' if subset_name is not None and 'PAN-X' in subset_name else None
-    return load_dataset(set_name, subset_name, ignore_verifications=True,data_dir  =  data_dir,cache_dir='/public/ckchan666/6520/xtreme')
+    # if subset_name == 'tatoeba.tel':
+    #     import os
+    #     import pandas as pd
+    #     from nlp import Dataset
+    #     if os.path.exists('/public/ckchan666/6520/xtreme/tatoeba.tel/'):
+    #         df = pd.read_pickle('/public/ckchan666/6520/xtreme/tatoeba.tel/cache.pd')
+    #     else:
+    #         os.mkdir('/public/ckchan666/6520/xtreme/tatoeba.tel/')
+    #         import requests
+    #         import io
+    #         url="https://raw.githubusercontent.com/facebookresearch/LASER/master/data/tatoeba/v1/tatoeba.tel-eng.eng"
+    #         s=requests.get(url).content
+    #         eng=pd.read_csv(io.StringIO(s.decode('utf-8')),sep = '\n',names=['target_sentence'], encoding='utf8')
+    #         url="https://raw.githubusercontent.com/facebookresearch/LASER/master/data/tatoeba/v1/tatoeba.tel-eng.tel"
+    #         s=requests.get(url).content
+    #         tel=pd.read_csv(io.StringIO(s.decode('utf-8')),sep = '\n',names=['source_sentence'], encoding='utf8')
+    #         df = pd.concat((eng,tel), axis=1)
+    #         df.to_pickle('/public/ckchan666/6520/xtreme/tatoeba.tel/cache.pd')
+    #     return {'validation':Dataset.from_pandas(df,split ='validation')}
+    from datasets import load_dataset
+    data_dir  = '/gpfs1/scratch/ckchan666/xtreme' if subset_name is not None and 'PAN-X' in subset_name else None
+    return load_dataset(set_name, subset_name, ignore_verifications=True,data_dir  =  data_dir,cache_dir='/gpfs1/scratch/ckchan666/xtreme')
 
 def summary():
     for task in TASK:
