@@ -1,7 +1,3 @@
-import urllib.request
-urllib.request.urlretrieve(
-    "https://content-na.drive.amazonaws.com/cdproxy/batchLink/29749zQQWaHq7LsGM7DUQiWjReGoWUlGZ32hAnQBXXw/content",
-    "/gpfs1/scratch/ckchan666/xtreme/AmazonPhotos.zip")
 import xtreme_ds
 for task in xtreme_ds.TASK:
     try:
