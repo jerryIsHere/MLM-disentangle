@@ -294,7 +294,7 @@ def get_dataset(set_name, subset_name):
     if subset_name == 'tatoeba.tel':
         import os
         import pandas as pd
-        from nlp import Dataset
+        from datasets import Dataset
         if os.path.exists('/gpfs1/scratch/ckchan666/xtreme/tatoeba.tel/'):
             df = pd.read_pickle('/gpfs1/scratch/ckchan666/xtreme/tatoeba.tel/cache.pd')
         else:
@@ -310,7 +310,7 @@ def get_dataset(set_name, subset_name):
             df = pd.concat((eng,tel), axis=1)
             df.to_pickle('/gpfs1/scratch/ckchan666/xtreme/tatoeba.tel/cache.pd')
         return {'validation':Dataset.from_pandas(df,split ='validation')}
-    from nlp import load_dataset
+    from datasets import load_dataset
     data_dir = '/gpfs1/scratch/ckchan666/xtreme' if subset_name is not None and 'PAN-X' in subset_name else None
     return load_dataset(set_name, subset_name, ignore_verifications=True, data_dir=data_dir, cache_dir='/gpfs1/scratch/ckchan666/xtreme')
 

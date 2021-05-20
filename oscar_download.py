@@ -1,4 +1,4 @@
-from nlp import load_dataset
+from datasets import load_dataset
 import xtreme_ds
 xtreme_lan = set()
 for task in xtreme_ds.TASK2LANGS:
