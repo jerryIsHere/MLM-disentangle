@@ -346,3 +346,6 @@ def summary():
                 set_name, subset_name, split = TASK[task]['src'][lan]
                 print('training data ('+lan+') for ' + task + ' : ' +
                       str(len(get_dataset(set_name, subset_name)[split])))
+xtreme_lan = set()
+for task in TASK2LANGS:
+    xtreme_lan = xtreme_lan.union([lan for lan in TASK2LANGS[task]])

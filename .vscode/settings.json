@@ -1,0 +1,7 @@
+{
+    "json.schemas": [
+    
+    ],
+    "python.pythonPath": "C:\\Users\\jerry\\OneDrive\\桌面\\GitHub repository\\virtualenv\\mnlpEnv\\Scripts\\python.exe",
+    "python.formatting.provider": "black"
+}
