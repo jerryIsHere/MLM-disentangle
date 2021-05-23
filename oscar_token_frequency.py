@@ -10,7 +10,7 @@ import argparse
 
 parser = argparse.ArgumentParser(description="token frequency of 40 corpus")
 parser.add_argument(
-    "example",
+    "--example",
     metavar="N",
     type=int,
     help="number of example from each corpus",
