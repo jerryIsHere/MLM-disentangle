@@ -21,14 +21,17 @@ args = parser.parse_args()
 tokenizer = XLMRobertaTokenizer.from_pretrained(
     "xlm-roberta-large", cache_dir="/gpfs1/scratch/ckchan666/transformer_model_cache"
 )
+import collections, time
+
+t = time.time()
 for lan in xtreme_ds.xtreme_lan:
     dataset = oscar_corpus.get_corpus(lan)
     example = args.example
-    if len(dataset["train"]) < example:
-        example = len(dataset["train"])
+    if len(dataset) < example:
+        example = len(dataset)
 
     def trial(i):
-        token = tokenizer.encode(text=dataset["train"][int(i)]["text"])
+        token = tokenizer.encode(text=dataset[int(i)]["text"])
         token = token[1 : len(token) - 1]
         return collections.Counter(token)
 
@@ -43,3 +46,9 @@ for lan in xtreme_ds.xtreme_lan:
             combine, pool.map(partial(reduce, combine), es_per_process)
         )
     oscar_corpus.put_token_frequency(lan, word_frequency)
+
+
+time_token = time.time() - t
+print("with " + str(mp.cpu_count()) + " cpu")
+print("seconds needed for " + str(args.example) + " examples for 40 corpus is:")
+print(time_token)
