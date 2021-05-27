@@ -1,4 +1,5 @@
 #!/bin/bash
+#SBATCH --qoa=debug
 #SBATCH --partition=debugq
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
