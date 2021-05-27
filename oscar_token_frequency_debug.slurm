@@ -1,8 +1,8 @@
 #!/bin/bash
 #SBATCH --partition=debugq
 #SBATCH --nodes=1
-#SBATCH --ntasks-per-node=128
-#SBATCH --cpus-per-task=128
+#SBATCH --ntasks-per-node=64
+#SBATCH --cpus-per-task=64
 #SBATCH --mem=8GB
 #SBATCH --time=00:10:00
 #SBATCH --output=/gpfs1/home/ckchan666/job/oscar_token_frequency/task.log
@@ -11,4 +11,4 @@
 
 module load python37
 source /gpfs1/home/ckchan666/mnlpEnv/bin/activate
-python /gpfs1/home/ckchan666/MLM-disentangle/oscar_token_frequency.py --example 256
+python /gpfs1/home/ckchan666/MLM-disentangle/oscar_token_frequency.py --example 128
