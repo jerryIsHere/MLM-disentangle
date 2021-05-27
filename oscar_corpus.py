@@ -225,7 +225,7 @@ def get_corpus(lan):
         "oscar",
         "unshuffled_deduplicated_" + lan,
         cache_dir="/gpfs1/scratch/ckchan666/oscar",
-    )['"train"']
+    )['train']
 
 
 def get_token_frequency(lan):
