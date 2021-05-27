@@ -241,7 +241,7 @@ def put_token_frequency(lan, word_frequency):
     import pickle
 
     filehandler = open(
-        "/gpfs1/scratch/ckchan666/oscar_token_frequency/" + lan + ".pickle", "w"
+        "/gpfs1/scratch/ckchan666/oscar_token_frequency/" + lan + ".pickle", "wb"
     )
     pickle.dump(word_frequency, filehandler)
 
