@@ -14,7 +14,7 @@ parser.add_argument(
     metavar="N",
     type=int,
     help="number of example from each corpus",
-    default=2 ** 16,
+    default=2 ** 15,
 )
 args = parser.parse_args()
 
