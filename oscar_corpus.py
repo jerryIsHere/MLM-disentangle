@@ -1,3 +1,223 @@
+import pandas as pd
+
+languages = pd.DataFrame.from_dict(
+    {
+        "family": {
+            0: "Indo-European",
+            1: "Afro-Asiatic",
+            2: "Basque",
+            3: "Indo-European",
+            4: "Indo-European",
+            5: "Sino-Tibetan",
+            6: "Sino-Tibetan",
+            7: "Indo-European",
+            8: "Indo-European",
+            9: "Uralic",
+            10: "Uralic",
+            11: "Indo-European",
+            12: "Kartvelian",
+            13: "Indo-European",
+            14: "Indo-European",
+            15: "Afro-Asiatic",
+            16: "Indo-European",
+            17: "Uralic",
+            18: "Austronesian",
+            19: "Indo-European",
+            20: "Japanese",
+            21: "Austronesian",
+            22: "Altaic",
+            23: "Korean",
+            24: "Dravidian",
+            25: "Austronesian",
+            26: "Indo-European",
+            27: "Indo-European",
+            28: "Indo-European",
+            29: "Indo-European",
+            30: "Indo-European",
+            31: "Niger-Congo",
+            32: "Austronesian",
+            33: "Dravidian",
+            34: "Dravidian",
+            35: "Altaic",
+            36: "Indo-European",
+            37: "Austro-Asiatic",
+            38: "Niger-Congo",
+            39: "Tai-Kadai",
+        },
+        "genus": {
+            0: "Germanic",
+            1: "Semitic",
+            2: "Basque",
+            3: "Indic",
+            4: "Slavic",
+            5: "Burmese-Lolo",
+            6: "Chinese",
+            7: "Germanic",
+            8: "Germanic",
+            9: "Finnic",
+            10: "Finnic",
+            11: "Romance",
+            12: "Kartvelian",
+            13: "Germanic",
+            14: "Greek",
+            15: "Semitic",
+            16: "Indic",
+            17: "Ugric",
+            18: "Malayo-Sumbawan",
+            19: "Romance",
+            20: "Japanese",
+            21: "Javanese",
+            22: "Turkic",
+            23: "Korean",
+            24: "Southern Dravidian",
+            25: "Malayo-Sumbawan",
+            26: "Indic",
+            27: "Iranian",
+            28: "Romance",
+            29: "Slavic",
+            30: "Romance",
+            31: "Bantoid",
+            32: "Greater Central Philippine",
+            33: "Southern Dravidian",
+            34: "South-Central Dravidian",
+            35: "Turkic",
+            36: "Indic",
+            37: "Viet-Muong",
+            38: "Defoid",
+            39: "Kam-Tai",
+        },
+        "iso639_1": {
+            0: "af",
+            1: "ar",
+            2: "eu",
+            3: "bn",
+            4: "bg",
+            5: "my",
+            6: "zh",
+            7: "nl",
+            8: "en",
+            9: "et",
+            10: "fi",
+            11: "fr",
+            12: "ka",
+            13: "de",
+            14: "el",
+            15: "he",
+            16: "hi",
+            17: "hu",
+            18: "id",
+            19: "it",
+            20: "ja",
+            21: "jv",
+            22: "kk",
+            23: "ko",
+            24: "ml",
+            25: "ms",
+            26: "mr",
+            27: "fa",
+            28: "pt",
+            29: "ru",
+            30: "es",
+            31: "sw",
+            32: "tl",
+            33: "ta",
+            34: "te",
+            35: "tr",
+            36: "ur",
+            37: "vi",
+            38: "yo",
+            39: "th",
+        },
+        "iso639_3": {
+            0: "afr",
+            1: "apc",
+            2: "eus",
+            3: "ben",
+            4: "bul",
+            5: "mya",
+            6: "cmn",
+            7: "nld",
+            8: "eng",
+            9: "est",
+            10: "fin",
+            11: "fra",
+            12: "kat",
+            13: "deu",
+            14: "ell",
+            15: "heb",
+            16: "hin",
+            17: "hun",
+            18: "ind",
+            19: "ita",
+            20: "jpn",
+            21: "jav",
+            22: "kaz",
+            23: "kor",
+            24: "mal",
+            25: "zsm",
+            26: "mar",
+            27: "pes",
+            28: "por",
+            29: "rus",
+            30: "spa",
+            31: "swh",
+            32: "tgl",
+            33: "tam",
+            34: "tel",
+            35: "tur",
+            36: "urd",
+            37: "vie",
+            38: "yor",
+            39: "tha",
+        },
+        "language": {
+            0: "Afrikaans",
+            1: "Arabic",
+            2: "Basque",
+            3: "Bengali",
+            4: "Bulgarian",
+            5: "Burmese",
+            6: "Chinese",
+            7: "Dutch",
+            8: "English",
+            9: "Estonian",
+            10: "Finnish",
+            11: "French",
+            12: "Georgian",
+            13: "German",
+            14: "Greek",
+            15: "Hebrew",
+            16: "Hindi",
+            17: "Hungarian",
+            18: "Indonesian",
+            19: "Italian",
+            20: "Japanese",
+            21: "Javanese",
+            22: "Kazakh",
+            23: "Korean",
+            24: "Malayalam",
+            25: "Malay",
+            26: "Marathi",
+            27: "Persian (Farsi)",
+            28: "Portuguese",
+            29: "Russian",
+            30: "Spanish",
+            31: "Swahili",
+            32: "Tagalog",
+            33: "Tamil",
+            34: "Telugu",
+            35: "Turkish",
+            36: "Urdu",
+            37: "Vietnamese",
+            38: "Yoruba",
+            39: "Thai",
+        },
+    }
+)
+genus = languages.genus.unique()
+family = languages.family.unique()
+
+
 def get_corpus(lan):
     from datasets import load_dataset
 
@@ -248,15 +468,41 @@ class MLMDisentangleDataset(torch.utils.data.IterableDataset):
                         ([s_pre_token], masked_tokens, [s_end_token])
                     )
                     txt_tokens = np.concatenate((txt_tokens, tokens))
-                    txt_masked_tokens = np.concatenate((txt_masked_tokens, masked_tokens))
+                    txt_masked_tokens = np.concatenate(
+                        (txt_masked_tokens, masked_tokens)
+                    )
                 if len(txt_tokens) >= tokenizer.model_max_length:
                     txt_tokens = txt_tokens[0 : tokenizer.model_max_length]
-                    txt_masked_tokens = txt_masked_tokens[0 : tokenizer.model_max_length]
+                    txt_masked_tokens = txt_masked_tokens[
+                        0 : tokenizer.model_max_length
+                    ]
                     yield {
                         "tokens": txt_tokens,
                         "masked_tokens": txt_masked_tokens,
                         "language_id": torch.nn.functional.one_hot(
                             torch.tensor(lan_idx), num_classes=len(xtreme_ds.xtreme_lan)
+                        ),
+                        "genus_label": torch.nn.functional.one_hot(
+                            torch.tensor(
+                                np.where(
+                                    genus
+                                    == languages[languages.iso639_1 == lan].genus.iloc[
+                                        0
+                                    ]
+                                )
+                            ),
+                            num_classes=len(genus),
+                        ),
+                        "family_label": torch.nn.functional.one_hot(
+                            torch.tensor(
+                                np.where(
+                                    genus
+                                    == languages[languages.iso639_1 == lan].family.iloc[
+                                        0
+                                    ]
+                                )
+                            ),
+                            num_classes=len(family),
                         ),
                     }
                     break
