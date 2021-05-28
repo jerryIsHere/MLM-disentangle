@@ -17,7 +17,8 @@ parser.add_argument(
     default=2 ** 15,
 )
 args = parser.parse_args()
-
+print("with " + str(mp.cpu_count()) + " cpu")
+print("example per langauge: " + str(args.example))
 tokenizer = XLMRobertaTokenizer.from_pretrained(
     "xlm-roberta-large", cache_dir="/gpfs1/scratch/ckchan666/transformer_model_cache"
 )
@@ -49,6 +50,6 @@ for lan in xtreme_ds.xtreme_lan:
 
 
 time_token = time.time() - t
-print("with " + str(mp.cpu_count()) + " cpu")
+
 print("seconds needed for " + str(args.example) + " examples for 40 corpus is:")
 print(time_token)
