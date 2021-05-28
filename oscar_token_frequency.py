@@ -14,7 +14,7 @@ parser.add_argument(
     metavar="N",
     type=int,
     help="number of example from each corpus",
-    default=2 ** 15,
+    default=2 ** 16,
 )
 args = parser.parse_args()
 print("with " + str(mp.cpu_count()) + " cpu")
@@ -41,7 +41,8 @@ for lan in xtreme_ds.xtreme_lan:
 
     with mp.Pool(processes=mp.cpu_count()) as pool:
         es_per_process = pool.map(
-            partial(map, trial), np.array_split(range(example), pool._processes)
+            partial(map, trial), 
+            [np.arange(i,example,pool._processes) for i in range(pool._processes)]
         )
         word_frequency = reduce(
             combine, pool.map(partial(reduce, combine), es_per_process)
