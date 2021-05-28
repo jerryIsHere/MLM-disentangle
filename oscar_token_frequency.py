@@ -14,7 +14,7 @@ parser.add_argument(
     metavar="N",
     type=int,
     help="number of example from each corpus",
-    default=2 ** 15,
+    default=2 ** 16,
 )
 args = parser.parse_args()
 print("with " + str(mp.cpu_count()) + " cpu")
