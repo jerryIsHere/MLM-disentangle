@@ -225,7 +225,7 @@ def get_corpus(lan):
         "oscar",
         "unshuffled_deduplicated_" + lan,
         cache_dir="/gpfs1/scratch/ckchan666/oscar",
-    )['train']
+    )["train"]
 
 
 def get_token_frequency(lan):
@@ -408,12 +408,12 @@ class MLMDisentangleDataset(torch.utils.data.IterableDataset):
             self.vocab_prob[lan] = np.array(
                 [
                     0
-                    if token_id not in self.tokenFrequency
-                    else self.tokenFrequency[token_id]
+                    if token_id not in self.tokenFrequency[lan]
+                    else self.tokenFrequency[lan][token_id]
                     for token_id in vocab_token
                 ]
             )
-            self.vocab_prob[lan] = vocab_prob / np.sum(vocab_prob[lan])
+            self.vocab_prob[lan] = self.vocab_prob[lan] / np.sum(self.vocab_prob[lan])
 
     def __iter__(self):
         idx = {}
