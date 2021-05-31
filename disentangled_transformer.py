@@ -107,6 +107,66 @@ import torch.utils.checkpoint
 from torch.nn import MSELoss
 
 
+
+from enum import Enum
+import json
+
+
+class DiscriminatorType(str, Enum):
+    SingleToken = "SingleToken"
+    FullSequence = "FullSequence"
+
+
+class DiscriminatorConfig:
+    def __init__(
+        self,
+        dtype: DiscriminatorType,
+        length: int,
+        weight: float,
+        num_labels: int,
+        label_id: str,
+        hidden_size: int,
+        nhead: int = 1,
+        num_layers: int = 1,
+    ):
+        self.dtype = dtype
+        self.length = length
+        self.weight = weight
+        self.num_labels = num_labels
+        self.label_id = label_id
+        self.hidden_size = hidden_size
+        self.nhead = nhead
+        self.num_layers = num_layers
+
+    @classmethod
+    def from_json(cls, jstr):
+        param = json.loads(jstr)
+
+
+class DiscriminatorConfigSerializer(json.JSONEncoder, json.JSONDecoder):
+    def default(self, o):
+        return o.__dict__
+
+    def __init__(self, *args, **kwargs):
+        super(DiscriminatorConfigSerializer, self).__init__()
+        json.JSONDecoder.__init__(self, object_hook=self.object_hook, *args, **kwargs)
+
+    def object_hook(self, discriminator_config):
+        discriminator = DiscriminatorConfig(
+            dtype=DiscriminatorType(discriminator_config["dtype"]),
+            length=int(discriminator_config["length"]),
+            weight=float(discriminator_config["weight"]),
+            num_labels=int(discriminator_config["num_labels"]),
+            label_id=str(discriminator_config["label_id"]),
+            hidden_size=int(discriminator_config["hidden_size"]),
+        )
+        if "nhead" in discriminator_config:
+            discriminator.nhead = int(discriminator_config["nhead"])
+        if "num_layers" in discriminator_config:
+            discriminator.num_layers = int(discriminator_config["num_layers"])
+        return discriminator
+
+
 class XLMRobertSingleTokenDiscriminator(nn.Module):
     """Head for sentence-level classification tasks."""
 
@@ -254,62 +314,3 @@ class XLMRobertaForDisentanglement(RobertaPreTrainedModel):
             hidden_states=outputs.hidden_states,
             attentions=outputs.attentions,
         )
-
-
-from enum import Enum
-import json
-
-
-class DiscriminatorType(str, Enum):
-    SingleToken = "SingleToken"
-    FullSequence = "FullSequence"
-
-
-class DiscriminatorConfig:
-    def __init__(
-        self,
-        dtype: DiscriminatorType,
-        length: int,
-        weight: float,
-        num_labels: int,
-        label_id: str,
-        hidden_size: int,
-        nhead: int = 1,
-        num_layers: int = 1,
-    ):
-        self.dtype = dtype
-        self.length = length
-        self.weight = weight
-        self.num_labels = num_labels
-        self.label_id = label_id
-        self.hidden_size = hidden_size
-        self.nhead = nhead
-        self.num_layers = num_layers
-
-    @classmethod
-    def from_json(cls, jstr):
-        param = json.loads(jstr)
-
-
-class DiscriminatorConfigSerializer(json.JSONEncoder, json.JSONDecoder):
-    def default(self, o):
-        return o.__dict__
-
-    def __init__(self, *args, **kwargs):
-        super(DiscriminatorConfigSerializer, self).__init__()
-        json.JSONDecoder.__init__(self, object_hook=self.object_hook, *args, **kwargs)
-
-    def object_hook(self, discriminator_config):
-        discriminator = DiscriminatorConfig(
-            dtype=DiscriminatorType(discriminator_config["dtype"]),
-            length=int(discriminator_config["length"]),
-            weight=float(discriminator_config["weight"]),
-            num_labels=int(discriminator_config["num_labels"]),
-            label_id=str(discriminator_config["label_id"]),
-            hidden_size=int(discriminator_config["hidden_size"]),
-        )
-        if "nhead" in discriminator_config:
-            discriminator.nhead = int(discriminator_config["nhead"])
-        if "num_layers" in discriminator_config:
-            discriminator.num_layers = int(discriminator_config["num_layers"])
-        return discriminator
