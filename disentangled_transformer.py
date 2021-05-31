@@ -3,16 +3,17 @@ import torch
 import torch.nn as nn
 import transformers
 
+# https://colab.research.google.com/github/zphang/zphang.github.io/blob/master/files/notebooks/Multi_task_Training_with_Transformers_NLP.ipynb#scrollTo=7zSZsp8Cb7gd
 
 class MultitaskModel(transformers.PreTrainedModel):
-    def __init__(self, encoder, taskmodels_dict):
+    def __init__(self, backbone, taskmodels_dict):
         """
         Setting MultitaskModel up as a PretrainedModel allows us
         to take better advantage of Trainer features
         """
         super().__init__(transformers.PretrainedConfig())
 
-        self.encoder = encoder
+        self.backbone = backbone
         self.taskmodels_dict = nn.ModuleDict(taskmodels_dict)
 
     @classmethod
@@ -22,27 +23,27 @@ class MultitaskModel(transformers.PreTrainedModel):
         from single-task models.
 
         We do this by creating each single-task model, and having them share
-        the same encoder transformer.
+        the same backbone transformer.
         """
-        shared_encoder = None
+        shared_backbone = None
         taskmodels_dict = {}
         for task in task_dict:
             model = task_dict[task]["type"].from_pretrained(
                 backbone_name,
                 config=task_dict[task]["config"],
             )
-            if shared_encoder is None:
-                shared_encoder = getattr(model, cls.get_encoder_attr_name(model))
+            if shared_backbone is None:
+                shared_backbone = getattr(model, cls.get_backbone_attr_name(model))
             else:
-                setattr(model, cls.get_encoder_attr_name(model), shared_encoder)
+                setattr(model, cls.get_backbone_attr_name(model), shared_backbone)
             taskmodels_dict[task] = model
-        return cls(encoder=shared_encoder, taskmodels_dict=taskmodels_dict)
+        return cls(backbone=shared_backbone, taskmodels_dict=taskmodels_dict)
 
     @classmethod
-    def get_encoder_attr_name(cls, model):
+    def get_backbone_attr_name(cls, model):
         """
-        The encoder transformer is named differently in each model "architecture".
-        This method lets us get the name of the encoder attribute
+        The backbone transformer is named differently in each model "architecture".
+        This method lets us get the name of the backbone attribute
         """
         model_class_name = model.__class__.__name__
         if model_class_name.startswith("XLMRoberta"):
@@ -105,7 +106,6 @@ import torch
 import torch.nn as nn
 import torch.utils.checkpoint
 from torch.nn import MSELoss
-
 
 
 from enum import Enum
