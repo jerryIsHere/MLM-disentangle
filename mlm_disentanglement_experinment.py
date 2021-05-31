@@ -18,21 +18,14 @@ parser.add_argument(
     help="path to configuration json file",
     default="experinment_configuaration.json",
 )
-parser.add_argument(
-    "--frozen_layers",
-    metavar="layers",
-    type=int,
-    help="number of layer frozen in the disentanglement training",
-    default=20,
-)
 args = parser.parse_args()
 
 backbone_name = "xlm-roberta-large"
 XLMRobertaConfig = transformers.AutoConfig.from_pretrained(backbone_name)
 
 with open(args.config_json, "r") as outfile:
-    discriminator_config = json.load(outfile, cls=DiscriminatorConfigSerializer)
-setattr(XLMRobertaConfig, "discriminators", discriminator_config)
+    experinment_config_dict = json.load(outfile, cls=ExperinmentConfigSerializer)
+setattr(XLMRobertaConfig, "discriminators", experinment_config_dict["discrimintors"])
 
 multitask_model = MultitaskModel.create(
     backbone_name="xlm-roberta-large",
@@ -48,6 +41,6 @@ multitask_model = MultitaskModel.create(
     },
 )
 
-for layers in multitask_model.backbone.encoder.layer[: args.frozen_layers]:  # 0:24
+for layers in multitask_model.backbone.encoder.layer[: experinment_config_dict["training"].num_frozen_layers]:  # 0:24
     for param in layers.parameters():
         param.requires_grad = False

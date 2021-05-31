@@ -1,42 +1,48 @@
-[
-    {
-        "dtype": "SingleToken",
-        "length": 992.0,
-        "weight": 1,
-        "num_labels": 5,
-        "label_id": "language_id",
-        "hidden_size": 512.0,
-        "nhead": 1,
-        "num_layers": 1
-    },
-    {
-        "dtype": "FullSequence",
-        "length": 512.0,
-        "weight": 1,
-        "num_labels": 5,
-        "label_id": "language_id",
-        "hidden_size": 128.0,
-        "nhead": 4.0,
-        "num_layers": 3.0
-    },
-    {
-        "dtype": "FullSequence",
-        "length": 384.0,
-        "weight": 1,
-        "num_labels": 5,
-        "label_id": "family_label",
-        "hidden_size": 128.0,
-        "nhead": 4.0,
-        "num_layers": 3.0
-    },
-    {
-        "dtype": "FullSequence",
-        "length": 256.0,
-        "weight": 1,
-        "num_labels": 6,
-        "label_id": "genus_label",
-        "hidden_size": 128.0,
-        "nhead": 4.0,
-        "num_layers": 3.0
+{
+    "discriminators": [
+        {
+            "dtype": "SingleToken",
+            "length": 992,
+            "weight": 1.0,
+            "num_labels": 5,
+            "label_id": "language_id",
+            "hidden_size": 512,
+            "nhead": 1,
+            "num_layers": 1
+        },
+        {
+            "dtype": "FullSequence",
+            "length": 512,
+            "weight": 1.0,
+            "num_labels": 5,
+            "label_id": "language_id",
+            "hidden_size": 128,
+            "nhead": 4,
+            "num_layers": 3
+        },
+        {
+            "dtype": "FullSequence",
+            "length": 384,
+            "weight": 1.0,
+            "num_labels": 5,
+            "label_id": "family_label",
+            "hidden_size": 128,
+            "nhead": 4,
+            "num_layers": 3
+        },
+        {
+            "dtype": "FullSequence",
+            "length": 256,
+            "weight": 1.0,
+            "num_labels": 6,
+            "label_id": "genus_label",
+            "hidden_size": 128,
+            "nhead": 4,
+            "num_layers": 3
+        }
+    ],
+    "training": {
+        "training_name": "first_trail",
+        "num_frozen_layers": 18
     }
-]
+}

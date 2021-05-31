@@ -5,6 +5,7 @@ import transformers
 
 # https://colab.research.google.com/github/zphang/zphang.github.io/blob/master/files/notebooks/Multi_task_Training_with_Transformers_NLP.ipynb#scrollTo=7zSZsp8Cb7gd
 
+
 class MultitaskModel(transformers.PreTrainedModel):
     def __init__(self, backbone, taskmodels_dict):
         """
@@ -138,33 +139,39 @@ class DiscriminatorConfig:
         self.nhead = nhead
         self.num_layers = num_layers
 
-    @classmethod
-    def from_json(cls, jstr):
-        param = json.loads(jstr)
+
+class TrainingConfig:
+    def __init__(self, dictionary):
+        for key in dictionary:
+            setattr(self, key, dictionary[key])
 
 
-class DiscriminatorConfigSerializer(json.JSONEncoder, json.JSONDecoder):
+class ExperinmentConfigSerializer(json.JSONEncoder, json.JSONDecoder):
     def default(self, o):
         return o.__dict__
 
     def __init__(self, *args, **kwargs):
-        super(DiscriminatorConfigSerializer, self).__init__()
+        super(ExperinmentConfigSerializer, self).__init__()
         json.JSONDecoder.__init__(self, object_hook=self.object_hook, *args, **kwargs)
 
-    def object_hook(self, discriminator_config):
-        discriminator = DiscriminatorConfig(
-            dtype=DiscriminatorType(discriminator_config["dtype"]),
-            length=int(discriminator_config["length"]),
-            weight=float(discriminator_config["weight"]),
-            num_labels=int(discriminator_config["num_labels"]),
-            label_id=str(discriminator_config["label_id"]),
-            hidden_size=int(discriminator_config["hidden_size"]),
-        )
-        if "nhead" in discriminator_config:
-            discriminator.nhead = int(discriminator_config["nhead"])
-        if "num_layers" in discriminator_config:
-            discriminator.num_layers = int(discriminator_config["num_layers"])
-        return discriminator
+    def object_hook(self, config):
+        if "dtype" in config:
+            discriminator = DiscriminatorConfig(
+                dtype=DiscriminatorType(config["dtype"]),
+                length=int(config["length"]),
+                weight=float(config["weight"]),
+                num_labels=int(config["num_labels"]),
+                label_id=str(config["label_id"]),
+                hidden_size=int(config["hidden_size"]),
+            )
+            if "nhead" in config:
+                discriminator.nhead = int(config["nhead"])
+            if "num_layers" in config:
+                discriminator.num_layers = int(config["num_layers"])
+            return discriminator
+        if "model_name" in config:
+            return TrainingConfig(config)
+        return config
 
 
 class XLMRobertSingleTokenDiscriminator(nn.Module):
