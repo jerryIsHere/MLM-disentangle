@@ -42,7 +42,7 @@
         }
     ],
     "training": {
-        "training_name": "first_trail",
+        "model_name": "first_trail",
         "num_frozen_layers": 18
     }
 }

@@ -25,7 +25,7 @@ XLMRobertaConfig = transformers.AutoConfig.from_pretrained(backbone_name)
 
 with open(args.config_json, "r") as outfile:
     experinment_config_dict = json.load(outfile, cls=ExperinmentConfigSerializer)
-setattr(XLMRobertaConfig, "discriminators", experinment_config_dict["discrimintors"])
+setattr(XLMRobertaConfig, "discriminators", experinment_config_dict["discriminators"])
 
 multitask_model = MultitaskModel.create(
     backbone_name="xlm-roberta-large",
