@@ -3,7 +3,7 @@ from disentangled_transformer import (
     XLMRobertaForDisentanglement,
     DiscriminatorType,
     DiscriminatorConfig,
-    DiscriminatorConfigSerializer,
+    ExperinmentConfigSerializer,
 )
 import oscar_corpus
 import transformers
@@ -16,7 +16,7 @@ parser.add_argument(
     metavar="path",
     type=str,
     help="path to configuration json file",
-    default="experinment_configuaration.json",
+    default="default_experinment_configuaration.json",
 )
 args = parser.parse_args()
 
