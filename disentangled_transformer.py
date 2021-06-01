@@ -2,7 +2,7 @@ import numpy as np
 import torch
 import torch.nn as nn
 import transformers
-from typing import Optional
+from typing import Optional, Tuple
 
 # https://colab.research.google.com/github/zphang/zphang.github.io/blob/master/files/notebooks/Multi_task_Training_with_Transformers_NLP.ipynb#scrollTo=7zSZsp8Cb7gd
 
