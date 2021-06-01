@@ -174,6 +174,13 @@ class ExperinmentConfigSerializer(json.JSONEncoder, json.JSONDecoder):
         return config
 
 
+class DisentanglerOutput(ModelOutput):
+    loss: Optional[torch.FloatTensor] = None
+    logits: dict[torch.FloatTensor] = None
+    hidden_states: Optional[Tuple[torch.FloatTensor]] = None
+    attentions: Optional[Tuple[torch.FloatTensor]] = None
+
+
 class XLMRobertSingleTokenDiscriminator(nn.Module):
     """Head for sentence-level classification tasks."""
 
@@ -329,7 +336,7 @@ class XLMRobertaForDisentanglement(RobertaPreTrainedModel):
             output = (discriminator_logits,) + outputs[2:]
             return ((loss,) + output) if loss is not None else output
 
-        return SequenceClassifierOutput(
+        return DisentanglerOutput(
             loss=loss,
             logits=discriminator_logits,
             hidden_states=outputs.hidden_states,
