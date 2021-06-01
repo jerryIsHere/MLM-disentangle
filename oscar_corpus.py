@@ -232,7 +232,7 @@ def get_token_frequency(lan):
     import pickle
 
     filehandler = open(
-        "/gpfs1/scratch/ckchan666/oscar_token_frequency/" + lan + ".pickle", "r"
+        "/gpfs1/scratch/ckchan666/oscar_token_frequency/" + lan + ".pickle", "rb"
     )
     object = pickle.load(filehandler)
 
@@ -484,23 +484,23 @@ class MLMDisentangleDataset(torch.utils.data.IterableDataset):
                         ),
                         "genus_label": torch.nn.functional.one_hot(
                             torch.tensor(
-                                np.where(
+                                np.nonzero(
                                     genus
                                     == languages[languages.iso639_1 == lan].genus.iloc[
                                         0
                                     ]
-                                )
+                                )[0]
                             ),
                             num_classes=len(genus),
                         ),
                         "family_label": torch.nn.functional.one_hot(
                             torch.tensor(
-                                np.where(
-                                    genus
+                                np.nonzero(
+                                    family
                                     == languages[languages.iso639_1 == lan].family.iloc[
                                         0
                                     ]
-                                )
+                                )[0]
                             ),
                             num_classes=len(family),
                         ),
