@@ -301,16 +301,35 @@ class XLMRobertaForDisentanglement(RobertaPreTrainedModel):
             loss_fct = CrossEntropyLoss()
             loss = 0
             for i, discriminator_config in enumerate(self.discriminators_config):
-                loss = (
-                    loss
-                    + loss_fct(
-                        discriminator_logits[i].view(
-                            -1, discriminator_config.num_labels
-                        ),
-                        labels[discriminator_config.label_id].view(-1),
+                if discriminator_config.dtype == DiscriminatorType.SingleToken:
+                    loss = (
+                        loss
+                        + loss_fct(
+                            discriminator_logits[i].view(
+                                -1, discriminator_config.num_labels
+                            ),
+                            labels[discriminator_config.label_id]
+                            .view(-1)
+                            .repeat_interleave(
+                                int(
+                                    torch.numel(discriminator_logits[i])
+                                    / discriminator_config.num_labels
+                                )
+                            ),
+                        )
+                        * discriminator_config.weight
                     )
-                    * discriminator_config.weight
-                )
+                elif discriminator_config.dtype == DiscriminatorType.FullSequence:
+                    loss = (
+                        loss
+                        + loss_fct(
+                            discriminator_logits[i].view(
+                                -1, discriminator_config.num_labels
+                            ),
+                            labels[discriminator_config.label_id].view(-1),
+                        )
+                        * discriminator_config.weight
+                    )
 
         if not return_dict:
             output = (discriminator_logits,) + outputs[2:]
