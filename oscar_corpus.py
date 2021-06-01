@@ -235,6 +235,7 @@ def get_token_frequency(lan):
         "/gpfs1/scratch/ckchan666/oscar_token_frequency/" + lan + ".pickle", "rb"
     )
     object = pickle.load(filehandler)
+    return object
 
 
 def put_token_frequency(lan, word_frequency):
