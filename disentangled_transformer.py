@@ -296,7 +296,6 @@ class XLMRobertaForDisentanglement(RobertaPreTrainedModel):
             )
 
         loss = None
-        print(discriminator_logits)
         if labels is not None:
             loss_fct = CrossEntropyLoss()
             loss = 0
@@ -310,12 +309,7 @@ class XLMRobertaForDisentanglement(RobertaPreTrainedModel):
                             ),
                             labels[discriminator_config.label_id]
                             .view(-1)
-                            .repeat_interleave(
-                                int(
-                                    torch.numel(discriminator_logits[i])
-                                    / discriminator_config.num_labels
-                                )
-                            ),
+                            .repeat_interleave(input_ids.shape[1]),
                         )
                         * discriminator_config.weight
                     )
