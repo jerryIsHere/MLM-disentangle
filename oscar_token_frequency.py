@@ -26,6 +26,8 @@ import collections, time
 
 t = time.time()
 for lan in xtreme_ds.xtreme_lan:
+    if oscar_corpus.get_token_fequency(lan) != None:
+        continue
     dataset = oscar_corpus.get_corpus(lan)
     example = args.example
     if len(dataset) < example:

@@ -231,11 +231,13 @@ def get_corpus(lan):
 def get_token_frequency(lan):
     import pickle
 
-    filehandler = open(
-        "/gpfs1/scratch/ckchan666/oscar_token_frequency/" + lan + ".pickle", "rb"
-    )
-    object = pickle.load(filehandler)
-    return object
+    try:
+        path = "/gpfs1/scratch/ckchan666/oscar_token_frequency/" + lan + ".pickle"
+        filehandler = open(path, "rb")
+        object = pickle.load(filehandler)
+        return object
+    except:
+        return None
 
 
 def put_token_frequency(lan, word_frequency):
