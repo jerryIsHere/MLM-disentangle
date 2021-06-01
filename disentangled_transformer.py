@@ -296,6 +296,7 @@ class XLMRobertaForDisentanglement(RobertaPreTrainedModel):
             )
 
         loss = None
+        print(discriminator_logits)
         if labels is not None:
             loss_fct = CrossEntropyLoss()
             loss = 0

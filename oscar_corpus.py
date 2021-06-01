@@ -482,30 +482,18 @@ class MLMDisentangleDataset(torch.utils.data.IterableDataset):
                     yield {
                         "tokens": torch.from_numpy(txt_tokens).int(),
                         "masked_tokens": torch.from_numpy(txt_masked_tokens).int(),
-                        "language_id": torch.nn.functional.one_hot(
-                            torch.tensor(lan_idx), num_classes=len(xtreme_ds.xtreme_lan)
+                        "language_id": torch.tensor(lan_idx),
+                        "genus_label": torch.tensor(
+                            np.nonzero(
+                                genus
+                                == languages[languages.iso639_1 == lan].genus.iloc[0]
+                            )[0]
                         ),
-                        "genus_label": torch.nn.functional.one_hot(
-                            torch.tensor(
-                                np.nonzero(
-                                    genus
-                                    == languages[languages.iso639_1 == lan].genus.iloc[
-                                        0
-                                    ]
-                                )[0]
-                            ),
-                            num_classes=len(genus),
-                        ),
-                        "family_label": torch.nn.functional.one_hot(
-                            torch.tensor(
-                                np.nonzero(
-                                    family
-                                    == languages[languages.iso639_1 == lan].family.iloc[
-                                        0
-                                    ]
-                                )[0]
-                            ),
-                            num_classes=len(family),
+                        "family_label": torch.tensor(
+                            np.nonzero(
+                                family
+                                == languages[languages.iso639_1 == lan].family.iloc[0]
+                            )[0]
                         ),
                     }
                     break
