@@ -176,7 +176,7 @@ class ExperinmentConfigSerializer(json.JSONEncoder, json.JSONDecoder):
 
 class DisentanglerOutput(transformers.file_utils.ModelOutput):
     loss: Optional[torch.FloatTensor] = None
-    logits: dict[torch.FloatTensor] = None
+    logits: dict[int,torch.FloatTensor] = None
     hidden_states: Optional[Tuple[torch.FloatTensor]] = None
     attentions: Optional[Tuple[torch.FloatTensor]] = None
 
