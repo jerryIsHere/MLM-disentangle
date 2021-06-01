@@ -4,7 +4,7 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=128
 #SBATCH --mem=32GB
-#SBATCH --time=72:00:00
+#SBATCH --time=1:00:00
 #SBATCH --output=/gpfs1/home/ckchan666/job/oscar_token_frequency/task.log
 #SBATCH --error=/gpfs1/home/ckchan666/job/oscar_token_frequency/task.err
 # 65536

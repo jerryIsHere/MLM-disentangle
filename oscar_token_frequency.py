@@ -45,7 +45,9 @@ for lan in xtreme_ds.xtreme_lan:
             [np.arange(i, example, pool._processes) for i in range(pool._processes)],
         )
         word_frequency = reduce(
-            combine, pool.map(partial(reduce, combine), es_per_process)
+            combine,
+            pool.map(partial(reduce, combine), es_per_process),
+            collections.Counter(),
         )
     oscar_corpus.put_token_frequency(lan, word_frequency)
 
