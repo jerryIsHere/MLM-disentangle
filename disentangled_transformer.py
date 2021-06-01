@@ -2,7 +2,6 @@ import numpy as np
 import torch
 import torch.nn as nn
 import transformers
-
 # https://colab.research.google.com/github/zphang/zphang.github.io/blob/master/files/notebooks/Multi_task_Training_with_Transformers_NLP.ipynb#scrollTo=7zSZsp8Cb7gd
 
 
@@ -174,7 +173,7 @@ class ExperinmentConfigSerializer(json.JSONEncoder, json.JSONDecoder):
         return config
 
 
-class DisentanglerOutput(ModelOutput):
+class DisentanglerOutput(transformers.file_utils.ModelOutput):
     loss: Optional[torch.FloatTensor] = None
     logits: dict[torch.FloatTensor] = None
     hidden_states: Optional[Tuple[torch.FloatTensor]] = None
