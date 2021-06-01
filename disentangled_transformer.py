@@ -219,7 +219,7 @@ class XLMRobertFullSequenceDiscriminator(nn.Module):
         )
         self.dropout = nn.Dropout(config.hidden_dropout_prob)
         self.classifier = nn.Linear(
-            discriminator_config.hidden_size, discriminator_config.num_labels
+            discriminator_config.length, discriminator_config.num_labels
         )
 
     def forward(self, features, **kwargs):
