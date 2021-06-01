@@ -234,8 +234,8 @@ def get_token_frequency(lan):
     try:
         path = "/gpfs1/scratch/ckchan666/oscar_token_frequency/" + lan + ".pickle"
         filehandler = open(path, "rb")
-        object = pickle.load(filehandler)
-        return object
+        obj = pickle.load(filehandler)
+        return obj
     except:
         return None
 
