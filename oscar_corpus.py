@@ -480,8 +480,8 @@ class MLMDisentangleDataset(torch.utils.data.IterableDataset):
                         0 : tokenizer.model_max_length
                     ]
                     yield {
-                        "tokens": torch.from_numpy(txt_tokens).int(),
-                        "masked_tokens": torch.from_numpy(txt_masked_tokens).int(),
+                        "tokens": torch.from_numpy(txt_tokens).long(),
+                        "masked_tokens": torch.from_numpy(txt_masked_tokens).long(),
                         "language_id": torch.tensor(lan_idx),
                         "genus_label": torch.tensor(
                             np.nonzero(

@@ -2,53 +2,53 @@
     "discriminators": [
         {
             "dtype": "SingleToken",
-            "length": 992,
+            "length": 744,
             "weight": 1.0,
             "num_labels": 5,
             "label_id": "language_id",
-            "hidden_size": 512,
+            "hidden_size": 384,
             "nhead": 1,
             "num_layers": 1
-        },
-        {
-            "dtype": "FullSequence",
-            "length": 512,
-            "weight": 1.0,
-            "num_labels": 5,
-            "label_id": "language_id",
-            "hidden_size": 128,
-            "nhead": 4,
-            "num_layers": 3
         },
         {
             "dtype": "FullSequence",
             "length": 384,
             "weight": 1.0,
             "num_labels": 5,
-            "label_id": "family_label",
-            "hidden_size": 128,
+            "label_id": "language_id",
+            "hidden_size": 96,
             "nhead": 4,
             "num_layers": 3
         },
         {
             "dtype": "FullSequence",
-            "length": 256,
+            "length": 288,
+            "weight": 1.0,
+            "num_labels": 5,
+            "label_id": "family_label",
+            "hidden_size": 96,
+            "nhead": 4,
+            "num_layers": 3
+        },
+        {
+            "dtype": "FullSequence",
+            "length": 192,
             "weight": 1.0,
             "num_labels": 6,
             "label_id": "genus_label",
-            "hidden_size": 128,
+            "hidden_size": 96,
             "nhead": 4,
             "num_layers": 3
         }
     ],
     "training": {
-        "backbone_name": "xlm-roberta-large",
+        "backbone_name": "xlm-roberta-base",
         "model_name": "default_configuration",
         "gradient_acc_step": 16,
         "batch_size": 2,
         "max_step": 10000,
         "log_step": 100,
-        "num_frozen_layers": 18,
+        "num_frozen_layers": 9,
 
 
         "disentangle_lr": 4e-4,
