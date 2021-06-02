@@ -44,8 +44,8 @@
         "model_name": "default_configuration",
         "gradient_acc_step": 4,
         "batch_size": 2,
-        "max_step": 10000,
-        "log_step": 100,
+        "max_step": 1000,
+        "log_step": 50,
         "num_frozen_layers": 9,
 
 
