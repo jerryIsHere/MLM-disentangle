@@ -29,12 +29,13 @@ parser.add_argument(
 )
 args = parser.parse_args()
 args.time = sum([a * b for a, b in zip([3600, 60, 1], map(int, args.time.split(":")))])
+with open(args.config_json, "r") as outfile:
+    experinment_config_dict = json.load(outfile, cls=ExperinmentConfigSerializer)
+
 
 backbone_name = "xlm-roberta-large"
 XLMRobertaConfig = transformers.AutoConfig.from_pretrained(backbone_name)
 
-with open(args.config_json, "r") as outfile:
-    experinment_config_dict = json.load(outfile, cls=ExperinmentConfigSerializer)
 setattr(XLMRobertaConfig, "discriminators", experinment_config_dict["discriminators"])
 
 multitask_model = MultitaskModel.create(
@@ -94,12 +95,14 @@ log_step = (
     experinment_config_dict["training"].log_step
     / experinment_config_dict["training"].batch_size
 )
-max_step = log_step.max_step / experinment_config_dict["training"].batch_size
+max_step = (
+    experinment_config_dict["training"].max_step
+    / experinment_config_dict["training"].batch_size
+)
 for i, batch in enumerate(dataloader):
-    print(i)
     # mlm input to gpu
-    batch["masked_tokens"] = (batch["masked_tokens"].cuda(),)
-    batch["tokens"] = (batch["tokens"].cuda(),)
+    batch["masked_tokens"] = batch["masked_tokens"].cuda()
+    batch["tokens"] = batch["tokens"].cuda()
 
     # mlm model to gpu
     multitask_model.taskmodels_dict["mlm"].cuda()
