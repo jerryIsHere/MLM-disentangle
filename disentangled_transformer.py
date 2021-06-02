@@ -248,7 +248,11 @@ class XLMRobertaForDisentanglement(RobertaPreTrainedModel):
 
         self.disentangling = {}
         self.discriminators_config = config.discriminators
-        for i, discriminator_config in enumerate(self.discriminators_config):
+        self.discriminators_config = {
+            str(i): discriminator_config
+            for i, discriminator_config in enumerate(self.discriminators_config)
+        }
+        for i, discriminator_config in self.discriminators_config.items():
             if discriminator_config.dtype == DiscriminatorType.SingleToken:
                 discriminator = XLMRobertSingleTokenDiscriminator(
                     config, discriminator_config
@@ -298,7 +302,7 @@ class XLMRobertaForDisentanglement(RobertaPreTrainedModel):
         )
         sequence_output = outputs[0]
         discriminator_logits = {}
-        for i, discriminator_config in enumerate(self.discriminators_config):
+        for i, discriminator_config in self.discriminators_config.items():
             discriminator_logits[i] = self.disentangling[i](
                 sequence_output,
                 attention_mask=attention_mask,
@@ -308,7 +312,7 @@ class XLMRobertaForDisentanglement(RobertaPreTrainedModel):
         if labels is not None:
             loss_fct = CrossEntropyLoss()
             loss = 0
-            for i, discriminator_config in enumerate(self.discriminators_config):
+            for i, discriminator_config in self.discriminators_config.items():
                 if discriminator_config.dtype == DiscriminatorType.SingleToken:
                     loss = (
                         loss
