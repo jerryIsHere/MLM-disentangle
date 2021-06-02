@@ -199,11 +199,8 @@ class XLMRobertSingleTokenDiscriminator(nn.Module):
 
     def forward(self, features, **kwargs):
         x = features[:, :, 0 : self.portion_length]
-        print(x.type())
         x = self.revgrad(x)
-        print(x.type())
         x = self.dropout(x)
-        print(x.type())
         x = self.dense(x)
         x = torch.tanh(x)
         x = self.dropout(x)
@@ -261,6 +258,7 @@ class XLMRobertaForDisentanglement(RobertaPreTrainedModel):
                     config, discriminator_config
                 )
             self.disentangling[i] = discriminator
+        self.disentangling = nn.ModuleDict(self.disentangling)
         self.roberta = RobertaModel(config, add_pooling_layer=False)
         self.init_weights()
 
