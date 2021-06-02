@@ -199,8 +199,11 @@ class XLMRobertSingleTokenDiscriminator(nn.Module):
 
     def forward(self, features, **kwargs):
         x = features[:, :, 0 : self.portion_length]
+        print(x.type())
         x = self.revgrad(x)
+        print(x.type())
         x = self.dropout(x)
+        print(x.type())
         x = self.dense(x)
         x = torch.tanh(x)
         x = self.dropout(x)

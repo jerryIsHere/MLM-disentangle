@@ -95,9 +95,11 @@ for task in multitask_model.taskmodels_dict:
     multitask_model.taskmodels_dict[task].to(torch.device("cpu"))
 mlmLoss = 0
 disentangleLoss = 0
-log_step = arg.log_step
-max_step = arg.max_step
+log_step = args.log_step
+max_step = args.max_step
 for i, batch in enumerate(dataloader):
+    for item_name in batch:
+        batch[item_name] = batch[item_name].to(torch.device("cuda"))
     multitask_model.taskmodels_dict["disentangle"].zero_grad()
     multitask_model.taskmodels_dict["disentangle"].to(torch.device("cuda"))
     disentangleOutput = multitask_model.taskmodels_dict["disentangle"](
