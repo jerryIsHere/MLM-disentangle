@@ -42,8 +42,8 @@
     "training": {
         "backbone_name": "xlm-roberta-base",
         "model_name": "default_configuration",
-        "gradient_acc_step": 1,
-        "batch_size": 1,
+        "gradient_acc_step": 8,
+        "batch_size": 2,
         "max_step": 1000,
         "log_step": 50,
         "num_frozen_layers": 9,
