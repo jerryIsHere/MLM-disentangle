@@ -87,17 +87,19 @@ dataloader = torch.utils.data.DataLoader(
     MLMD_ds, batch_size=experinment_config_dict["training"].batch_size, num_workers=0
 )
 
+import gc
+
 for task in multitask_model.taskmodels_dict:
     multitask_model.taskmodels_dict[task].cpu()
-mlmLoss = 0
-disentangleLoss = 0
-log_step = (
-    experinment_config_dict["training"].log_step
-    / experinment_config_dict["training"].batch_size
-)
-max_step = (
-    experinment_config_dict["training"].max_step
-    / experinment_config_dict["training"].batch_size
+mlmLoss = 0.0
+disentangleLoss = 0.0
+gradient_step = 0
+print(
+    "run for "
+    + str(experinment_config_dict["training"].max_step)
+    + " step with "
+    + str(experinment_config_dict["training"].gradient_acc_size)
+    + " gradient acc size"
 )
 for i, batch in enumerate(dataloader):
     # mlm input to gpu
@@ -113,9 +115,9 @@ for i, batch in enumerate(dataloader):
     mlmOutput["loss"].backward()
 
     # mlm model & input to cpu
+    mlmLoss = mlmLoss + mlmOutput["loss"].item()
     multitask_model.taskmodels_dict["mlm"].cpu()
-    for output in mlmOutput:
-        mlmOutput[output] = mlmOutput[output].cpu()
+    del mlmOutput
     batch["tokens"] = batch["tokens"].cpu()
 
     # disentangle input to gpu
@@ -136,37 +138,64 @@ for i, batch in enumerate(dataloader):
     disentangleOutput["loss"].backward()
 
     # disentangle model & input to cpu
+    disentangleLoss = disentangleLoss + disentangleOutput["loss"].item()
     multitask_model.taskmodels_dict["disentangle"].cpu()
     for output in disentangleOutput:
         if disentangleOutput[output] == None:
             continue
         if output == "logits":
-            for j in disentangleOutput[output]:
-                disentangleOutput[output][j] = disentangleOutput[output][j].cpu()
-        else:
-            disentangleOutput[output] = disentangleOutput[output].cpu()
-    for item_name in batch:
-        batch[item_name] = batch[item_name].cpu()
-
-    # count loss
-    mlmLoss = mlmLoss + mlmOutput["loss"]
-    disentangleLoss = disentangleLoss + disentangleOutput["loss"]
+            disentangleOutput[output].clear()
+    batch.clear()
+    del batch
 
     if (i + 1) % (
-        experinment_config_dict["training"].gradient_acc_step
+        experinment_config_dict["training"].gradient_acc_size
         / experinment_config_dict["training"].batch_size
     ) == 0:
         optimizermlm.step()
         multitask_model.taskmodels_dict["mlm"].zero_grad()
         optimizerdisentangle.step()
         multitask_model.taskmodels_dict["disentangle"].zero_grad()
+        gradient_step += 1
+        if (gradient_step + 1) % experinment_config_dict["training"].log_step == 0:
+            # writer.add_scalar("mlm lr", scheduler.get_lr()[0], global_step)
+            # writer.add_scalar("disentangle lr", scheduler.get_lr()[0], global_step)
+            print(
+                "mlm loss ("
+                + str(gradient_step)
+                + "): "
+                + str(mlmLoss / experinment_config_dict["training"].log_step)
+            )
+            print(
+                "disentangle loss ("
+                + str(gradient_step)
+                + "): "
+                + str(disentangleLoss / experinment_config_dict["training"].log_step)
+            )
+            writer.add_scalar(
+                "mlm loss",
+                mlmLoss / experinment_config_dict["training"].log_step,
+                gradient_step,
+            )
+            writer.add_scalar(
+                "disentangle loss",
+                disentangleLoss / experinment_config_dict["training"].log_step,
+                gradient_step,
+            )
+            mlmLoss = 0
+            disentangleLoss = 0
+            multitask_model.save_pretrained(
+                "./" + experinment_config_dict["training"].model_name,
+            )
+        if (
+            gradient_step > experinment_config_dict["training"].max_step
+            or time.time() - start_time > 0.9 * args.time
+        ):
+            break
+    gc.collect()
 
-    if (i + 1) % log_step == 0:
-        writer.add_scalar("mlm loss", mlmLoss / log_step, i)
-        writer.add_scalar("disentangle loss", disentangleLoss / log_step, i)
-        mlmLoss = 0
-        disentangleLoss = 0
-    if i > max_step or time.time() - start_time > 0.9 * args.time:
-        break
 
-multitask_model.save_pretrained("./" + experinment_config_dict["training"].model_name,)
+multitask_model.save_pretrained(
+    "./" + experinment_config_dict["training"].model_name,
+)
+print(str(time.time() - start_time) + " seconds elapsed")
