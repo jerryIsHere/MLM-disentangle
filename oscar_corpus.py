@@ -496,5 +496,10 @@ class MLMDisentangleDataset(torch.utils.data.IterableDataset):
                             )[0]
                         ),
                     }
+                    del masked_tokens
+                    del prob
+                    del chosen
+                    del txt_masked_tokens
+                    del txt_tokens
                     break
             lan_idx = (lan_idx + 1) % len(xtreme_ds.xtreme_lan)
