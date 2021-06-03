@@ -42,13 +42,11 @@
     "training": {
         "backbone_name": "xlm-roberta-large",
         "model_name": "default_configuration",
-        "gradient_acc_step": 16,
+        "gradient_acc_size": 16,
         "batch_size": 2,
         "max_step": 10000,
         "log_step": 100,
         "num_frozen_layers": 18,
-
-
         "disentangle_lr": 4e-4,
         "disentangle_beta1": 0.9,
         "disentangle_beta2": 0.98,

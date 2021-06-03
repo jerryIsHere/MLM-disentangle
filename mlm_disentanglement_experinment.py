@@ -168,3 +168,5 @@ for i, batch in enumerate(dataloader):
         disentangleLoss = 0
     if i > max_step or time.time() - start_time > 0.9 * args.time:
         break
+
+multitask_model.save_pretrained("./" + experinment_config_dict["training"].model_name,)
