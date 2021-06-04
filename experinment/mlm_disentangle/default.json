@@ -41,7 +41,7 @@
     ],
     "training": {
         "backbone_name": "xlm-roberta-large",
-        "model_name": "default_configuration",
+        "model_name": "mlm_disentangle_default",
         "gradient_acc_size": 16,
         "batch_size": 2,
         "max_step": 10000,

@@ -11,6 +11,7 @@ import json
 import argparse
 import torch
 import time
+import os
 
 start_time = time.time()
 parser = argparse.ArgumentParser(description="token frequency of 40 corpus")
@@ -19,7 +20,7 @@ parser.add_argument(
     metavar="path",
     type=str,
     help="path to configuration json file",
-    default="config/default_experinment.json",
+    default=os.path.join(os.path.dirname(os.path.abspath(__file__)), "/default.json"),
 )
 parser.add_argument(
     "time",
@@ -78,7 +79,9 @@ optimizerdisentangle = torch.optim.Adam(
 from torch.utils.tensorboard import SummaryWriter
 
 writer = SummaryWriter(
-    "/gpfs1/home/ckchan666/mlm_disentangle/tensorboard"
+    "/gpfs1/home/ckchan666/mlm_disentangle_experinment/tensorboard/"
+    + os.path.dirname(os.path.abspath(__file__)).split("/")[-1]
+    + "/"
     + experinment_config_dict["training"].model_name
 )
 
@@ -197,6 +200,9 @@ for i, batch in enumerate(dataloader):
 
 
 multitask_model.save_pretrained(
-    "./" + experinment_config_dict["training"].model_name,
+    "/gpfs1/home/ckchan666/mlm_disentangle_experinment/model/"
+    + os.path.dirname(os.path.abspath(__file__)).split("/")[-1]
+    + "/"
+    + experinment_config_dict["training"].model_name,
 )
 print(str(time.time() - start_time) + " seconds elapsed")
