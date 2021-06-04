@@ -34,20 +34,20 @@ with open(args.config_json, "r") as outfile:
 
 
 backbone_name = "xlm-roberta-large"
-XLMRobertaConfig = transformers.AutoConfig.from_pretrained(backbone_name)
+XLMRConfig = transformers.AutoConfig.from_pretrained(backbone_name)
 
-setattr(XLMRobertaConfig, "discriminators", experinment_config_dict["discriminators"])
+setattr(XLMRConfig, "discriminators", experinment_config_dict["discriminators"])
 
 multitask_model = MultitaskModel.create(
     backbone_name=backbone_name,
     task_dict={
         "mlm": {
-            "type": transformers.AutoModelForMaskedLM,
-            "config": transformers.AutoConfig.from_pretrained(backbone_name),
+            "type": transformers.XLMRobertaForMaskedLM,
+            "config": transformers.XLMRobertaConfig.from_pretrained(backbone_name),
         },
         "disentangle": {
             "type": XLMRobertaForDisentanglement,
-            "config": XLMRobertaConfig,
+            "config": XLMRConfig,
         },
     },
 )
@@ -118,7 +118,7 @@ for i, batch in enumerate(dataloader):
     mlmLoss = mlmLoss + mlmOutput["loss"].item()
     multitask_model.taskmodels_dict["mlm"].cpu()
     del mlmOutput
-    batch["tokens"] = batch["tokens"].cpu()
+    del batch["tokens"]
 
     # disentangle input to gpu
     batch["language_id"] = batch["language_id"].cuda()
@@ -145,6 +145,7 @@ for i, batch in enumerate(dataloader):
             continue
         if output == "logits":
             disentangleOutput[output].clear()
+    del disentangleOutput
     batch.clear()
     del batch
 
