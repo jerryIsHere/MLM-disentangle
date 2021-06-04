@@ -1,13 +1,13 @@
 TASK = {
     "udpos": {},  # POS
     "panx": {},  # NER
-    "xnli": {},
-    "pawsx": {},
-    "xquad": {},
-    "mlqa": {},
-    "tydiqa": {},
-    "bucc2018": {},
-    "tatoeba": {},
+    "xnli": {},  # sentence classification
+    "pawsx": {},  # sentence classification
+    "xquad": {},  # QA
+    "mlqa": {},  # QA
+    "tydiqa": {},  # QA
+    "bucc2018": {},  # retrival
+    "tatoeba": {},  # retrival
 }
 TASK["udpos"]["train"] = ("xtreme", "udpos.English", "train")
 TASK["udpos"]["epochs"] = 10
@@ -477,3 +477,32 @@ xtreme_lan = {
     "yo",
     "zh",
 }
+from transformers import XLMRobertaTokenizer
+
+tokenizer = XLMRobertaTokenizer.from_pretrained(
+    "xlm-roberta-large",
+    cache_dir="/gpfs1/scratch/ckchan666/transformer_model_cache",
+)
+
+
+# class udposTrainDataset(torch.utils.data.Dataset):
+#     task = "udpos"
+
+#     def __init__(self):
+#         set_name, subset_name, split = TASK[task]["train"]
+#         self.dataset = get_dataset(set_name, subset_name)[split]
+
+#     def __len__(self):
+#         return len(self.dataset)
+
+#     def __getitem__(self, id):
+#         features = self.dataset[id]
+#         txt = features['word']
+#         train_encodings = tokenizer.encode(
+#             txt,
+#             is_split_into_words=True,
+#             max_length=TASK[task]["max seq length"],
+#             truncation=True,
+#         )
+
+#         return

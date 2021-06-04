@@ -34,7 +34,7 @@ with open(args.config_json, "r") as outfile:
     experinment_config_dict = json.load(outfile, cls=ExperinmentConfigSerializer)
 
 
-backbone_name = "xlm-roberta-large"
+backbone_name = experinment_config_dict["training"].backbone_name
 XLMRConfig = transformers.AutoConfig.from_pretrained(backbone_name)
 
 setattr(XLMRConfig, "discriminators", experinment_config_dict["discriminators"])
