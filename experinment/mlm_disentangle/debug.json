@@ -1,0 +1,59 @@
+{
+    "discriminators": [
+        {
+            "dtype": "SingleToken",
+            "length": 992,
+            "weight": 1.0,
+            "num_labels": 40,
+            "label_id": "language_id",
+            "hidden_size": 512
+        },
+        {
+            "dtype": "FullSequence",
+            "length": 512,
+            "weight": 1.0,
+            "num_labels": 40,
+            "label_id": "language_id",
+            "hidden_size": 128,
+            "nhead": 4,
+            "num_layers": 3
+        },
+        {
+            "dtype": "FullSequence",
+            "length": 384,
+            "weight": 1.0,
+            "num_labels": 14,
+            "label_id": "family_label",
+            "hidden_size": 128,
+            "nhead": 4,
+            "num_layers": 3
+        },
+        {
+            "dtype": "FullSequence",
+            "length": 256,
+            "weight": 1.0,
+            "num_labels": 25,
+            "label_id": "genus_label",
+            "hidden_size": 128,
+            "nhead": 4,
+            "num_layers": 3
+        }
+    ],
+    "training": {
+        "backbone_name": "xlm-roberta-large",
+        "model_name": "mlm_disentangle_default",
+        "gradient_acc_size": 16,
+        "batch_size": 2,
+        "max_step": 200,
+        "log_step": 25,
+        "num_frozen_layers": 18,
+        "disentangle_lr": 4e-4,
+        "disentangle_beta1": 0.9,
+        "disentangle_beta2": 0.98,
+        "disentangle_eps": 1e-6,
+        "mlm_lr": 4e-4,
+        "mlm_beta1": 0.9,
+        "mlm_beta2": 0.98,
+        "mlm_eps": 1e-6
+    }
+}

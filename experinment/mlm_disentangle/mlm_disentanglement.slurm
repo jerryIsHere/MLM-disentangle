@@ -5,9 +5,9 @@
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=32GB
 #SBATCH --time=01:00:00
-#SBATCH --output=/gpfs1/home/ckchan666/job/oscar_token_frequency/task.log
-#SBATCH --error=/gpfs1/home/ckchan666/job/oscar_token_frequency/task.err
+#SBATCH --output=/gpfs1/home/ckchan666/mlm_disentangle_experinment/job/mlm_disentangle/task.log
+#SBATCH --error=/gpfs1/home/ckchan666/mlm_disentangle_experinment/job/mlm_disentangle/task.err
 
 module load python37
 source /gpfs1/home/ckchan666/mnlpEnv/bin/activate
-python /gpfs1/home/ckchan666/MLM-disentangle/experinment/mlm_disentangle/mlm_disentanglement_experinment.py 01:00:00
+python /gpfs1/home/ckchan666/MLM-disentangle/experinment/mlm_disentangle/mlm_disentanglement_experinment.py 01:00:00 --config_json /gpfs1/home/ckchan666/MLM-disentangle/experinment/mlm_disentangle/debug.json
