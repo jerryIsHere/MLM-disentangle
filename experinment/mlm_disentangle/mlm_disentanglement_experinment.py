@@ -32,7 +32,9 @@ args = parser.parse_args()
 args.time = sum([a * b for a, b in zip([3600, 60, 1], map(int, args.time.split(":")))])
 with open(args.config_json, "r") as outfile:
     experinment_config_dict = json.load(outfile, cls=ExperinmentConfigSerializer)
-
+experinment_config_dict["training"].model_name = (
+    os.path.abspath(args.config_json).split("/")[-1].split(".")[0]
+)
 
 backbone_name = experinment_config_dict["training"].backbone_name
 XLMRConfig = transformers.AutoConfig.from_pretrained(backbone_name)
@@ -191,10 +193,10 @@ for i, batch in enumerate(dataloader):
             multitask_model.save_pretrained(
                 "./" + experinment_config_dict["training"].model_name,
             )
-        if (
-            gradient_step > experinment_config_dict["training"].max_step
-            or time.time() - start_time > 0.9 * args.time
-        ):
+        if gradient_step >= experinment_config_dict["training"].max_step:
+            break
+        if time.time() - start_time > 0.9 * args.time:
+            print(str(time.time() - start_time) + " exceed 0.9 of the time limit")
             break
     gc.collect()
 
@@ -206,3 +208,5 @@ multitask_model.save_pretrained(
     + experinment_config_dict["training"].model_name,
 )
 print(str(time.time() - start_time) + " seconds elapsed")
+from resource import getrusage, RUSAGE_SELF
+print(str(getrusage(RUSAGE_SELF).ru_maxrss) + "KB used (peak)")
