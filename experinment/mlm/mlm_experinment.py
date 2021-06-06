@@ -1,11 +1,11 @@
-from disentangled_transformer import (
+from ...disentangled_transformer import (
     MultitaskModel,
     XLMRobertaForDisentanglement,
     DiscriminatorType,
     DiscriminatorConfig,
     ExperinmentConfigSerializer,
 )
-import oscar_corpus
+from ... import oscar_corpus
 import transformers
 import json
 import argparse
@@ -209,4 +209,5 @@ multitask_model.save_pretrained(
 )
 print(str(time.time() - start_time) + " seconds elapsed")
 from resource import getrusage, RUSAGE_SELF
+
 print(str(getrusage(RUSAGE_SELF).ru_maxrss) + "KB used (peak)")
