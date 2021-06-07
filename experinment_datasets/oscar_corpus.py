@@ -252,7 +252,7 @@ def put_token_frequency(lan, word_frequency):
 import torch
 from torch.utils.data import Dataset
 import spacy
-import xtreme_ds
+from . import xtreme_ds
 from transformers import XLMRobertaTokenizer
 import collections
 import numpy as np
