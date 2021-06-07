@@ -8,7 +8,7 @@ import torch
 import torch.nn as nn
 import torch.utils.checkpoint
 from torch.nn import MSELoss
-from experinment_util.discriminator_config import DiscriminatorType
+from experinment_util.discriminator_config import DiscriminatorType, DiscriminatorConfig
 from experinment_models.gradient_reverser import RevGrad
 
 
