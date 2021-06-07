@@ -1,4 +1,4 @@
-from .discriminator_config import DiscriminatorConfig, DiscriminatorType
+from discriminator_config import DiscriminatorConfig, DiscriminatorType
 import json
 
 
