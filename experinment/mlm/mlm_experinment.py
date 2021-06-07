@@ -1,5 +1,7 @@
-from ... import disentangled_transformer
-from ... import oscar_corpus
+from ...experinment_util.experinment_config import ExperinmentConfigSerializer
+from ...experinment_models.multitask_transformer import MultitaskModel
+from ...experinment_models.disentangled_transformer import XLMRobertaForDisentanglement
+from experinment_datasets import oscar_corpus
 import transformers
 import json
 import argparse
@@ -25,7 +27,7 @@ parser.add_argument(
 args = parser.parse_args()
 args.time = sum([a * b for a, b in zip([3600, 60, 1], map(int, args.time.split(":")))])
 with open(args.config_json, "r") as outfile:
-    experinment_config_dict = json.load(outfile, cls=disentangled_transformer.ExperinmentConfigSerializer)
+    experinment_config_dict = json.load(outfile, cls=ExperinmentConfigSerializer)
 experinment_config_dict["training"].model_name = (
     os.path.abspath(args.config_json).split("/")[-1].split(".")[0]
 )
@@ -35,7 +37,7 @@ XLMRConfig = transformers.AutoConfig.from_pretrained(backbone_name)
 
 setattr(XLMRConfig, "discriminators", experinment_config_dict["discriminators"])
 
-multitask_model = disentangled_transformer.MultitaskModel.create(
+multitask_model = MultitaskModel.create(
     backbone_name=backbone_name,
     task_dict={
         "mlm": {
@@ -43,7 +45,7 @@ multitask_model = disentangled_transformer.MultitaskModel.create(
             "config": transformers.XLMRobertaConfig.from_pretrained(backbone_name),
         },
         "disentangle": {
-            "type": disentangled_transformer.XLMRobertaForDisentanglement,
+            "type": XLMRobertaForDisentanglement,
             "config": XLMRConfig,
         },
     },
