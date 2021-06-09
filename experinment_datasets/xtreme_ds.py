@@ -1,3 +1,8 @@
+import os
+
+custom_xtreme_path = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)), "custom_xtreme.py"
+)
 TASK = {
     "udpos": {},  # POS
     "panx": {},  # NER
@@ -9,47 +14,47 @@ TASK = {
     "bucc2018": {},  # retrival
     "tatoeba": {},  # retrival
 }
-TASK["udpos"]["train"] = ("xtreme", "udpos.English", "train")
+TASK["udpos"]["train"] = (custom_xtreme_path, "udpos.English", "train")
 TASK["udpos"]["epochs"] = 10
 TASK["udpos"]["max seq length"] = 128
 TASK["udpos"]["learning rate"] = 2e-5
 TASK["udpos"]["weight decay"] = 0
 TASK["udpos"]["warmup step"] = 0
-TASK["udpos"]["validation"] = ("xtreme", "udpos.English", "validation")
+TASK["udpos"]["validation"] = (custom_xtreme_path, "udpos.English", "validation")
 TASK["udpos"]["test"] = {}
-TASK["udpos"]["test"]["en"] = ("xtreme", "udpos.English", "test")
-TASK["udpos"]["test"]["af"] = ("xtreme", "udpos.Afrikaans", "test")
-TASK["udpos"]["test"]["ar"] = ("xtreme", "udpos.Arabic", "test")
-TASK["udpos"]["test"]["eu"] = ("xtreme", "udpos.Basque", "test")
-TASK["udpos"]["test"]["bg"] = ("xtreme", "udpos.Bulgarian", "test")
-TASK["udpos"]["test"]["nl"] = ("xtreme", "udpos.Dutch", "test")
-TASK["udpos"]["test"]["et"] = ("xtreme", "udpos.Estonian", "test")
-TASK["udpos"]["test"]["fi"] = ("xtreme", "udpos.Finnish", "test")
-TASK["udpos"]["test"]["fr"] = ("xtreme", "udpos.French", "test")
-TASK["udpos"]["test"]["de"] = ("xtreme", "udpos.German", "test")
-TASK["udpos"]["test"]["el"] = ("xtreme", "udpos.Greek", "test")
-TASK["udpos"]["test"]["he"] = ("xtreme", "udpos.Hebrew", "test")
-TASK["udpos"]["test"]["hi"] = ("xtreme", "udpos.Hindi", "test")
-TASK["udpos"]["test"]["hu"] = ("xtreme", "udpos.Hungarian", "test")
-TASK["udpos"]["test"]["id"] = ("xtreme", "udpos.Indonesian", "test")
-TASK["udpos"]["test"]["it"] = ("xtreme", "udpos.Italian", "test")
-TASK["udpos"]["test"]["ja"] = ("xtreme", "udpos.Japanese", "test")
-TASK["udpos"]["test"]["kk"] = ("xtreme", "udpos.Kazakh", "test")
-TASK["udpos"]["test"]["ko"] = ("xtreme", "udpos.Korean", "test")
-TASK["udpos"]["test"]["zh"] = ("xtreme", "udpos.Chinese", "test")
-TASK["udpos"]["test"]["mr"] = ("xtreme", "udpos.Marathi", "test")
-TASK["udpos"]["test"]["fa"] = ("xtreme", "udpos.Persian", "test")
-TASK["udpos"]["test"]["pt"] = ("xtreme", "udpos.Portuguese", "test")
-TASK["udpos"]["test"]["ru"] = ("xtreme", "udpos.Russian", "test")
-TASK["udpos"]["test"]["es"] = ("xtreme", "udpos.Spanish", "test")
-TASK["udpos"]["test"]["tl"] = ("xtreme", "udpos.Tagalog", "test")
-TASK["udpos"]["test"]["ta"] = ("xtreme", "udpos.Tamil", "test")
-TASK["udpos"]["test"]["te"] = ("xtreme", "udpos.Telugu", "test")
-TASK["udpos"]["test"]["th"] = ("xtreme", "udpos.Thai", "test")
-TASK["udpos"]["test"]["tr"] = ("xtreme", "udpos.Turkish", "test")
-TASK["udpos"]["test"]["ur"] = ("xtreme", "udpos.Urdu", "test")
-TASK["udpos"]["test"]["vi"] = ("xtreme", "udpos.Vietnamese", "test")
-TASK["udpos"]["test"]["yo"] = ("xtreme", "udpos.Yoruba", "test")
+TASK["udpos"]["test"]["en"] = (custom_xtreme_path, "udpos.English", "test")
+TASK["udpos"]["test"]["af"] = (custom_xtreme_path, "udpos.Afrikaans", "test")
+TASK["udpos"]["test"]["ar"] = (custom_xtreme_path, "udpos.Arabic", "test")
+TASK["udpos"]["test"]["eu"] = (custom_xtreme_path, "udpos.Basque", "test")
+TASK["udpos"]["test"]["bg"] = (custom_xtreme_path, "udpos.Bulgarian", "test")
+TASK["udpos"]["test"]["nl"] = (custom_xtreme_path, "udpos.Dutch", "test")
+TASK["udpos"]["test"]["et"] = (custom_xtreme_path, "udpos.Estonian", "test")
+TASK["udpos"]["test"]["fi"] = (custom_xtreme_path, "udpos.Finnish", "test")
+TASK["udpos"]["test"]["fr"] = (custom_xtreme_path, "udpos.French", "test")
+TASK["udpos"]["test"]["de"] = (custom_xtreme_path, "udpos.German", "test")
+TASK["udpos"]["test"]["el"] = (custom_xtreme_path, "udpos.Greek", "test")
+TASK["udpos"]["test"]["he"] = (custom_xtreme_path, "udpos.Hebrew", "test")
+TASK["udpos"]["test"]["hi"] = (custom_xtreme_path, "udpos.Hindi", "test")
+TASK["udpos"]["test"]["hu"] = (custom_xtreme_path, "udpos.Hungarian", "test")
+TASK["udpos"]["test"]["id"] = (custom_xtreme_path, "udpos.Indonesian", "test")
+TASK["udpos"]["test"]["it"] = (custom_xtreme_path, "udpos.Italian", "test")
+TASK["udpos"]["test"]["ja"] = (custom_xtreme_path, "udpos.Japanese", "test")
+TASK["udpos"]["test"]["kk"] = (custom_xtreme_path, "udpos.Kazakh", "test")
+TASK["udpos"]["test"]["ko"] = (custom_xtreme_path, "udpos.Korean", "test")
+TASK["udpos"]["test"]["zh"] = (custom_xtreme_path, "udpos.Chinese", "test")
+TASK["udpos"]["test"]["mr"] = (custom_xtreme_path, "udpos.Marathi", "test")
+TASK["udpos"]["test"]["fa"] = (custom_xtreme_path, "udpos.Persian", "test")
+TASK["udpos"]["test"]["pt"] = (custom_xtreme_path, "udpos.Portuguese", "test")
+TASK["udpos"]["test"]["ru"] = (custom_xtreme_path, "udpos.Russian", "test")
+TASK["udpos"]["test"]["es"] = (custom_xtreme_path, "udpos.Spanish", "test")
+TASK["udpos"]["test"]["tl"] = (custom_xtreme_path, "udpos.Tagalog", "test")
+TASK["udpos"]["test"]["ta"] = (custom_xtreme_path, "udpos.Tamil", "test")
+TASK["udpos"]["test"]["te"] = (custom_xtreme_path, "udpos.Telugu", "test")
+TASK["udpos"]["test"]["th"] = (custom_xtreme_path, "udpos.Thai", "test")
+TASK["udpos"]["test"]["tr"] = (custom_xtreme_path, "udpos.Turkish", "test")
+TASK["udpos"]["test"]["ur"] = (custom_xtreme_path, "udpos.Urdu", "test")
+TASK["udpos"]["test"]["vi"] = (custom_xtreme_path, "udpos.Vietnamese", "test")
+TASK["udpos"]["test"]["yo"] = (custom_xtreme_path, "udpos.Yoruba", "test")
 
 
 TASK["panx"]["train"] = ("xtreme", "PAN-X.en", "train")
