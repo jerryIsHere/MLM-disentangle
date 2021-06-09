@@ -1005,7 +1005,11 @@ class Xtreme(datasets.GeneratorBasedBuilder):
                         if len(row) >= 10 and row[1] != "_" and row[3] != "_":
                             tokens.append(row[1])
                             pos_tags.append(row[3])
+                            print(row[1])
+                            print(row[3])
                         if len(row) == 0:
+                            print(tokens)
+                            print(pos_tags)
                             yield str(id_file) + "_" + str(id_row), {
                                 "tokens": tokens,
                                 "pos_tags": pos_tags,
