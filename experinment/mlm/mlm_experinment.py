@@ -193,7 +193,7 @@ for i, batch in enumerate(dataloader):
             break
         if time.time() - start_time > 0.9 * args.time:
             print(str(time.time() - start_time) + "s exceed 0.9 of the time limit")
-            print(str(i) + "th batch & " + str(gradient_step)+ "th gradient step")
+            print(str(gradient_step)+ "th gradient step")
             break
     gc.collect()
 
