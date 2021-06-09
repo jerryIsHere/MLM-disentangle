@@ -435,7 +435,7 @@ def summary():
                 )
 
 
-xtreme_lan = {
+xtreme_lan = [
     "af",
     "ar",
     "bg",
@@ -476,7 +476,7 @@ xtreme_lan = {
     "vi",
     "yo",
     "zh",
-}
+]
 from transformers import XLMRobertaTokenizer
 
 tokenizer = XLMRobertaTokenizer.from_pretrained(
