@@ -5,7 +5,7 @@
 #SBATCH --cpus-per-task=4
 #SBATCH --gres=gpu:1
 #SBATCH --mem=32GB
-#SBATCH --time=0-04:00:00
+#SBATCH --time=0-05:00:00
 #SBATCH --output=/gpfs1/home/ckchan666/mlm_disentangle_experinment/job/mlm/task.log
 #SBATCH --error=/gpfs1/home/ckchan666/mlm_disentangle_experinment/job/mlm/task.err
 
