@@ -1,10 +1,19 @@
-from experinment_datasets import oscar_corpus
-import torch
+from datasets import load_dataset
+import time
 
-MLMD_ds = oscar_corpus.MLMDisentangleDataset()
-dataloader = torch.utils.data.DataLoader(MLMD_ds, batch_size=2, num_workers=0)
-for i, batch in enumerate(dataloader):
-    print(i)
-    print(batch)
-    if i > 40:
-        break
+t = time.time()
+load_dataset(
+    "oscar",
+    "unshuffled_deduplicated_zh",
+    cache_dir="/gpfs1/scratch/ckchan666/oscar",
+)
+print(time.time() - t)
+
+t = time.time()
+load_dataset(
+    "oscar",
+    "unshuffled_deduplicated_zh",
+    cache_dir="/gpfs1/scratch/ckchan666/oscar",
+    ignore_verifications=True,
+)
+print(time.time() - t)
