@@ -95,6 +95,8 @@ for task in multitask_model.taskmodels_dict:
 mlmLoss = 0.0
 disentangleLoss = 0.0
 gradient_step = 0
+print("building time: " + str(time.time() - start_time) + "s")
+start_time = time.time()
 print(
     "run for "
     + str(experinment_config_dict["training"].max_step)
@@ -193,7 +195,7 @@ for i, batch in enumerate(dataloader):
             break
         if time.time() - start_time > 0.9 * args.time:
             print(str(time.time() - start_time) + "s exceed 0.9 of the time limit")
-            print(str(gradient_step)+ "th gradient step")
+            print(str(gradient_step) + "th gradient step")
             break
     gc.collect()
 
