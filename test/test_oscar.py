@@ -4,7 +4,7 @@ import time
 t = time.time()
 load_dataset(
     "oscar",
-    "unshuffled_deduplicated_zh",
+    "unshuffled_deduplicated_en",
     cache_dir="/gpfs1/scratch/ckchan666/oscar",
 )
 print(time.time() - t)
@@ -12,7 +12,7 @@ print(time.time() - t)
 t = time.time()
 load_dataset(
     "oscar",
-    "unshuffled_deduplicated_zh",
+    "unshuffled_deduplicated_en",
     cache_dir="/gpfs1/scratch/ckchan666/oscar",
     ignore_verifications=True,
 )
