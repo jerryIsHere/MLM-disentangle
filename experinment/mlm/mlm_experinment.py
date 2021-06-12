@@ -161,7 +161,20 @@ for i, batch in enumerate(dataloader):
         optimizerdisentangle.step()
         multitask_model.taskmodels_dict["disentangle"].zero_grad()
         gradient_step += 1
-        if (gradient_step + 1) % experinment_config_dict["training"].log_step == 0:
+        if gradient_step == 1:
+            print(
+                "mlm loss ("
+                + str(gradient_step)
+                + "): "
+                + str(mlmLoss / experinment_config_dict["training"].log_step)
+            )
+            print(
+                "disentangle loss ("
+                + str(gradient_step)
+                + "): "
+                + str(disentangleLoss / experinment_config_dict["training"].log_step)
+            )
+        if gradient_step % experinment_config_dict["training"].log_step == 0:
             # writer.add_scalar("mlm lr", scheduler.get_lr()[0], global_step)
             # writer.add_scalar("disentangle lr", scheduler.get_lr()[0], global_step)
             print(
