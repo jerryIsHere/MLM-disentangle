@@ -2,39 +2,39 @@
     "discriminators": [
         {
             "dtype": "SingleToken",
-            "length": 992,
-            "weight": 1.0,
+            "length": 744,
+            "weight": 0.01,
             "num_labels": 40,
             "label_id": "language_id",
-            "hidden_size": 512
-        },
-        {
-            "dtype": "FullSequence",
-            "length": 512,
-            "weight": 1.0,
-            "num_labels": 40,
-            "label_id": "language_id",
-            "hidden_size": 128,
-            "nhead": 4,
-            "num_layers": 3
+            "hidden_size": 384
         },
         {
             "dtype": "FullSequence",
             "length": 384,
-            "weight": 1.0,
-            "num_labels": 14,
-            "label_id": "family_label",
-            "hidden_size": 128,
+            "weight": 0.01,
+            "num_labels": 40,
+            "label_id": "language_id",
+            "hidden_size": 96,
             "nhead": 4,
             "num_layers": 3
         },
         {
             "dtype": "FullSequence",
-            "length": 256,
-            "weight": 1.0,
+            "length": 288,
+            "weight": 0.01,
+            "num_labels": 14,
+            "label_id": "family_label",
+            "hidden_size": 96,
+            "nhead": 4,
+            "num_layers": 3
+        },
+        {
+            "dtype": "FullSequence",
+            "length": 192,
+            "weight": 0.01,
             "num_labels": 25,
             "label_id": "genus_label",
-            "hidden_size": 128,
+            "hidden_size": 96,
             "nhead": 4,
             "num_layers": 3
         }
