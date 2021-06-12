@@ -405,7 +405,7 @@ def get_custom_corpus():
     import os
 
     return load_dataset(
-        os.path.join(os.path.dirname(os.path.abspath(__file__)), "custom_xtreme.py"),
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), "CustomOscar.py"),
         split="train",
         cache_dir="/gpfs1/scratch/ckchan666/custom_oscar",
     )

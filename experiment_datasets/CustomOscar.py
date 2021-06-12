@@ -17,7 +17,7 @@ import collections
 import numpy as np
 
 
-class Oscar(datasets.GeneratorBasedBuilder):
+class CustomOscar(datasets.GeneratorBasedBuilder):
     def _info(self):
 
         return datasets.DatasetInfo(
