@@ -1,4 +1,4 @@
-from experiment_util.experiment_config import experimentConfigSerializer
+from experiment_util.experiment_config import ExperimentConfigSerializer
 from experiment_models.multitask_transformer import MultitaskModel
 from experiment_models.disentangled_transformer import XLMRobertaForDisentanglement
 from experiment_datasets import oscar_corpus
@@ -27,7 +27,7 @@ parser.add_argument(
 args = parser.parse_args()
 args.time = sum([a * b for a, b in zip([3600, 60, 1], map(int, args.time.split(":")))])
 with open(args.config_json, "r") as outfile:
-    experiment_config_dict = json.load(outfile, cls=experimentConfigSerializer)
+    experiment_config_dict = json.load(outfile, cls=ExperimentConfigSerializer)
 experiment_config_dict["training"].model_name = (
     os.path.abspath(args.config_json).split("/")[-1].split(".")[0]
 )

@@ -8,12 +8,12 @@ class TrainingConfig:
             setattr(self, key, dictionary[key])
 
 
-class experimentConfigSerializer(json.JSONEncoder, json.JSONDecoder):
+class ExperimentConfigSerializer(json.JSONEncoder, json.JSONDecoder):
     def default(self, o):
         return o.__dict__
 
     def __init__(self, *args, **kwargs):
-        super(experimentConfigSerializer, self).__init__()
+        super(ExperimentConfigSerializer, self).__init__()
         json.JSONDecoder.__init__(self, object_hook=self.object_hook, *args, **kwargs)
 
     def object_hook(self, config):

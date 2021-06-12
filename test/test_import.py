@@ -1,4 +1,4 @@
-from experiment_util.experiment_config import experimentConfigSerializer
+from experiment_util.experiment_config import ExperimentConfigSerializer
 from experiment_models.multitask_transformer import MultitaskModel
 from experiment_models.disentangled_transformer import XLMRobertaForDisentanglement
 from experiment_datasets import oscar_corpus
