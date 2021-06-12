@@ -1,5 +1,5 @@
-import xtreme_ds
-import oscar_corpus
+from experiment_datasets import xtreme_ds
+from experiment_datasets import oscar_corpus
 from transformers import XLMRobertaTokenizer
 import collections
 from functools import partial, reduce
