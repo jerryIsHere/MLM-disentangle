@@ -29,9 +29,9 @@ class CustomOscar(datasets.GeneratorBasedBuilder):
                     {
                         "tokens": datasets.Sequence(datasets.Value("int64")),
                         "masked_tokens": datasets.Sequence(datasets.Value("int64")),
-                        "language_id": datasets.Value("int8"),
-                        "genus_label": datasets.Value("int8"),
-                        "family_label": datasets.Value("int8"),
+                        "language_id": datasets.Value("int64"),
+                        "genus_label": datasets.Value("int64"),
+                        "family_label": datasets.Value("int64"),
                     }
                 )
             ),
