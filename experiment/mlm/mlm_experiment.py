@@ -1,7 +1,7 @@
-from experinment_util.experinment_config import ExperinmentConfigSerializer
-from experinment_models.multitask_transformer import MultitaskModel
-from experinment_models.disentangled_transformer import XLMRobertaForDisentanglement
-from experinment_datasets import oscar_corpus
+from experiment_util.experiment_config import experimentConfigSerializer
+from experiment_models.multitask_transformer import MultitaskModel
+from experiment_models.disentangled_transformer import XLMRobertaForDisentanglement
+from experiment_datasets import oscar_corpus
 import transformers
 import json
 import argparse
@@ -27,15 +27,15 @@ parser.add_argument(
 args = parser.parse_args()
 args.time = sum([a * b for a, b in zip([3600, 60, 1], map(int, args.time.split(":")))])
 with open(args.config_json, "r") as outfile:
-    experinment_config_dict = json.load(outfile, cls=ExperinmentConfigSerializer)
-experinment_config_dict["training"].model_name = (
+    experiment_config_dict = json.load(outfile, cls=experimentConfigSerializer)
+experiment_config_dict["training"].model_name = (
     os.path.abspath(args.config_json).split("/")[-1].split(".")[0]
 )
 
-backbone_name = experinment_config_dict["training"].backbone_name
+backbone_name = experiment_config_dict["training"].backbone_name
 XLMRConfig = transformers.AutoConfig.from_pretrained(backbone_name)
 
-setattr(XLMRConfig, "discriminators", experinment_config_dict["discriminators"])
+setattr(XLMRConfig, "discriminators", experiment_config_dict["discriminators"])
 
 multitask_model = MultitaskModel.create(
     backbone_name=backbone_name,
@@ -52,40 +52,40 @@ multitask_model = MultitaskModel.create(
 )
 
 for layers in multitask_model.backbone.encoder.layer[
-    : experinment_config_dict["training"].num_frozen_layers
+    : experiment_config_dict["training"].num_frozen_layers
 ]:  # 0:24
     for param in layers.parameters():
         param.requires_grad = False
 optimizermlm = torch.optim.Adam(
     multitask_model.taskmodels_dict["mlm"].parameters(),
-    lr=experinment_config_dict["training"].mlm_lr,
+    lr=experiment_config_dict["training"].mlm_lr,
     betas=(
-        experinment_config_dict["training"].mlm_beta1,
-        experinment_config_dict["training"].mlm_beta2,
+        experiment_config_dict["training"].mlm_beta1,
+        experiment_config_dict["training"].mlm_beta2,
     ),
-    eps=experinment_config_dict["training"].mlm_eps,
+    eps=experiment_config_dict["training"].mlm_eps,
 )
 optimizerdisentangle = torch.optim.Adam(
     multitask_model.taskmodels_dict["disentangle"].parameters(),
-    lr=experinment_config_dict["training"].disentangle_lr,
+    lr=experiment_config_dict["training"].disentangle_lr,
     betas=(
-        experinment_config_dict["training"].disentangle_beta1,
-        experinment_config_dict["training"].disentangle_beta2,
+        experiment_config_dict["training"].disentangle_beta1,
+        experiment_config_dict["training"].disentangle_beta2,
     ),
-    eps=experinment_config_dict["training"].disentangle_eps,
+    eps=experiment_config_dict["training"].disentangle_eps,
 )
 from torch.utils.tensorboard import SummaryWriter
 
 writer = SummaryWriter(
-    "/gpfs1/home/ckchan666/mlm_disentangle_experinment/tensorboard/"
+    "/gpfs1/home/ckchan666/mlm_disentangle_experiment/tensorboard/"
     + os.path.dirname(os.path.abspath(__file__)).split("/")[-1]
     + "/"
-    + experinment_config_dict["training"].model_name
+    + experiment_config_dict["training"].model_name
 )
 
 MLMD_ds = oscar_corpus.MLMDisentangleDataset()
 dataloader = torch.utils.data.DataLoader(
-    MLMD_ds, batch_size=experinment_config_dict["training"].batch_size, num_workers=0
+    MLMD_ds, batch_size=experiment_config_dict["training"].batch_size, num_workers=0
 )
 
 import gc
@@ -99,9 +99,9 @@ print("building time: " + str(time.time() - start_time) + "s")
 start_time = time.time()
 print(
     "run for "
-    + str(experinment_config_dict["training"].max_step)
+    + str(experiment_config_dict["training"].max_step)
     + " step with "
-    + str(experinment_config_dict["training"].gradient_acc_size)
+    + str(experiment_config_dict["training"].gradient_acc_size)
     + " gradient acc size"
 )
 for i, batch in enumerate(dataloader):
@@ -153,8 +153,8 @@ for i, batch in enumerate(dataloader):
     del batch
 
     if (i + 1) % (
-        experinment_config_dict["training"].gradient_acc_size
-        / experinment_config_dict["training"].batch_size
+        experiment_config_dict["training"].gradient_acc_size
+        / experiment_config_dict["training"].batch_size
     ) == 0:
         optimizermlm.step()
         multitask_model.taskmodels_dict["mlm"].zero_grad()
@@ -166,45 +166,45 @@ for i, batch in enumerate(dataloader):
                 "mlm loss ("
                 + str(gradient_step)
                 + "): "
-                + str(mlmLoss / experinment_config_dict["training"].log_step)
+                + str(mlmLoss / experiment_config_dict["training"].log_step)
             )
             print(
                 "disentangle loss ("
                 + str(gradient_step)
                 + "): "
-                + str(disentangleLoss / experinment_config_dict["training"].log_step)
+                + str(disentangleLoss / experiment_config_dict["training"].log_step)
             )
-        if gradient_step % experinment_config_dict["training"].log_step == 0:
+        if gradient_step % experiment_config_dict["training"].log_step == 0:
             # writer.add_scalar("mlm lr", scheduler.get_lr()[0], global_step)
             # writer.add_scalar("disentangle lr", scheduler.get_lr()[0], global_step)
             print(
                 "mlm loss ("
                 + str(gradient_step)
                 + "): "
-                + str(mlmLoss / experinment_config_dict["training"].log_step)
+                + str(mlmLoss / experiment_config_dict["training"].log_step)
             )
             print(
                 "disentangle loss ("
                 + str(gradient_step)
                 + "): "
-                + str(disentangleLoss / experinment_config_dict["training"].log_step)
+                + str(disentangleLoss / experiment_config_dict["training"].log_step)
             )
             writer.add_scalar(
                 "mlm loss",
-                mlmLoss / experinment_config_dict["training"].log_step,
+                mlmLoss / experiment_config_dict["training"].log_step,
                 gradient_step,
             )
             writer.add_scalar(
                 "disentangle loss",
-                disentangleLoss / experinment_config_dict["training"].log_step,
+                disentangleLoss / experiment_config_dict["training"].log_step,
                 gradient_step,
             )
             mlmLoss = 0
             disentangleLoss = 0
             multitask_model.save_pretrained(
-                "./" + experinment_config_dict["training"].model_name,
+                "./" + experiment_config_dict["training"].model_name,
             )
-        if gradient_step >= experinment_config_dict["training"].max_step:
+        if gradient_step >= experiment_config_dict["training"].max_step:
             break
         if time.time() - start_time > 0.9 * args.time:
             print(str(time.time() - start_time) + "s exceed 0.9 of the time limit")
@@ -214,10 +214,10 @@ for i, batch in enumerate(dataloader):
 
 
 multitask_model.save_pretrained(
-    "/gpfs1/home/ckchan666/mlm_disentangle_experinment/model/"
+    "/gpfs1/home/ckchan666/mlm_disentangle_experiment/model/"
     + os.path.dirname(os.path.abspath(__file__)).split("/")[-1]
     + "/"
-    + experinment_config_dict["training"].model_name,
+    + experiment_config_dict["training"].model_name,
 )
 print(str(time.time() - start_time) + " seconds elapsed")
 from resource import getrusage, RUSAGE_SELF
