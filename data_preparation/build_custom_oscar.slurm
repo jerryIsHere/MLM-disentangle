@@ -1,0 +1,14 @@
+#!/bin/bash
+#SBATCH --partition=cpu_14d1n
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=1
+#SBATCH --cpus-per-task=4
+#SBATCH --mem=32GB
+#SBATCH --time=6:00:00
+#SBATCH --output=/gpfs1/home/ckchan666/job/build_custom_oscar/task.log      # Standard output
+#SBATCH --error=/gpfs1/home/ckchan666/job/build_custom_oscar/task.err       # Standard error log
+
+
+module load python37
+source /gpfs1/home/ckchan666/mnlpEnv/bin/activate
+python /gpfs1/home/ckchan666/MLM-disentangle/build_custom_oscar.py

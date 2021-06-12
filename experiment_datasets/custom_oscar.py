@@ -62,6 +62,7 @@ class Oscar(datasets.GeneratorBasedBuilder):
             )
             self.vocab_prob[lan] = self.vocab_prob[lan] / np.sum(self.vocab_prob[lan])
         idx = {}
+        id_all = 0
         for lan in xtreme_ds.xtreme_lan:
             idx[lan] = 0
         lan_idx = 0
@@ -121,7 +122,7 @@ class Oscar(datasets.GeneratorBasedBuilder):
                     txt_masked_tokens = txt_masked_tokens[
                         0 : tokenizer.model_max_length
                     ]
-                    yield {
+                    yield id_all, {
                         "tokens": txt_tokens,
                         "masked_tokens": txt_masked_tokens,
                         "language_id": lan_idx,
@@ -133,6 +134,7 @@ class Oscar(datasets.GeneratorBasedBuilder):
                             == languages[languages.iso639_1 == lan].family.iloc[0]
                         )[0],
                     }
+                    id_all += 1
                     del masked_tokens
                     del prob
                     del chosen
@@ -140,3 +142,5 @@ class Oscar(datasets.GeneratorBasedBuilder):
                     del txt_tokens
                     break
             lan_idx = (lan_idx + 1) % len(xtreme_ds.xtreme_lan)
+            if id_all > len(xtreme_ds.xtreme_lan) * 700 * 4:
+                break
