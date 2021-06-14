@@ -45,7 +45,7 @@ class CustomOscarDebug(datasets.GeneratorBasedBuilder):
             )
         ]
 
-    def _generate_examples(self, filepath):
+    def _generate_examples(self):
         self.corpuses = {}
         self.tokenFrequency = {}
         self.vocab_prob = {}
