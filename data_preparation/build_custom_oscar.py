@@ -20,5 +20,4 @@ for i in range(len(xtreme_ds.xtreme_lan)):
     print(xtreme_ds.xtreme_lan[i])
     for label in dataset[i]:
         print(label)
-        print(dataset[i][label].dtype)
         print(dataset[i][label])
