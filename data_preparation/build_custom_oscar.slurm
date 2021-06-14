@@ -4,7 +4,7 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=4
 #SBATCH --mem=32GB
-#SBATCH --time=24:00:00
+#SBATCH --time=2:00:00
 #SBATCH --output=/gpfs1/home/ckchan666/job/build_custom_oscar/task.log      # Standard output
 #SBATCH --error=/gpfs1/home/ckchan666/job/build_custom_oscar/task.err       # Standard error log
 
