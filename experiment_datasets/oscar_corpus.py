@@ -400,6 +400,17 @@ s_pre_token = tokenizer_vocab[tokenizer.cls_token]
 s_end_token = tokenizer_vocab[tokenizer.sep_token]
 
 
+def get_custom_corpus_debug():
+    from datasets import load_dataset
+    import os
+
+    return load_dataset(
+        os.path.join(os.path.dirname(os.path.abspath(__file__)), "CustomOscarDebug.py"),
+        split="train",
+        cache_dir="/gpfs1/scratch/ckchan666/custom_oscar_debug",
+    )
+
+
 def get_custom_corpus():
     from datasets import load_dataset
     import os
