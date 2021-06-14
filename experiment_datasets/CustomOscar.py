@@ -1,6 +1,6 @@
 import datasets
-from . import xtreme_ds
-from .oscar_corpus import (
+from experiment_datasets import xtreme_ds
+from experiment_datasets.oscar_corpus import (
     get_corpus,
     get_token_frequency,
     vocab_token,
