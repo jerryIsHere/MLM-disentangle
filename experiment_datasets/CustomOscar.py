@@ -128,11 +128,11 @@ class CustomOscar(datasets.GeneratorBasedBuilder):
                         "language_id": lan_idx,
                         "genus_label": np.nonzero(
                             genus == languages[languages.iso639_1 == lan].genus.iloc[0]
-                        )[0],
+                        )[0][0],
                         "family_label": np.nonzero(
                             family
                             == languages[languages.iso639_1 == lan].family.iloc[0]
-                        )[0],
+                        )[0][0],
                     }
                     id_all += 1
                     del masked_tokens
