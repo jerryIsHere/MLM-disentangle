@@ -3,7 +3,7 @@
         {
             "dtype": "SingleToken",
             "length": 744,
-            "weight": 0.01,
+            "weight": 0.0004,
             "num_labels": 40,
             "label_id": "language_id",
             "hidden_size": 384
@@ -11,7 +11,7 @@
         {
             "dtype": "FullSequence",
             "length": 384,
-            "weight": 0.01,
+            "weight": 0.0002,
             "num_labels": 40,
             "label_id": "language_id",
             "hidden_size": 96,
@@ -21,7 +21,7 @@
         {
             "dtype": "FullSequence",
             "length": 288,
-            "weight": 0.01,
+            "weight": 0.0002,
             "num_labels": 14,
             "label_id": "family_label",
             "hidden_size": 96,
@@ -31,7 +31,7 @@
         {
             "dtype": "FullSequence",
             "length": 192,
-            "weight": 0.01,
+            "weight": 0.0002,
             "num_labels": 25,
             "label_id": "genus_label",
             "hidden_size": 96,
