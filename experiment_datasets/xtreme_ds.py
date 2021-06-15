@@ -716,10 +716,8 @@ class xquadTrainDataset(torch.utils.data.Dataset):
             features["context"], features["question"], return_tensors="pt"
         )
         return {
-            "tokens": torch.from_numpy(train_encodings.input_ids).long(),
-            "start_positions": torch.Tensor(
-                features["answer"]["answer_start"]
-            ).long(),
+            "tokens": train_encodings.input_ids.long(),
+            "start_positions": torch.Tensor(features["answer"]["answer_start"]).long(),
             "end_positions": torch.Tensor(
                 features["answer"]["answer_start"] + len(features["answer"]["text"])
             ).long(),
@@ -742,10 +740,8 @@ class xquadValidationDataset(torch.utils.data.Dataset):
             features["context"], features["question"], return_tensors="pt"
         )
         return {
-            "tokens": torch.from_numpy(train_encodings.input_ids).long(),
-            "start_positions": torch.Tensor(
-                features["answer"]["answer_start"]
-            ).long(),
+            "tokens": train_encodings.input_ids.long(),
+            "start_positions": torch.Tensor(features["answer"]["answer_start"]).long(),
             "end_positions": torch.Tensor(
                 features["answer"]["answer_start"] + len(features["answer"]["text"])
             ).long(),
@@ -776,7 +772,7 @@ class xquadTestDataset(torch.utils.data.Dataset):
             features["context"], features["question"], return_tensors="pt"
         )
         return {
-            "tokens": torch.from_numpy(train_encodings.input_ids).long(),
+            "tokens": train_encodings.input_ids.long(),
             "start_positions": torch.Tensor(features["answer"]["answer_start"]).long(),
             "end_positions": torch.Tensor(
                 features["answer"]["answer_start"] + len(features["answer"]["text"])
