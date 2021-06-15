@@ -713,8 +713,8 @@ class xquadTrainDataset(torch.utils.data.Dataset):
     def __getitem__(self, id):
         features = self.dataset[id]
         train_encodings = tokenizer(
-            features["context"],
             features["question"],
+            features["context"],
             return_tensors="pt",
             max_length=TASK[panxTestDataset.task]["max seq length"],
             truncation=True,
@@ -746,8 +746,8 @@ class xquadValidationDataset(torch.utils.data.Dataset):
     def __getitem__(self, id):
         features = self.dataset[id]
         train_encodings = tokenizer(
-            features["context"],
             features["question"],
+            features["context"],
             return_tensors="pt",
             max_length=TASK[panxTestDataset.task]["max seq length"],
             truncation=True,
@@ -787,8 +787,8 @@ class xquadTestDataset(torch.utils.data.Dataset):
             id_absolute -= length
         features = self.dataset[lan][id]
         train_encodings = tokenizer(
-            features["context"],
             features["question"],
+            features["context"],
             return_tensors="pt",
             max_length=TASK[panxTestDataset.task]["max seq length"],
             truncation=True,
