@@ -83,7 +83,7 @@ writer = SummaryWriter(
     + experiment_config_dict["training"].model_name
 )
 
-MLMD_ds = oscar_corpus.MLMDisentangleDataset()
+MLMD_ds = oscar_corpus.get_custom_corpus().set_format(type="torch")
 dataloader = torch.utils.data.DataLoader(
     MLMD_ds, batch_size=experiment_config_dict["training"].batch_size, num_workers=0
 )
@@ -220,6 +220,7 @@ multitask_model.save_pretrained(
     + experiment_config_dict["training"].model_name,
 )
 print(str(time.time() - start_time) + " seconds elapsed")
+
 from resource import getrusage, RUSAGE_SELF
 
 print(str(getrusage(RUSAGE_SELF).ru_maxrss) + "KB used (peak)")
