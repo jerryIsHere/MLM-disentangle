@@ -807,70 +807,70 @@ class xquadTestDataset(torch.utils.data.Dataset):
         }
 
 
-class mlqaTrainDataset(torch.utils.data.Dataset):
-    task = "mlqa"
+# class mlqaTrainDataset(torch.utils.data.Dataset):
+#     task = "mlqa"
 
-    def __init__(self):
-        set_name, subset_name, split = TASK[mlqaTrainDataset.task]["train"]
-        self.dataset = get_dataset(set_name, subset_name)[split]
+#     def __init__(self):
+#         set_name, subset_name, split = TASK[mlqaTrainDataset.task]["train"]
+#         self.dataset = get_dataset(set_name, subset_name)[split]
 
-    def __len__(self):
-        return len(self.dataset)
+#     def __len__(self):
+#         return len(self.dataset)
 
-    def __getitem__(self, id):
-        features = self.dataset[id]
-        train_encodings = tokenizer(
-            features["question"],
-            features["context"],
-            return_tensors="pt",
-            max_length=TASK[mlqaTrainDataset.task]["max seq length"],
-            truncation=True,
-        )
-        return {
-            "tokens": train_encodings.input_ids.long(),
-            "start_positions": torch.Tensor(
-                [features["answers"]["answer_start"][0]]
-            ).long(),
-            "end_positions": torch.Tensor(
-                [
-                    features["answers"]["answer_start"][0]
-                    + len(features["answers"]["text"][0])
-                ]
-            ).long(),
-        }
+#     def __getitem__(self, id):
+#         features = self.dataset[id]
+#         train_encodings = tokenizer(
+#             features["question"],
+#             features["context"],
+#             return_tensors="pt",
+#             max_length=TASK[mlqaTrainDataset.task]["max seq length"],
+#             truncation=True,
+#         )
+#         return {
+#             "tokens": train_encodings.input_ids.long(),
+#             "start_positions": torch.Tensor(
+#                 [features["answers"]["answer_start"][0]]
+#             ).long(),
+#             "end_positions": torch.Tensor(
+#                 [
+#                     features["answers"]["answer_start"][0]
+#                     + len(features["answers"]["text"][0])
+#                 ]
+#             ).long(),
+#         }
 
 
-class mlqaValidationDataset(torch.utils.data.Dataset):
-    task = "mlqa"
+# class mlqaValidationDataset(torch.utils.data.Dataset):
+#     task = "mlqa"
 
-    def __init__(self):
-        set_name, subset_name, split = TASK[mlqaValidationDataset.task]["validation"]
-        self.dataset = get_dataset(set_name, subset_name)[split]
+#     def __init__(self):
+#         set_name, subset_name, split = TASK[mlqaValidationDataset.task]["validation"]
+#         self.dataset = get_dataset(set_name, subset_name)[split]
 
-    def __len__(self):
-        return len(self.dataset)
+#     def __len__(self):
+#         return len(self.dataset)
 
-    def __getitem__(self, id):
-        features = self.dataset[id]
-        train_encodings = tokenizer(
-            features["question"],
-            features["context"],
-            return_tensors="pt",
-            max_length=TASK[mlqaValidationDataset.task]["max seq length"],
-            truncation=True,
-        )
-        return {
-            "tokens": train_encodings.input_ids.long(),
-            "start_positions": torch.Tensor(
-                [features["answers"]["answer_start"][0]]
-            ).long(),
-            "end_positions": torch.Tensor(
-                [
-                    features["answers"]["answer_start"][0]
-                    + len(features["answers"]["text"][0])
-                ]
-            ).long(),
-        }
+#     def __getitem__(self, id):
+#         features = self.dataset[id]
+#         train_encodings = tokenizer(
+#             features["question"],
+#             features["context"],
+#             return_tensors="pt",
+#             max_length=TASK[mlqaValidationDataset.task]["max seq length"],
+#             truncation=True,
+#         )
+#         return {
+#             "tokens": train_encodings.input_ids.long(),
+#             "start_positions": torch.Tensor(
+#                 [features["answers"]["answer_start"][0]]
+#             ).long(),
+#             "end_positions": torch.Tensor(
+#                 [
+#                     features["answers"]["answer_start"][0]
+#                     + len(features["answers"]["text"][0])
+#                 ]
+#             ).long(),
+#         }
 
 
 class mlqaTestDataset(torch.utils.data.Dataset):
@@ -984,27 +984,19 @@ class tydiqaTestDataset(torch.utils.data.Dataset):
     task = "tydiqa"
 
     def __init__(self):
-        self.dataset = {}
-        for lan in TASK[tydiqaTestDataset.task]["test"]:
-            set_name, subset_name, split = TASK[tydiqaTestDataset.task]["test"][lan]
-            self.dataset[lan] = get_dataset(set_name, subset_name)[split]
+        set_name, subset_name, split = TASK[tydiqaValidationDataset.task]["test"]
+        self.dataset = get_dataset(set_name, subset_name)[split]
 
     def __len__(self):
-        return sum(map(lambda x: len(x), self.dataset.items))
+        return len(self.dataset)
 
-    def __getitem__(self, id_absolute):
-        for lan in self.dataset:
-            length = len(self.dataset[lan])
-            if id_absolute < length:
-                id = id_absolute
-                break
-            id_absolute -= length
-        features = self.dataset[lan][id]
+    def __getitem__(self, id):
+        features = self.dataset[id]
         train_encodings = tokenizer(
             features["question"],
             features["context"],
             return_tensors="pt",
-            max_length=TASK[tydiqaTestDataset.task]["max seq length"],
+            max_length=TASK[tydiqaValidationDataset.task]["max seq length"],
             truncation=True,
         )
         return {
