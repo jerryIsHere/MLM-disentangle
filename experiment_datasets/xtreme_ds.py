@@ -482,32 +482,115 @@ xtreme_lan = [
     "yo",
     "zh",
 ]
-from transformers import XLMRobertaTokenizer
+from transformers import XLMRobertaTokenizerFast
 
-tokenizer = XLMRobertaTokenizer.from_pretrained(
+tokenizer = XLMRobertaTokenizerFast.from_pretrained(
     "xlm-roberta-large",
     cache_dir="/gpfs1/scratch/ckchan666/transformer_model_cache",
 )
+import numpy as np
+import torch
 
 
-# class udposTrainDataset(torch.utils.data.Dataset):
-#     task = "udpos"
+class udposTrainDataset(torch.utils.data.Dataset):
+    task = "udpos"
 
-#     def __init__(self):
-#         set_name, subset_name, split = TASK[task]["train"]
-#         self.dataset = get_dataset(set_name, subset_name)[split]
+    def __init__(self):
+        set_name, subset_name, split = TASK[udposTrainDataset.task]["train"]
+        self.dataset = get_dataset(set_name, subset_name)[split]
 
-#     def __len__(self):
-#         return len(self.dataset)
+    def __len__(self):
+        return len(self.dataset)
 
-#     def __getitem__(self, id):
-#         features = self.dataset[id]
-#         txt = features['word']
-#         train_encodings = tokenizer.encode(
-#             txt,
-#             is_split_into_words=True,
-#             max_length=TASK[task]["max seq length"],
-#             truncation=True,
-#         )
+    def __getitem__(self, id):
+        features = self.dataset[id]
+        txt = features["tokens"]
+        train_encodings = tokenizer(
+            txt,
+            is_split_into_words=True,
+            max_length=TASK[udposTrainDataset.task]["max seq length"],
+            truncation=True,
+            return_offsets_mapping=True,
+        )
+        labels = np.ones(len(train_encodings.input_ids), dtype=int) * -100
+        ids = np.array(train_encodings.input_ids)
+        arr_offset = np.array(train_encodings.offset_mapping)
+        labels[
+            (arr_offset[:, 0] == 0) & (arr_offset[:, 1] != 0) & (ids[:] != 6)
+        ] = self.dataset[0]["pos_tags"]
+        return {
+            "tokens": torch.from_numpy(ids).long(),
+            "pos_tags": torch.from_numpy(labels).long(),
+        }
 
-#         return
+
+class udposValidationDataset(torch.utils.data.Dataset):
+    task = "udpos"
+
+    def __init__(self):
+        set_name, subset_name, split = TASK[udposTrainDataset.task]["validation"]
+        self.dataset = get_dataset(set_name, subset_name)[split]
+
+    def __len__(self):
+        return len(self.dataset)
+
+    def __getitem__(self, id):
+        features = self.dataset[id]
+        txt = features["tokens"]
+        train_encodings = tokenizer(
+            txt,
+            is_split_into_words=True,
+            max_length=TASK[udposTrainDataset.task]["max seq length"],
+            truncation=True,
+            return_offsets_mapping=True,
+        )
+        labels = np.ones(len(train_encodings.input_ids), dtype=int) * -100
+        ids = np.array(train_encodings.input_ids)
+        arr_offset = np.array(train_encodings.offset_mapping)
+        labels[
+            (arr_offset[:, 0] == 0) & (arr_offset[:, 1] != 0) & (ids[:] != 6)
+        ] = self.dataset[id]["pos_tags"]
+        return {
+            "tokens": torch.from_numpy(ids).long(),
+            "pos_tags": torch.from_numpy(labels).long(),
+        }
+
+
+class udposTestDataset(torch.utils.data.Dataset):
+    task = "udpos"
+
+    def __init__(self):
+        self.dataset = {}
+        for lan in TASK[udposTrainDataset.task]["test"]:
+            set_name, subset_name, split = TASK[udposTrainDataset.task]["test"][lan]
+            self.dataset[lan] = get_dataset(set_name, subset_name)[split]
+
+    def __len__(self):
+        return sum(map(lambda x: len(x), self.dataset.items))
+
+    def __getitem__(self, id_absolute):
+        for lan in self.dataset:
+            length = len(self.dataset[lan])
+            if id_absolute < length:
+                id = id_absolute
+                break
+            id_absolute -= length
+        features = self.dataset[lan][id]
+        txt = features["tokens"]
+        train_encodings = tokenizer(
+            txt,
+            is_split_into_words=True,
+            max_length=TASK[udposTrainDataset.task]["max seq length"],
+            truncation=True,
+            return_offsets_mapping=True,
+        )
+        labels = np.ones(len(train_encodings.input_ids), dtype=int) * -100
+        ids = np.array(train_encodings.input_ids)
+        arr_offset = np.array(train_encodings.offset_mapping)
+        labels[
+            (arr_offset[:, 0] == 0) & (arr_offset[:, 1] != 0) & (ids[:] != 6)
+        ] = self.dataset[lan][id]["pos_tags"]
+        return {
+            "tokens": torch.from_numpy(ids).long(),
+            "pos_tags": torch.from_numpy(labels).long(),
+        }
