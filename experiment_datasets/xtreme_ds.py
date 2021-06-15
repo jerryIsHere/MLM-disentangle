@@ -595,6 +595,7 @@ class udposTestDataset(torch.utils.data.Dataset):
             "pos_tags": torch.from_numpy(labels).long(),
         }
 
+
 class panxTrainDataset(torch.utils.data.Dataset):
     task = "panx"
 
@@ -696,4 +697,88 @@ class panxTestDataset(torch.utils.data.Dataset):
         return {
             "tokens": torch.from_numpy(ids).long(),
             "ner_tags": torch.from_numpy(labels).long(),
+        }
+
+
+class xquadTrainDataset(torch.utils.data.Dataset):
+    task = "xquad"
+
+    def __init__(self):
+        set_name, subset_name, split = TASK[xquadTrainDataset.task]["train"]
+        self.dataset = get_dataset(set_name, subset_name)[split]
+
+    def __len__(self):
+        return len(self.dataset)
+
+    def __getitem__(self, id):
+        features = self.dataset[id]
+        train_encodings = tokenizer(
+            features["context"], features["question"], return_tensors="pt"
+        )
+        return {
+            "tokens": torch.from_numpy(train_encodings.input_ids).long(),
+            "start_positions": torch.Tensor(
+                features["answer"]["answer_start"]
+            ).long(),
+            "end_positions": torch.Tensor(
+                features["answer"]["answer_start"] + len(features["answer"]["text"])
+            ).long(),
+        }
+
+
+class xquadValidationDataset(torch.utils.data.Dataset):
+    task = "xquad"
+
+    def __init__(self):
+        set_name, subset_name, split = TASK[xquadValidationDataset.task]["validation"]
+        self.dataset = get_dataset(set_name, subset_name)[split]
+
+    def __len__(self):
+        return len(self.dataset)
+
+    def __getitem__(self, id):
+        features = self.dataset[id]
+        train_encodings = tokenizer(
+            features["context"], features["question"], return_tensors="pt"
+        )
+        return {
+            "tokens": torch.from_numpy(train_encodings.input_ids).long(),
+            "start_positions": torch.Tensor(
+                features["answer"]["answer_start"]
+            ).long(),
+            "end_positions": torch.Tensor(
+                features["answer"]["answer_start"] + len(features["answer"]["text"])
+            ).long(),
+        }
+
+
+class xquadTestDataset(torch.utils.data.Dataset):
+    task = "xquad"
+
+    def __init__(self):
+        self.dataset = {}
+        for lan in TASK[xquadTestDataset.task]["test"]:
+            set_name, subset_name, split = TASK[xquadTestDataset.task]["test"][lan]
+            self.dataset[lan] = get_dataset(set_name, subset_name)[split]
+
+    def __len__(self):
+        return sum(map(lambda x: len(x), self.dataset.items))
+
+    def __getitem__(self, id_absolute):
+        for lan in self.dataset:
+            length = len(self.dataset[lan])
+            if id_absolute < length:
+                id = id_absolute
+                break
+            id_absolute -= length
+        features = self.dataset[lan][id]
+        train_encodings = tokenizer(
+            features["context"], features["question"], return_tensors="pt"
+        )
+        return {
+            "tokens": torch.from_numpy(train_encodings.input_ids).long(),
+            "start_positions": torch.Tensor(features["answer"]["answer_start"]).long(),
+            "end_positions": torch.Tensor(
+                features["answer"]["answer_start"] + len(features["answer"]["text"])
+            ).long(),
         }
