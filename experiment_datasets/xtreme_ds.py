@@ -594,3 +594,106 @@ class udposTestDataset(torch.utils.data.Dataset):
             "tokens": torch.from_numpy(ids).long(),
             "pos_tags": torch.from_numpy(labels).long(),
         }
+
+class panxTrainDataset(torch.utils.data.Dataset):
+    task = "panx"
+
+    def __init__(self):
+        set_name, subset_name, split = TASK[udposTrainDataset.task]["train"]
+        self.dataset = get_dataset(set_name, subset_name)[split]
+
+    def __len__(self):
+        return len(self.dataset)
+
+    def __getitem__(self, id):
+        features = self.dataset[id]
+        txt = features["tokens"]
+        train_encodings = tokenizer(
+            txt,
+            is_split_into_words=True,
+            max_length=TASK[udposTrainDataset.task]["max seq length"],
+            truncation=True,
+            return_offsets_mapping=True,
+        )
+        labels = np.ones(len(train_encodings.input_ids), dtype=int) * -100
+        ids = np.array(train_encodings.input_ids)
+        arr_offset = np.array(train_encodings.offset_mapping)
+        labels[
+            (arr_offset[:, 0] == 0) & (arr_offset[:, 1] != 0) & (ids[:] != 6)
+        ] = self.dataset[0]["ner_tags"]
+        return {
+            "tokens": torch.from_numpy(ids).long(),
+            "ner_tags": torch.from_numpy(labels).long(),
+        }
+
+
+class panxValidationDataset(torch.utils.data.Dataset):
+    task = "panx"
+
+    def __init__(self):
+        set_name, subset_name, split = TASK[udposTrainDataset.task]["validation"]
+        self.dataset = get_dataset(set_name, subset_name)[split]
+
+    def __len__(self):
+        return len(self.dataset)
+
+    def __getitem__(self, id):
+        features = self.dataset[id]
+        txt = features["tokens"]
+        train_encodings = tokenizer(
+            txt,
+            is_split_into_words=True,
+            max_length=TASK[udposTrainDataset.task]["max seq length"],
+            truncation=True,
+            return_offsets_mapping=True,
+        )
+        labels = np.ones(len(train_encodings.input_ids), dtype=int) * -100
+        ids = np.array(train_encodings.input_ids)
+        arr_offset = np.array(train_encodings.offset_mapping)
+        labels[
+            (arr_offset[:, 0] == 0) & (arr_offset[:, 1] != 0) & (ids[:] != 6)
+        ] = self.dataset[id]["ner_tags"]
+        return {
+            "tokens": torch.from_numpy(ids).long(),
+            "ner_tags": torch.from_numpy(labels).long(),
+        }
+
+
+class panxTestDataset(torch.utils.data.Dataset):
+    task = "panx"
+
+    def __init__(self):
+        self.dataset = {}
+        for lan in TASK[udposTrainDataset.task]["test"]:
+            set_name, subset_name, split = TASK[udposTrainDataset.task]["test"][lan]
+            self.dataset[lan] = get_dataset(set_name, subset_name)[split]
+
+    def __len__(self):
+        return sum(map(lambda x: len(x), self.dataset.items))
+
+    def __getitem__(self, id_absolute):
+        for lan in self.dataset:
+            length = len(self.dataset[lan])
+            if id_absolute < length:
+                id = id_absolute
+                break
+            id_absolute -= length
+        features = self.dataset[lan][id]
+        txt = features["tokens"]
+        train_encodings = tokenizer(
+            txt,
+            is_split_into_words=True,
+            max_length=TASK[udposTrainDataset.task]["max seq length"],
+            truncation=True,
+            return_offsets_mapping=True,
+        )
+        labels = np.ones(len(train_encodings.input_ids), dtype=int) * -100
+        ids = np.array(train_encodings.input_ids)
+        arr_offset = np.array(train_encodings.offset_mapping)
+        labels[
+            (arr_offset[:, 0] == 0) & (arr_offset[:, 1] != 0) & (ids[:] != 6)
+        ] = self.dataset[lan][id]["ner_tags"]
+        return {
+            "tokens": torch.from_numpy(ids).long(),
+            "ner_tags": torch.from_numpy(labels).long(),
+        }
