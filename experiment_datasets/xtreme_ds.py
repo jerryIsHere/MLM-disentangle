@@ -689,7 +689,7 @@ class panxTestDataset(torch.utils.data.Dataset):
 
 
 class xnliTrainDataset(torch.utils.data.Dataset):
-    class_label = ["contradiction", "neutral", "entailment"]
+    class_label = ["0", "1", "2"]
 
     def __init__(self):
         set_name, subset_name, split = TASK["xnli"]["train"]
@@ -701,8 +701,8 @@ class xnliTrainDataset(torch.utils.data.Dataset):
     def __getitem__(self, id):
         features = self.dataset[id]
         train_encodings = tokenizer(
-            features["sentence1"],
-            features["sentence2"],
+            features["premise"],
+            features["hypothesis"],
             return_tensors="pt",
             max_length=TASK["xnli"]["max seq length"],
             truncation=True,
@@ -710,7 +710,7 @@ class xnliTrainDataset(torch.utils.data.Dataset):
         return {
             "tokens": train_encodings.input_ids.long(),
             "label": torch.Tensor(
-                [xnliTrainDataset.class_label.index(features["gold_label"])]
+                [xnliTrainDataset.class_label.index(features["label"])]
             ).long(),
         }
 
@@ -726,8 +726,8 @@ class xnliValidationDataset(torch.utils.data.Dataset):
     def __getitem__(self, id):
         features = self.dataset[id]
         train_encodings = tokenizer(
-            features["sentence1"],
-            features["sentence2"],
+            features["premise"],
+            features["hypothesis"],
             return_tensors="pt",
             max_length=TASK["xnli"]["max seq length"],
             truncation=True,
@@ -735,7 +735,7 @@ class xnliValidationDataset(torch.utils.data.Dataset):
         return {
             "tokens": train_encodings.input_ids.long(),
             "label": torch.Tensor(
-                [xnliTrainDataset.class_label.index(features["gold_label"])]
+                [xnliTrainDataset.class_label.index(features["label"])]
             ).long(),
         }
 
