@@ -717,6 +717,7 @@ class xnliTrainDataset(torch.utils.data.Dataset):
 
 class xnliValidationDataset(torch.utils.data.Dataset):
     def __init__(self):
+        self.dataset = {}
         for split in TASK["xnli"]["validation"]:
             set_name, subset_name, split = TASK["xnli"]["validation"][split]
             self.dataset[split] = get_dataset(set_name, subset_name)[split]
