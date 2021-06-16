@@ -834,7 +834,7 @@ class pawsxTestDataset(torch.utils.data.Dataset):
     def __init__(self):
         self.dataset = {}
         for lan in TASK["pawsx"]["test"]:
-            set_name, subset_name, split = TASK["pawsx"]["test"]
+            set_name, subset_name, split = TASK["pawsx"]["test"][lan]
             self.dataset[lan] = get_dataset(set_name, subset_name)[split]
 
     def __len__(self):
