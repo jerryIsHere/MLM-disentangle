@@ -142,5 +142,5 @@ class CustomOscarDebug(datasets.GeneratorBasedBuilder):
                     del txt_tokens
                     break
             lan_idx = (lan_idx + 1) % len(xtreme_ds.xtreme_lan)
-            if id_all > len(xtreme_ds.xtreme_lan):# * 700 * 4:
+            if id_all > len(xtreme_ds.xtreme_lan) * 2:  # * 700 * 4:
                 break
