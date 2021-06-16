@@ -689,7 +689,7 @@ class panxTestDataset(torch.utils.data.Dataset):
 
 
 class xnliTrainDataset(torch.utils.data.Dataset):
-    class_label = ["0", "1", "2"]
+    class_label = [0, 1, 2]
 
     def __init__(self):
         set_name, subset_name, split = TASK["xnli"]["train"]
