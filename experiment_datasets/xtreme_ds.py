@@ -717,14 +717,21 @@ class xnliTrainDataset(torch.utils.data.Dataset):
 
 class xnliValidationDataset(torch.utils.data.Dataset):
     def __init__(self):
-        set_name, subset_name, split = TASK["xnli"]["validation"]
-        self.dataset = get_dataset(set_name, subset_name)[split]
+        for split in TASK["xnli"]["validation"]:
+            set_name, subset_name, split = TASK["xnli"]["validation"][split]
+            self.dataset[split] = get_dataset(set_name, subset_name)[split]
 
     def __len__(self):
-        return len(self.dataset)
+        return sum(map(lambda x: len(x), self.dataset.items))
 
-    def __getitem__(self, id):
-        features = self.dataset[id]
+    def __getitem__(self, id_absolute):
+        for split in self.dataset:
+            length = len(self.dataset[split])
+            if id_absolute < length:
+                id = id_absolute
+                break
+            id_absolute -= length
+        features = self.dataset[split][id]
         train_encodings = tokenizer(
             features["premise"],
             features["hypothesis"],
@@ -839,7 +846,7 @@ class pawsxTestDataset(torch.utils.data.Dataset):
                 id = id_absolute
                 break
             id_absolute -= length
-        features = self.dataset[id]
+        features = self.dataset[lan][id]
         train_encodings = tokenizer(
             features["sentence1"],
             features["sentence2"],
