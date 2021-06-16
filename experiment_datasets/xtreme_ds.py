@@ -741,6 +741,8 @@ class xnliValidationDataset(torch.utils.data.Dataset):
 
 
 class xnliTestDataset(torch.utils.data.Dataset):
+    class_label = ["entailment", "neutral", "contradiction"]
+
     def __init__(self):
         set_name, subset_name, split = TASK["xnli"]["test"]
         self.dataset = get_dataset(set_name, subset_name)[split]
@@ -760,7 +762,7 @@ class xnliTestDataset(torch.utils.data.Dataset):
         return {
             "tokens": train_encodings.input_ids.long(),
             "label": torch.Tensor(
-                [xnliTrainDataset.class_label.index(features["gold_label"])]
+                [xnliTestDataset.class_label.index(features["gold_label"])]
             ).long(),
         }
 
