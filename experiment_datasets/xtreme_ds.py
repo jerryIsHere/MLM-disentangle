@@ -493,10 +493,8 @@ import torch
 
 
 class udposTrainDataset(torch.utils.data.Dataset):
-    task = "udpos"
-
     def __init__(self):
-        set_name, subset_name, split = TASK[udposTrainDataset.task]["train"]
+        set_name, subset_name, split = TASK["udpos"]["train"]
         self.dataset = get_dataset(set_name, subset_name)[split]
 
     def __len__(self):
@@ -508,7 +506,7 @@ class udposTrainDataset(torch.utils.data.Dataset):
         train_encodings = tokenizer(
             txt,
             is_split_into_words=True,
-            max_length=TASK[udposTrainDataset.task]["max seq length"],
+            max_length=TASK["udpos"]["max seq length"],
             truncation=True,
             return_offsets_mapping=True,
         )
@@ -525,10 +523,8 @@ class udposTrainDataset(torch.utils.data.Dataset):
 
 
 class udposValidationDataset(torch.utils.data.Dataset):
-    task = "udpos"
-
     def __init__(self):
-        set_name, subset_name, split = TASK[udposValidationDataset.task]["validation"]
+        set_name, subset_name, split = TASK["udpos"]["validation"]
         self.dataset = get_dataset(set_name, subset_name)[split]
 
     def __len__(self):
@@ -540,7 +536,7 @@ class udposValidationDataset(torch.utils.data.Dataset):
         train_encodings = tokenizer(
             txt,
             is_split_into_words=True,
-            max_length=TASK[udposValidationDataset.task]["max seq length"],
+            max_length=TASK["udpos"]["max seq length"],
             truncation=True,
             return_offsets_mapping=True,
         )
@@ -557,12 +553,10 @@ class udposValidationDataset(torch.utils.data.Dataset):
 
 
 class udposTestDataset(torch.utils.data.Dataset):
-    task = "udpos"
-
     def __init__(self):
         self.dataset = {}
-        for lan in TASK[udposTestDataset.task]["test"]:
-            set_name, subset_name, split = TASK[udposTestDataset.task]["test"][lan]
+        for lan in TASK["udpos"]["test"]:
+            set_name, subset_name, split = TASK["udpos"]["test"][lan]
             self.dataset[lan] = get_dataset(set_name, subset_name)[split]
 
     def __len__(self):
@@ -580,7 +574,7 @@ class udposTestDataset(torch.utils.data.Dataset):
         train_encodings = tokenizer(
             txt,
             is_split_into_words=True,
-            max_length=TASK[udposTestDataset.task]["max seq length"],
+            max_length=TASK["udpos"]["max seq length"],
             truncation=True,
             return_offsets_mapping=True,
         )
@@ -597,10 +591,8 @@ class udposTestDataset(torch.utils.data.Dataset):
 
 
 class panxTrainDataset(torch.utils.data.Dataset):
-    task = "panx"
-
     def __init__(self):
-        set_name, subset_name, split = TASK[panxTrainDataset.task]["train"]
+        set_name, subset_name, split = TASK["panx"]["train"]
         self.dataset = get_dataset(set_name, subset_name)[split]
 
     def __len__(self):
@@ -612,7 +604,7 @@ class panxTrainDataset(torch.utils.data.Dataset):
         train_encodings = tokenizer(
             txt,
             is_split_into_words=True,
-            max_length=TASK[panxTrainDataset.task]["max seq length"],
+            max_length=TASK["panx"]["max seq length"],
             truncation=True,
             return_offsets_mapping=True,
         )
@@ -629,10 +621,8 @@ class panxTrainDataset(torch.utils.data.Dataset):
 
 
 class panxValidationDataset(torch.utils.data.Dataset):
-    task = "panx"
-
     def __init__(self):
-        set_name, subset_name, split = TASK[panxValidationDataset.task]["validation"]
+        set_name, subset_name, split = TASK["panx"]["validation"]
         self.dataset = get_dataset(set_name, subset_name)[split]
 
     def __len__(self):
@@ -644,7 +634,7 @@ class panxValidationDataset(torch.utils.data.Dataset):
         train_encodings = tokenizer(
             txt,
             is_split_into_words=True,
-            max_length=TASK[panxValidationDataset.task]["max seq length"],
+            max_length=TASK["panx"]["max seq length"],
             truncation=True,
             return_offsets_mapping=True,
         )
@@ -661,12 +651,10 @@ class panxValidationDataset(torch.utils.data.Dataset):
 
 
 class panxTestDataset(torch.utils.data.Dataset):
-    task = "panx"
-
     def __init__(self):
         self.dataset = {}
-        for lan in TASK[panxTestDataset.task]["test"]:
-            set_name, subset_name, split = TASK[panxTestDataset.task]["test"][lan]
+        for lan in TASK["panx"]["test"]:
+            set_name, subset_name, split = TASK["panx"]["test"][lan]
             self.dataset[lan] = get_dataset(set_name, subset_name)[split]
 
     def __len__(self):
@@ -684,7 +672,7 @@ class panxTestDataset(torch.utils.data.Dataset):
         train_encodings = tokenizer(
             txt,
             is_split_into_words=True,
-            max_length=TASK[panxTestDataset.task]["max seq length"],
+            max_length=TASK["panx"]["max seq length"],
             truncation=True,
             return_offsets_mapping=True,
         )
@@ -700,11 +688,174 @@ class panxTestDataset(torch.utils.data.Dataset):
         }
 
 
-class xquadTrainDataset(torch.utils.data.Dataset):
-    task = "xquad"
+class xnliTrainDataset(torch.utils.data.Dataset):
+    class_label = ["contradiction", "neutral", "entailment"]
 
     def __init__(self):
-        set_name, subset_name, split = TASK[xquadTrainDataset.task]["train"]
+        set_name, subset_name, split = TASK["xnli"]["train"]
+        self.dataset = get_dataset(set_name, subset_name)[split]
+
+    def __len__(self):
+        return len(self.dataset)
+
+    def __getitem__(self, id):
+        features = self.dataset[id]
+        train_encodings = tokenizer(
+            features["sentence1"],
+            features["sentence2"],
+            return_tensors="pt",
+            max_length=TASK["xnli"]["max seq length"],
+            truncation=True,
+        )
+        return {
+            "tokens": train_encodings.input_ids.long(),
+            "label": torch.Tensor(
+                [xnliTrainDataset.class_label.index(features["gold_label"])]
+            ).long(),
+        }
+
+
+class xnliValidationDataset(torch.utils.data.Dataset):
+    def __init__(self):
+        set_name, subset_name, split = TASK["xnli"]["validation"]
+        self.dataset = get_dataset(set_name, subset_name)[split]
+
+    def __len__(self):
+        return len(self.dataset)
+
+    def __getitem__(self, id):
+        features = self.dataset[id]
+        train_encodings = tokenizer(
+            features["sentence1"],
+            features["sentence2"],
+            return_tensors="pt",
+            max_length=TASK["xnli"]["max seq length"],
+            truncation=True,
+        )
+        return {
+            "tokens": train_encodings.input_ids.long(),
+            "label": torch.Tensor(
+                [xnliTrainDataset.class_label.index(features["gold_label"])]
+            ).long(),
+        }
+
+
+class xnliTestDataset(torch.utils.data.Dataset):
+    def __init__(self):
+        set_name, subset_name, split = TASK["xnli"]["test"]
+        self.dataset = get_dataset(set_name, subset_name)[split]
+
+    def __len__(self):
+        return len(self.dataset)
+
+    def __getitem__(self, id):
+        features = self.dataset[id]
+        train_encodings = tokenizer(
+            features["sentence1"],
+            features["sentence2"],
+            return_tensors="pt",
+            max_length=TASK["xnli"]["max seq length"],
+            truncation=True,
+        )
+        return {
+            "tokens": train_encodings.input_ids.long(),
+            "label": torch.Tensor(
+                [xnliTrainDataset.class_label.index(features["gold_label"])]
+            ).long(),
+        }
+
+
+class pawsxTrainDataset(torch.utils.data.Dataset):
+    class_label = [
+        "0",
+        "1",
+    ]
+
+    def __init__(self):
+        set_name, subset_name, split = TASK["pawsx"]["train"]
+        self.dataset = get_dataset(set_name, subset_name)[split]
+
+    def __len__(self):
+        return len(self.dataset)
+
+    def __getitem__(self, id):
+        features = self.dataset[id]
+        train_encodings = tokenizer(
+            features["sentence1"],
+            features["sentence2"],
+            return_tensors="pt",
+            max_length=TASK["pawsx"]["max seq length"],
+            truncation=True,
+        )
+        return {
+            "tokens": train_encodings.input_ids.long(),
+            "label": torch.Tensor(
+                [pawsxTrainDataset.class_label.index(features["label"])]
+            ).long(),
+        }
+
+
+class pawsxValidationDataset(torch.utils.data.Dataset):
+    def __init__(self):
+        set_name, subset_name, split = TASK["pawsx"]["validation"]
+        self.dataset = get_dataset(set_name, subset_name)[split]
+
+    def __len__(self):
+        return len(self.dataset)
+
+    def __getitem__(self, id):
+        features = self.dataset[id]
+        train_encodings = tokenizer(
+            features["sentence1"],
+            features["sentence2"],
+            return_tensors="pt",
+            max_length=TASK["pawsx"]["max seq length"],
+            truncation=True,
+        )
+        return {
+            "tokens": train_encodings.input_ids.long(),
+            "label": torch.Tensor(
+                [pawsxTrainDataset.class_label.index(features["label"])]
+            ).long(),
+        }
+
+
+class pawsxTestDataset(torch.utils.data.Dataset):
+    def __init__(self):
+        self.dataset = {}
+        for lan in TASK["pawsx"]["test"]:
+            set_name, subset_name, split = TASK["pawsx"]["test"]
+            self.dataset[lan] = get_dataset(set_name, subset_name)[split]
+
+    def __len__(self):
+        return sum(map(lambda x: len(x), self.dataset.items))
+
+    def __getitem__(self, id_absolute):
+        for lan in self.dataset:
+            length = len(self.dataset[lan])
+            if id_absolute < length:
+                id = id_absolute
+                break
+            id_absolute -= length
+        features = self.dataset[id]
+        train_encodings = tokenizer(
+            features["sentence1"],
+            features["sentence2"],
+            return_tensors="pt",
+            max_length=TASK["pawsx"]["max seq length"],
+            truncation=True,
+        )
+        return {
+            "tokens": train_encodings.input_ids.long(),
+            "label": torch.Tensor(
+                [pawsxTrainDataset.class_label.index(features["label"])]
+            ).long(),
+        }
+
+
+class xquadTrainDataset(torch.utils.data.Dataset):
+    def __init__(self):
+        set_name, subset_name, split = TASK["xquad"]["train"]
         self.dataset = get_dataset(set_name, subset_name)[split]
 
     def __len__(self):
@@ -716,7 +867,7 @@ class xquadTrainDataset(torch.utils.data.Dataset):
             features["question"],
             features["context"],
             return_tensors="pt",
-            max_length=TASK[xquadTrainDataset.task]["max seq length"],
+            max_length=TASK["xquad"]["max seq length"],
             truncation=True,
         )
         return {
@@ -734,10 +885,8 @@ class xquadTrainDataset(torch.utils.data.Dataset):
 
 
 class xquadValidationDataset(torch.utils.data.Dataset):
-    task = "xquad"
-
     def __init__(self):
-        set_name, subset_name, split = TASK[xquadValidationDataset.task]["validation"]
+        set_name, subset_name, split = TASK["xquad"]["validation"]
         self.dataset = get_dataset(set_name, subset_name)[split]
 
     def __len__(self):
@@ -749,7 +898,7 @@ class xquadValidationDataset(torch.utils.data.Dataset):
             features["question"],
             features["context"],
             return_tensors="pt",
-            max_length=TASK[xquadValidationDataset.task]["max seq length"],
+            max_length=TASK["xquad"]["max seq length"],
             truncation=True,
         )
         return {
@@ -767,12 +916,10 @@ class xquadValidationDataset(torch.utils.data.Dataset):
 
 
 class xquadTestDataset(torch.utils.data.Dataset):
-    task = "xquad"
-
     def __init__(self):
         self.dataset = {}
-        for lan in TASK[xquadTestDataset.task]["test"]:
-            set_name, subset_name, split = TASK[xquadTestDataset.task]["test"][lan]
+        for lan in TASK["xquad"]["test"]:
+            set_name, subset_name, split = TASK["xquad"]["test"][lan]
             self.dataset[lan] = get_dataset(set_name, subset_name)[split]
 
     def __len__(self):
@@ -790,7 +937,7 @@ class xquadTestDataset(torch.utils.data.Dataset):
             features["question"],
             features["context"],
             return_tensors="pt",
-            max_length=TASK[xquadTestDataset.task]["max seq length"],
+            max_length=TASK["xquad"]["max seq length"],
             truncation=True,
         )
         return {
@@ -808,10 +955,8 @@ class xquadTestDataset(torch.utils.data.Dataset):
 
 
 # class mlqaTrainDataset(torch.utils.data.Dataset):
-#     task = "mlqa"
-
 #     def __init__(self):
-#         set_name, subset_name, split = TASK[mlqaTrainDataset.task]["train"]
+#         set_name, subset_name, split = TASK["mlqa"]["train"]
 #         self.dataset = get_dataset(set_name, subset_name)[split]
 
 #     def __len__(self):
@@ -823,7 +968,7 @@ class xquadTestDataset(torch.utils.data.Dataset):
 #             features["question"],
 #             features["context"],
 #             return_tensors="pt",
-#             max_length=TASK[mlqaTrainDataset.task]["max seq length"],
+#             max_length=TASK["mlqa"]["max seq length"],
 #             truncation=True,
 #         )
 #         return {
@@ -841,10 +986,8 @@ class xquadTestDataset(torch.utils.data.Dataset):
 
 
 # class mlqaValidationDataset(torch.utils.data.Dataset):
-#     task = "mlqa"
-
 #     def __init__(self):
-#         set_name, subset_name, split = TASK[mlqaValidationDataset.task]["validation"]
+#         set_name, subset_name, split = TASK["mlqa"]["validation"]
 #         self.dataset = get_dataset(set_name, subset_name)[split]
 
 #     def __len__(self):
@@ -856,7 +999,7 @@ class xquadTestDataset(torch.utils.data.Dataset):
 #             features["question"],
 #             features["context"],
 #             return_tensors="pt",
-#             max_length=TASK[mlqaValidationDataset.task]["max seq length"],
+#             max_length=TASK["mlqa"]["max seq length"],
 #             truncation=True,
 #         )
 #         return {
@@ -874,12 +1017,10 @@ class xquadTestDataset(torch.utils.data.Dataset):
 
 
 class mlqaTestDataset(torch.utils.data.Dataset):
-    task = "mlqa"
-
     def __init__(self):
         self.dataset = {}
-        for lan in TASK[mlqaTestDataset.task]["test"]:
-            set_name, subset_name, split = TASK[mlqaTestDataset.task]["test"][lan]
+        for lan in TASK["mlqa"]["test"]:
+            set_name, subset_name, split = TASK["mlqa"]["test"][lan]
             self.dataset[lan] = get_dataset(set_name, subset_name)[split]
 
     def __len__(self):
@@ -897,7 +1038,7 @@ class mlqaTestDataset(torch.utils.data.Dataset):
             features["question"],
             features["context"],
             return_tensors="pt",
-            max_length=TASK[mlqaTestDataset.task]["max seq length"],
+            max_length=TASK["mlqa"]["max seq length"],
             truncation=True,
         )
         return {
@@ -915,10 +1056,8 @@ class mlqaTestDataset(torch.utils.data.Dataset):
 
 
 class tydiqaTrainDataset(torch.utils.data.Dataset):
-    task = "tydiqa"
-
     def __init__(self):
-        set_name, subset_name, split = TASK[tydiqaTrainDataset.task]["train"]
+        set_name, subset_name, split = TASK["tydiqa"]["train"]
         self.dataset = get_dataset(set_name, subset_name)[split]
 
     def __len__(self):
@@ -930,7 +1069,7 @@ class tydiqaTrainDataset(torch.utils.data.Dataset):
             features["question"],
             features["context"],
             return_tensors="pt",
-            max_length=TASK[tydiqaTrainDataset.task]["max seq length"],
+            max_length=TASK["tydiqa"]["max seq length"],
             truncation=True,
         )
         return {
@@ -948,10 +1087,8 @@ class tydiqaTrainDataset(torch.utils.data.Dataset):
 
 
 class tydiqaValidationDataset(torch.utils.data.Dataset):
-    task = "tydiqa"
-
     def __init__(self):
-        set_name, subset_name, split = TASK[tydiqaValidationDataset.task]["validation"]
+        set_name, subset_name, split = TASK["tydiqa"]["validation"]
         self.dataset = get_dataset(set_name, subset_name)[split]
 
     def __len__(self):
@@ -963,7 +1100,7 @@ class tydiqaValidationDataset(torch.utils.data.Dataset):
             features["question"],
             features["context"],
             return_tensors="pt",
-            max_length=TASK[tydiqaValidationDataset.task]["max seq length"],
+            max_length=TASK["tydiqa"]["max seq length"],
             truncation=True,
         )
         return {
@@ -981,10 +1118,8 @@ class tydiqaValidationDataset(torch.utils.data.Dataset):
 
 
 class tydiqaTestDataset(torch.utils.data.Dataset):
-    task = "tydiqa"
-
     def __init__(self):
-        set_name, subset_name, split = TASK[tydiqaValidationDataset.task]["test"]
+        set_name, subset_name, split = TASK["tydiqa"]["test"]
         self.dataset = get_dataset(set_name, subset_name)[split]
 
     def __len__(self):
@@ -996,7 +1131,7 @@ class tydiqaTestDataset(torch.utils.data.Dataset):
             features["question"],
             features["context"],
             return_tensors="pt",
-            max_length=TASK[tydiqaValidationDataset.task]["max seq length"],
+            max_length=TASK["tydiqa"]["max seq length"],
             truncation=True,
         )
         return {
@@ -1010,4 +1145,76 @@ class tydiqaTestDataset(torch.utils.data.Dataset):
                     + len(features["answers"]["text"][0])
                 ]
             ).long(),
+        }
+
+
+class bucc2018tDataset(torch.utils.data.Dataset):
+    def __init__(self):
+        self.dataset = {}
+        for lan in TASK["bucc2018"]["src"]:
+            set_name, subset_name, split = TASK["bucc2018"]["src"][lan]
+            self.dataset[lan] = get_dataset(set_name, subset_name)[split]
+
+    def __len__(self):
+        return sum(map(lambda x: len(x), self.dataset.items))
+
+    def __getitem__(self, id_absolute):
+        for lan in self.dataset:
+            length = len(self.dataset[lan])
+            if id_absolute < length:
+                id = id_absolute
+                break
+            id_absolute -= length
+        features = self.dataset[lan][id]
+        source_encodings = tokenizer(
+            features["source_sentence"],
+            return_tensors="pt",
+            max_length=TASK["bucc2018"]["max seq length"],
+            truncation=True,
+        )
+        target_encodings = tokenizer(
+            features["target_sentence"],
+            return_tensors="pt",
+            max_length=TASK["bucc2018"]["max seq length"],
+            truncation=True,
+        )
+        return {
+            "source_tokens": source_encodings.input_ids.long(),
+            "target_tokens": target_encodings.input_ids.long(),
+        }
+
+
+class tatoebaDataset(torch.utils.data.Dataset):
+    def __init__(self):
+        self.dataset = {}
+        for lan in TASK["tatoeba"]["src"]:
+            set_name, subset_name, split = TASK["tatoeba"]["src"][lan]
+            self.dataset[lan] = get_dataset(set_name, subset_name)[split]
+
+    def __len__(self):
+        return sum(map(lambda x: len(x), self.dataset.items))
+
+    def __getitem__(self, id_absolute):
+        for lan in self.dataset:
+            length = len(self.dataset[lan])
+            if id_absolute < length:
+                id = id_absolute
+                break
+            id_absolute -= length
+        features = self.dataset[lan][id]
+        source_encodings = tokenizer(
+            features["source_sentence"],
+            return_tensors="pt",
+            max_length=TASK["tatoeba"]["max seq length"],
+            truncation=True,
+        )
+        target_encodings = tokenizer(
+            features["target_sentence"],
+            return_tensors="pt",
+            max_length=TASK["tatoeba"]["max seq length"],
+            truncation=True,
+        )
+        return {
+            "source_tokens": source_encodings.input_ids.long(),
+            "target_tokens": target_encodings.input_ids.long(),
         }
