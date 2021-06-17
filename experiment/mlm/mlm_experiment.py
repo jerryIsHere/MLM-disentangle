@@ -10,7 +10,7 @@ import time
 import os
 
 start_time = time.time()
-parser = argparse.ArgumentParser(description="token frequency of 40 corpus")
+parser = argparse.ArgumentParser(description="mlm-disentanglement experinment")
 parser.add_argument(
     "--config_json",
     metavar="path",
