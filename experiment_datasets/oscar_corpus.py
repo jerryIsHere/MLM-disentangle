@@ -451,9 +451,8 @@ class MLMDisentangleDataset(torch.utils.data.IterableDataset):
             txt_tokens = np.array([])
             txt_masked_tokens = np.array([])
             while True:
-                i = idx[lan] // len(xtreme_ds.xtreme_lan)
-                idx[lan] = idx[lan] + 1
-                i = i % len(self.corpuses[lan])
+                i = idx[lan] % len(self.corpuses[lan])
+                idx[lan] += 1
                 txt = self.corpuses[lan][i]["text"]
                 for each in punct_chars_2_newline:
                     txt = txt.replace(each, punct_chars_2_newline[each])
