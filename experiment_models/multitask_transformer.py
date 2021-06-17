@@ -6,13 +6,13 @@ import transformers
 
 
 class MultitaskModel(transformers.PreTrainedModel):
-    def __init__(self, backbone, taskmodels_dict):
+    def __init__(self, backbone, taskmodels_dict, backbone_name):
         """
         Setting MultitaskModel up as a PretrainedModel allows us
         to take better advantage of Trainer features
         """
         super().__init__(transformers.PretrainedConfig())
-
+        self.backbone_name = backbone_name
         self.backbone = backbone
         self.taskmodels_dict = nn.ModuleDict(taskmodels_dict)
 
@@ -25,7 +25,6 @@ class MultitaskModel(transformers.PreTrainedModel):
         We do this by creating each single-task model, and having them share
         the same backbone transformer.
         """
-        self.backbone_name = backbone_name
         shared_backbone = None
         taskmodels_dict = {}
         for task in task_dict:
@@ -38,7 +37,11 @@ class MultitaskModel(transformers.PreTrainedModel):
             else:
                 setattr(model, cls.get_backbone_attr_name(model), shared_backbone)
             taskmodels_dict[task] = model
-        return cls(backbone=shared_backbone, taskmodels_dict=taskmodels_dict)
+        return cls(
+            backbone=shared_backbone,
+            taskmodels_dict=taskmodels_dict,
+            backbone_name=backbone_name,
+        )
 
     @classmethod
     def get_backbone_attr_name(cls, model):
@@ -68,6 +71,7 @@ class MultitaskModel(transformers.PreTrainedModel):
         )
         setattr(model, MultitaskModel.get_backbone_attr_name(model), self.backbone)
         self.taskmodels_dict[task_name] = model
+
 
 # https://github.com/janfreyberg/pytorch-revgrad
 from torch.autograd import Function
