@@ -1,14 +1,11 @@
 import torch
 import torch.nn as nn
 import transformers
-from transformers.models.roberta.configuration_roberta import RobertaConfig
 
 # https://colab.research.google.com/github/zphang/zphang.github.io/blob/master/files/notebooks/Multi_task_Training_with_Transformers_NLP.ipynb#scrollTo=7zSZsp8Cb7gd
 
 
 class MultitaskModel(transformers.PreTrainedModel):
-    config_class = RobertaConfig
-
     def __init__(self, backbone, taskmodels_dict):
         """
         Setting MultitaskModel up as a PretrainedModel allows us
