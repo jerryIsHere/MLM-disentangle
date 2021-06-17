@@ -12,4 +12,4 @@
 
 module load python37
 source /gpfs1/home/ckchan666/mnlpEnv/bin/activate
-python /gpfs1/home/ckchan666/MLM-disentangle/data_preparation/build_custom_oscar.py --debug
+python /gpfs1/home/ckchan666/MLM-disentangle/data_preparation/build_custom_oscar.py
