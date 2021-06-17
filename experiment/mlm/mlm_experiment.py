@@ -85,7 +85,10 @@ writer = SummaryWriter(
 
 MLMD_ds = oscar_corpus.get_custom_corpus().set_format(type="torch")
 dataloader = torch.utils.data.DataLoader(
-    MLMD_ds, batch_size=experiment_config_dict["training"].batch_size, num_workers=0
+    MLMD_ds,
+    batch_size=experiment_config_dict["training"].batch_size,
+    num_workers=0,
+    shuffle=True,
 )
 
 import gc
@@ -95,6 +98,12 @@ for task in multitask_model.taskmodels_dict:
 mlmLoss = 0.0
 disentangleLoss = 0.0
 gradient_step = 0
+model_path = (
+    "/gpfs1/home/ckchan666/mlm_disentangle_experiment/model/"
+    + os.path.dirname(os.path.abspath(__file__)).split("/")[-1]
+    + "/"
+    + experiment_config_dict["training"].model_name,
+)
 print("building time: " + str(time.time() - start_time) + "s")
 start_time = time.time()
 print(
@@ -201,9 +210,7 @@ for i, batch in enumerate(dataloader):
             )
             mlmLoss = 0
             disentangleLoss = 0
-            multitask_model.save_pretrained(
-                "./" + experiment_config_dict["training"].model_name,
-            )
+            multitask_model.save_pretrained(model_path)
         if gradient_step >= experiment_config_dict["training"].max_step:
             break
         if time.time() - start_time > 0.9 * args.time:
@@ -213,12 +220,7 @@ for i, batch in enumerate(dataloader):
     gc.collect()
 
 
-multitask_model.save_pretrained(
-    "/gpfs1/home/ckchan666/mlm_disentangle_experiment/model/"
-    + os.path.dirname(os.path.abspath(__file__)).split("/")[-1]
-    + "/"
-    + experiment_config_dict["training"].model_name,
-)
+multitask_model.save_pretrained(model_path)
 print(str(time.time() - start_time) + " seconds elapsed")
 
 from resource import getrusage, RUSAGE_SELF
