@@ -282,6 +282,20 @@ TASK["tatoeba"]["src"] = {
     code2: TASK["tatoeba"]["src"].get(code3) for (code3, code2) in lang3_dict.items()
 }
 
+from datasets import load_metric
+
+# https://github.com/google-research/xtreme/blob/master/evaluate.py#L130
+METRIC_FUNCTION = {
+    "pawsx": lambda: load_metric("accuracy"),
+    "xnli": lambda: load_metric("accuracy"),
+    "panx": lambda: load_metric("f1"),
+    "udpos": lambda: load_metric("f1"),
+    "bucc2018": bucc_f1,
+    "tatoeba": lambda: load_metric("accuracy"),
+    "xquad": squad_em_f1,
+    "mlqa": mlqa_em_f1,
+    "tydiqa": squad_em_f1,
+}
 TASK2LANGS = {
     "pawsx": "de,en,es,fr,ja,ko,zh".split(","),
     "xnli": "ar,bg,de,el,en,es,fr,hi,ru,sw,th,tr,ur,vi,zh".split(","),
@@ -587,6 +601,7 @@ class udposTestDataset(torch.utils.data.Dataset):
         return {
             "tokens": torch.from_numpy(ids).long(),
             "pos_tags": torch.from_numpy(labels).long(),
+            "lan": lan,
         }
 
 
@@ -685,6 +700,7 @@ class panxTestDataset(torch.utils.data.Dataset):
         return {
             "tokens": torch.from_numpy(ids).long(),
             "ner_tags": torch.from_numpy(labels).long(),
+            "lan": lan,
         }
 
 
@@ -772,6 +788,7 @@ class xnliTestDataset(torch.utils.data.Dataset):
             "label": torch.Tensor(
                 [xnliTestDataset.class_label.index(features["gold_label"])]
             ).long(),
+            "lan": features["language"],
         }
 
 
@@ -860,6 +877,7 @@ class pawsxTestDataset(torch.utils.data.Dataset):
             "label": torch.Tensor(
                 [pawsxTrainDataset.class_label.index(features["label"])]
             ).long(),
+            "lan": lan,
         }
 
 
@@ -961,6 +979,7 @@ class xquadTestDataset(torch.utils.data.Dataset):
                     + len(features["answers"]["text"][0])
                 ]
             ).long(),
+            "lan": lan,
         }
 
 
@@ -1062,6 +1081,7 @@ class mlqaTestDataset(torch.utils.data.Dataset):
                     + len(features["answers"]["text"][0])
                 ]
             ).long(),
+            "lan": lan,
         }
 
 
@@ -1127,6 +1147,19 @@ class tydiqaValidationDataset(torch.utils.data.Dataset):
         }
 
 
+LANG2ISO = {
+    "arabic": "ar",
+    "bengali": "bn",
+    "english": "en",
+    "finnish": "fi",
+    "indonesian": "id",
+    "korean": "ko",
+    "russian": "ru",
+    "swahili": "sw",
+    "telugu": "te",
+}
+
+
 class tydiqaTestDataset(torch.utils.data.Dataset):
     def __init__(self):
         set_name, subset_name, split = TASK["tydiqa"]["test"]
@@ -1155,6 +1188,7 @@ class tydiqaTestDataset(torch.utils.data.Dataset):
                     + len(features["answers"]["text"][0])
                 ]
             ).long(),
+            "lan": LANG2ISO[features["id"].split("-")[0]],
         }
 
 
@@ -1191,6 +1225,7 @@ class bucc2018tDataset(torch.utils.data.Dataset):
         return {
             "source_tokens": source_encodings.input_ids.long(),
             "target_tokens": target_encodings.input_ids.long(),
+            "lan": lan,
         }
 
 
@@ -1227,4 +1262,5 @@ class tatoebaDataset(torch.utils.data.Dataset):
         return {
             "source_tokens": source_encodings.input_ids.long(),
             "target_tokens": target_encodings.input_ids.long(),
+            "lan": lan,
         }
