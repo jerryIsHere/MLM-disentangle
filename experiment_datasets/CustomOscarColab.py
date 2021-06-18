@@ -53,7 +53,7 @@ class CustomOscarColab(datasets.GeneratorBasedBuilder):
         self.vocab_prob = {}
         for lan in CustomOscarColab.lan:
             self.corpuses[lan] = get_corpus(lan)
-            self.tokenFrequency[lan] = get_token_frequency(lan)
+            self.tokenFrequency[lan] = collections.Counter(vocab_token)
             self.vocab_prob[lan] = np.array(
                 [
                     0
