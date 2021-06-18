@@ -57,22 +57,13 @@ for layers in multitask_model.backbone.encoder.layer[
     for param in layers.parameters():
         param.requires_grad = False
 optimizermlm = torch.optim.Adam(
-    multitask_model.taskmodels_dict["mlm"].parameters(),
+    multitask_model.parameters(),
     lr=experiment_config_dict["training"].mlm_lr,
     betas=(
         experiment_config_dict["training"].mlm_beta1,
         experiment_config_dict["training"].mlm_beta2,
     ),
     eps=experiment_config_dict["training"].mlm_eps,
-)
-optimizerdisentangle = torch.optim.Adam(
-    multitask_model.taskmodels_dict["disentangle"].parameters(),
-    lr=experiment_config_dict["training"].disentangle_lr,
-    betas=(
-        experiment_config_dict["training"].disentangle_beta1,
-        experiment_config_dict["training"].disentangle_beta2,
-    ),
-    eps=experiment_config_dict["training"].disentangle_eps,
 )
 from torch.utils.tensorboard import SummaryWriter
 
@@ -167,7 +158,6 @@ for i, batch in enumerate(dataloader):
     ) == 0:
         optimizermlm.step()
         multitask_model.taskmodels_dict["mlm"].zero_grad()
-        optimizerdisentangle.step()
         multitask_model.taskmodels_dict["disentangle"].zero_grad()
         gradient_step += 1
         if gradient_step == 1:
@@ -222,7 +212,3 @@ for i, batch in enumerate(dataloader):
 
 multitask_model.save_pretrained(model_path)
 print(str(time.time() - start_time) + " seconds elapsed")
-
-from resource import getrusage, RUSAGE_SELF
-
-print(str(getrusage(RUSAGE_SELF).ru_maxrss) + "KB used (peak)")
