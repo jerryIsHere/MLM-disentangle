@@ -143,3 +143,5 @@ class CustomOscarColab(datasets.GeneratorBasedBuilder):
                     del txt_tokens
                     break
             lan_idx = (lan_idx + 1) % len(CustomOscarColab.lan)
+            if id_all > len(xtreme_ds.xtreme_lan) * 2 * 10 * 16:  # * 700 * 4:
+                break
