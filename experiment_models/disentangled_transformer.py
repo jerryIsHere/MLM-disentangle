@@ -25,7 +25,7 @@ class XLMRobertSingleTokenDiscriminator(nn.Module):
     def __init__(self, config, discriminator_config: DiscriminatorConfig):
         super().__init__()
         self.portion_length = discriminator_config.length
-        self.revgrad = RevGrad()
+        self.revgrad = RevGrad(alpha=discriminator_config.weight)
         self.dropout = nn.Dropout(config.hidden_dropout_prob)
         self.dense = nn.Linear(
             discriminator_config.length, discriminator_config.hidden_size
@@ -51,7 +51,7 @@ class XLMRobertFullSequenceDiscriminator(nn.Module):
     def __init__(self, config, discriminator_config: DiscriminatorConfig):
         super().__init__()
         self.portion_length = discriminator_config.length
-        self.revgrad = RevGrad()
+        self.revgrad = RevGrad(alpha=discriminator_config.weight)
 
         encoder_layers = torch.nn.TransformerEncoderLayer(
             discriminator_config.length,
@@ -151,28 +151,20 @@ class XLMRobertaForDisentanglement(RobertaPreTrainedModel):
             loss = 0
             for i, discriminator_config in self.discriminators_config.items():
                 if discriminator_config.dtype == DiscriminatorType.SingleToken:
-                    loss = (
-                        loss
-                        + loss_fct(
-                            discriminator_logits[i].view(
-                                -1, discriminator_config.num_labels
-                            ),
-                            labels[discriminator_config.label_id]
-                            .view(-1)
-                            .repeat_interleave(input_ids.shape[1]),
-                        )
-                        * discriminator_config.weight
+                    loss = loss + loss_fct(
+                        discriminator_logits[i].view(
+                            -1, discriminator_config.num_labels
+                        ),
+                        labels[discriminator_config.label_id]
+                        .view(-1)
+                        .repeat_interleave(input_ids.shape[1]),
                     )
                 elif discriminator_config.dtype == DiscriminatorType.FullSequence:
-                    loss = (
-                        loss
-                        + loss_fct(
-                            discriminator_logits[i].view(
-                                -1, discriminator_config.num_labels
-                            ),
-                            labels[discriminator_config.label_id].view(-1),
-                        )
-                        * discriminator_config.weight
+                    loss = loss + loss_fct(
+                        discriminator_logits[i].view(
+                            -1, discriminator_config.num_labels
+                        ),
+                        labels[discriminator_config.label_id].view(-1),
                     )
 
         if not return_dict:
