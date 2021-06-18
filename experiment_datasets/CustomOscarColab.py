@@ -18,7 +18,7 @@ import numpy as np
 
 
 class CustomOscarColab(datasets.GeneratorBasedBuilder):
-    lan = ["yo", "jv", "sw", "ms", "af", "eu", "tl", "my"]
+    lan = ["yo", "jv", "sw", "ms",]
 
     def _info(self):
 
@@ -143,5 +143,5 @@ class CustomOscarColab(datasets.GeneratorBasedBuilder):
                     del txt_tokens
                     break
             lan_idx = (lan_idx + 1) % len(CustomOscarColab.lan)
-            if id_all > len(xtreme_ds.xtreme_lan) * 2 * 10 * 16:  # * 700 * 4:
+            if id_all >  2 * 11 * 16:  # * 700 * 4:
                 break
