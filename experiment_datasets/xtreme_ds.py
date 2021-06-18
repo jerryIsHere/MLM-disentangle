@@ -290,11 +290,11 @@ METRIC_FUNCTION = {
     "xnli": lambda: load_metric("accuracy"),
     "panx": lambda: load_metric("f1"),
     "udpos": lambda: load_metric("f1"),
-    "bucc2018": bucc_f1,
+    "bucc2018": lambda: load_metric("f1"),
     "tatoeba": lambda: load_metric("accuracy"),
-    "xquad": squad_em_f1,
-    "mlqa": mlqa_em_f1,
-    "tydiqa": squad_em_f1,
+    "xquad": lambda: load_metric("squad"),  # should be f1 & exact match
+    "mlqa": lambda: load_metric("squad"),
+    "tydiqa": lambda: load_metric("squad"),
 }
 TASK2LANGS = {
     "pawsx": "de,en,es,fr,ja,ko,zh".split(","),
