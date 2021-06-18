@@ -71,7 +71,3 @@ class MultitaskModel(transformers.PreTrainedModel):
         )
         setattr(model, MultitaskModel.get_backbone_attr_name(model), self.backbone)
         self.taskmodels_dict[task_name] = model
-
-
-# https://github.com/janfreyberg/pytorch-revgrad
-from torch.autograd import Function
