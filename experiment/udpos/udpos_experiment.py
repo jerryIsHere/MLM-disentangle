@@ -22,7 +22,6 @@ parser.add_argument(
 )
 
 args = parser.parse_args()
-args.time = sum([a * b for a, b in zip([3600, 60, 1], map(int, args.time.split(":")))])
 with open(args.config_json, "r") as outfile:
     experiment_config_dict = json.load(outfile, cls=ExperimentConfigSerializer)
 experiment_config_dict["training"].model_name = (
@@ -60,25 +59,18 @@ finetune_model.taskmodels_dict.pop("mlm")
 finetune_model.add_task(
     task,
     transformers.XLMRobertaForTokenClassification,
-    transformers.XLMRobertaConfig.from_pretrained(finetune_model.backbone_name),
+    transformers.XLMRobertaConfig.from_pretrained(
+        finetune_model.backbone_name, num_labels=xtreme_ds.TASK[task]["num_labels"]
+    ),
 )
 
-
-optimizerudpos = torch.optim.Adam(
-    finetune_model.taskmodels_dict[task].parameters(),
+# training
+optimizer = torch.optim.Adam(
+    finetune_model.parameters(),
     lr=xtreme_ds.TASK[task]["learning rate"],
     eps=xtreme_ds.TASK[task]["weight decay"],
 )
 
-optimizerdisentangle = torch.optim.Adam(
-    finetune_model.taskmodels_dict["disentangle"].parameters(),
-    lr=experiment_config_dict["training"].disentangle_lr,
-    betas=(
-        experiment_config_dict["training"].disentangle_beta1,
-        experiment_config_dict["training"].disentangle_beta2,
-    ),
-    eps=experiment_config_dict["training"].disentangle_eps,
-)
 from torch.utils.tensorboard import SummaryWriter
 
 writer = SummaryWriter(
@@ -88,13 +80,15 @@ writer = SummaryWriter(
     + experiment_config_dict["training"].model_name
 )
 
-MLMD_ds = oscar_corpus.get_custom_corpus().set_format(type="torch")
+MLMD_ds = oscar_corpus.get_custom_corpus()
+MLMD_ds.set_format(type="torch")
 disentangle_dataloader = torch.utils.data.DataLoader(
     MLMD_ds,
     batch_size=experiment_config_dict["training"].batch_size,
     num_workers=0,
     shuffle=True,
 )
+disentangle_iter = iter(disentangle_dataloader)
 udpos_ds = xtreme_ds.udposTrainDataset()
 udpos_ds_dataloader = torch.utils.data.DataLoader(
     udpos_ds, batch_size=2, num_workers=0, shuffle=True
@@ -102,12 +96,13 @@ udpos_ds_dataloader = torch.utils.data.DataLoader(
 gradient_acc_size = 16
 batch_size = 2
 scheduler = transformers.get_linear_schedule_with_warmup(
-    optimizerudpos,
+    optimizer,
     num_warmup_steps=xtreme_ds.TASK[task]["warmup step"],
     num_training_steps=len(udpos_ds)
     // gradient_acc_size
     * xtreme_ds.TASK[task]["epochs"],
 )
+log_step = len(udpos_ds) // gradient_acc_size * xtreme_ds.TASK[task]["epochs"] // 20
 
 import gc
 
@@ -116,11 +111,17 @@ for task in finetune_model.taskmodels_dict:
 udposLoss = 0.0
 disentangleLoss = 0.0
 gradient_step = 0
+model_path = (
+    "/gpfs1/home/ckchan666/mlm_disentangle_experiment/model/"
+    + os.path.dirname(os.path.abspath(__file__)).split("/")[-1]
+    + "/"
+    + experiment_config_dict["training"].model_name,
+)
 print("building time: " + str(time.time() - start_time) + "s")
 start_time = time.time()
 print(
     "run for "
-    + xtreme_ds.TASK[task]["epochs"]
+    + str(xtreme_ds.TASK[task]["epochs"])
     + " epoches with "
     + str(gradient_acc_size)
     + " gradient acc size"
@@ -147,7 +148,7 @@ for _ in range(xtreme_ds.TASK[task]["epochs"]):
         batch.clear()
         del batch
 
-        batch = next(disentangle_dataloader)
+        batch = next(disentangle_iter)
         # disentangle input to gpu
         batch["masked_tokens"] = batch["masked_tokens"].cuda()
         batch["language_id"] = batch["language_id"].cuda()
@@ -179,89 +180,77 @@ for _ in range(xtreme_ds.TASK[task]["epochs"]):
         del batch
 
         if (i + 1) % (gradient_acc_size / batch_size) == 0:
-            optimizerudpos.step()
+            scheduler.step()
             finetune_model.taskmodels_dict[task].zero_grad()
-            optimizerdisentangle.step()
             finetune_model.taskmodels_dict["disentangle"].zero_grad()
             gradient_step += 1
             if gradient_step == 1:
-                print(
-                    "loss ("
-                    + str(gradient_step)
-                    + "): "
-                    + str(udposLoss / experiment_config_dict["training"].log_step)
-                )
+                print("loss (" + str(gradient_step) + "): " + str(udposLoss / log_step))
                 print(
                     "disentangle loss ("
                     + str(gradient_step)
                     + "): "
-                    + str(disentangleLoss / experiment_config_dict["training"].log_step)
+                    + str(disentangleLoss / log_step)
                 )
-            if gradient_step % experiment_config_dict["training"].log_step == 0:
+            if gradient_step % log_step == 0:
                 writer.add_scalar("lr", scheduler.get_lr()[0], i)
                 writer.add_scalar("disentangle lr", scheduler.get_lr()[0], i)
                 print(
-                    " loss ("
-                    + str(gradient_step)
-                    + "): "
-                    + str(udposLoss / experiment_config_dict["training"].log_step)
+                    " loss (" + str(gradient_step) + "): " + str(udposLoss / log_step)
                 )
                 print(
                     "disentangle loss ("
                     + str(gradient_step)
                     + "): "
-                    + str(disentangleLoss / experiment_config_dict["training"].log_step)
+                    + str(disentangleLoss / log_step)
                 )
                 writer.add_scalar(
                     " loss",
-                    udposLoss / experiment_config_dict["training"].log_step,
+                    udposLoss / log_step,
                     gradient_step,
                 )
                 writer.add_scalar(
                     "disentangle loss",
-                    disentangleLoss / experiment_config_dict["training"].log_step,
+                    disentangleLoss / log_step,
                     gradient_step,
                 )
                 udposLoss = 0
                 disentangleLoss = 0
-                finetune_model.save_pretrained(
-                    "./" + experiment_config_dict["training"].model_name,
-                )
+                finetune_model.save_pretrained(model_path)
         gc.collect()
         i += 1
 
-
-finetune_model.save_pretrained(
-    "/gpfs1/home/ckchan666/mlm_disentangle_experiment/model/"
-    + os.path.dirname(os.path.abspath(__file__)).split("/")[-1]
-    + "/"
-    + experiment_config_dict["training"].model_name,
-)
+finetune_model.save_pretrained(model_path)
 print(str(time.time() - start_time) + " seconds elapsed for training")
 
-
+# testing
 test_dataloader = torch.utils.data.DataLoader(
     xtreme_ds.udposTestDataset(), batch_size=2, num_workers=0, shuffle=True
 )
-
-
+metric = xtreme_ds.METRIC_FUNCTION[task]()
+lan_metric = {}
+for lan in xtreme_ds.TASK[task]["test"]:
+    lan_metric[lan] = xtreme_ds.METRIC_FUNCTION[task]()
+finetune_model.taskmodels_dict[task].cuda()
 for batch in test_dataloader:
-    #  input to gpu
-    batch["tokens"] = batch["tokens"].cuda()
-    batch["pos_tags"] = batch["pos_tags"].cuda()
+    with torch.no_grad():
+        #  input to gpu
+        batch["tokens"] = batch["tokens"].cuda()
 
-    #  model to gpu
-    finetune_model.taskmodels_dict[task].cuda()
-    Output = finetune_model.taskmodels_dict[task](
-        input_ids=batch["tokens"],
-        labels=batch["pos_tags"],
-    )
-=
-    del Output
-    batch.clear()
-    del batch
+        Output = finetune_model.taskmodels_dict[task](input_ids=batch["tokens"])
+        predictions = torch.argmax(Output["logits"], dim=2)
+        for i, lan in enumerate(batch["lan"]):
+            for j, token_pred in enumerate(predictions[i]):
+                if batch["pos_tags"][i][j] == -100:
+                    continue
+                lan_metric[lan].add(
+                    prediction=token_pred, reference=batch["pos_tags"][i][j]
+                )
+                metric.add(prediction=token_pred, reference=batch["pos_tags"][i][j])
+        del Output
+        batch.clear()
+        del batch
 
-
-from resource import getrusage, RUSAGE_SELF
-
-print(str(getrusage(RUSAGE_SELF).ru_maxrss) + "KB used (peak)")
+for lan in lan_metric:
+    lan_metric[lan].compute()
+metric.compute()
