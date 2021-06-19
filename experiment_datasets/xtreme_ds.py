@@ -522,6 +522,7 @@ class udposTrainDataset(torch.utils.data.Dataset):
             is_split_into_words=True,
             max_length=TASK["udpos"]["max seq length"],
             truncation=True,
+            padding="max_length",
             return_offsets_mapping=True,
         )
         labels = np.ones(len(train_encodings.input_ids), dtype=int) * -100
@@ -552,6 +553,7 @@ class udposValidationDataset(torch.utils.data.Dataset):
             is_split_into_words=True,
             max_length=TASK["udpos"]["max seq length"],
             truncation=True,
+            padding="max_length",
             return_offsets_mapping=True,
         )
         labels = np.ones(len(train_encodings.input_ids), dtype=int) * -100
@@ -590,6 +592,7 @@ class udposTestDataset(torch.utils.data.Dataset):
             is_split_into_words=True,
             max_length=TASK["udpos"]["max seq length"],
             truncation=True,
+            padding="max_length",
             return_offsets_mapping=True,
         )
         labels = np.ones(len(train_encodings.input_ids), dtype=int) * -100
@@ -621,6 +624,7 @@ class panxTrainDataset(torch.utils.data.Dataset):
             is_split_into_words=True,
             max_length=TASK["panx"]["max seq length"],
             truncation=True,
+            padding="max_length",
             return_offsets_mapping=True,
         )
         labels = np.ones(len(train_encodings.input_ids), dtype=int) * -100
@@ -651,6 +655,7 @@ class panxValidationDataset(torch.utils.data.Dataset):
             is_split_into_words=True,
             max_length=TASK["panx"]["max seq length"],
             truncation=True,
+            padding="max_length",
             return_offsets_mapping=True,
         )
         labels = np.ones(len(train_encodings.input_ids), dtype=int) * -100
@@ -689,6 +694,7 @@ class panxTestDataset(torch.utils.data.Dataset):
             is_split_into_words=True,
             max_length=TASK["panx"]["max seq length"],
             truncation=True,
+            padding="max_length",
             return_offsets_mapping=True,
         )
         labels = np.ones(len(train_encodings.input_ids), dtype=int) * -100
@@ -722,6 +728,7 @@ class xnliTrainDataset(torch.utils.data.Dataset):
             return_tensors="pt",
             max_length=TASK["xnli"]["max seq length"],
             truncation=True,
+            padding="max_length",
         )
         return {
             "tokens": train_encodings.input_ids.long(),
@@ -755,6 +762,7 @@ class xnliValidationDataset(torch.utils.data.Dataset):
             return_tensors="pt",
             max_length=TASK["xnli"]["max seq length"],
             truncation=True,
+            padding="max_length",
         )
         return {
             "tokens": train_encodings.input_ids.long(),
@@ -782,6 +790,7 @@ class xnliTestDataset(torch.utils.data.Dataset):
             return_tensors="pt",
             max_length=TASK["xnli"]["max seq length"],
             truncation=True,
+            padding="max_length",
         )
         return {
             "tokens": train_encodings.input_ids.long(),
@@ -813,6 +822,7 @@ class pawsxTrainDataset(torch.utils.data.Dataset):
             return_tensors="pt",
             max_length=TASK["pawsx"]["max seq length"],
             truncation=True,
+            padding="max_length",
         )
         return {
             "tokens": train_encodings.input_ids.long(),
@@ -838,6 +848,7 @@ class pawsxValidationDataset(torch.utils.data.Dataset):
             return_tensors="pt",
             max_length=TASK["pawsx"]["max seq length"],
             truncation=True,
+            padding="max_length",
         )
         return {
             "tokens": train_encodings.input_ids.long(),
@@ -871,6 +882,7 @@ class pawsxTestDataset(torch.utils.data.Dataset):
             return_tensors="pt",
             max_length=TASK["pawsx"]["max seq length"],
             truncation=True,
+            padding="max_length",
         )
         return {
             "tokens": train_encodings.input_ids.long(),
@@ -897,6 +909,7 @@ class xquadTrainDataset(torch.utils.data.Dataset):
             return_tensors="pt",
             max_length=TASK["xquad"]["max seq length"],
             truncation=True,
+            padding="max_length",
         )
         return {
             "tokens": train_encodings.input_ids.long(),
@@ -928,6 +941,7 @@ class xquadValidationDataset(torch.utils.data.Dataset):
             return_tensors="pt",
             max_length=TASK["xquad"]["max seq length"],
             truncation=True,
+            padding="max_length",
         )
         return {
             "tokens": train_encodings.input_ids.long(),
@@ -967,6 +981,7 @@ class xquadTestDataset(torch.utils.data.Dataset):
             return_tensors="pt",
             max_length=TASK["xquad"]["max seq length"],
             truncation=True,
+            padding="max_length",
         )
         return {
             "tokens": train_encodings.input_ids.long(),
@@ -999,6 +1014,7 @@ class xquadTestDataset(torch.utils.data.Dataset):
 #             return_tensors="pt",
 #             max_length=TASK["mlqa"]["max seq length"],
 #             truncation=True,
+            padding="max_length",
 #         )
 #         return {
 #             "tokens": train_encodings.input_ids.long(),
@@ -1030,6 +1046,7 @@ class xquadTestDataset(torch.utils.data.Dataset):
 #             return_tensors="pt",
 #             max_length=TASK["mlqa"]["max seq length"],
 #             truncation=True,
+            padding="max_length",
 #         )
 #         return {
 #             "tokens": train_encodings.input_ids.long(),
@@ -1069,6 +1086,7 @@ class mlqaTestDataset(torch.utils.data.Dataset):
             return_tensors="pt",
             max_length=TASK["mlqa"]["max seq length"],
             truncation=True,
+            padding="max_length",
         )
         return {
             "tokens": train_encodings.input_ids.long(),
@@ -1101,6 +1119,7 @@ class tydiqaTrainDataset(torch.utils.data.Dataset):
             return_tensors="pt",
             max_length=TASK["tydiqa"]["max seq length"],
             truncation=True,
+            padding="max_length",
         )
         return {
             "tokens": train_encodings.input_ids.long(),
@@ -1132,6 +1151,7 @@ class tydiqaValidationDataset(torch.utils.data.Dataset):
             return_tensors="pt",
             max_length=TASK["tydiqa"]["max seq length"],
             truncation=True,
+            padding="max_length",
         )
         return {
             "tokens": train_encodings.input_ids.long(),
@@ -1176,6 +1196,7 @@ class tydiqaTestDataset(torch.utils.data.Dataset):
             return_tensors="pt",
             max_length=TASK["tydiqa"]["max seq length"],
             truncation=True,
+            padding="max_length",
         )
         return {
             "tokens": train_encodings.input_ids.long(),
@@ -1215,12 +1236,14 @@ class bucc2018tDataset(torch.utils.data.Dataset):
             return_tensors="pt",
             max_length=TASK["bucc2018"]["max seq length"],
             truncation=True,
+            padding="max_length",
         )
         target_encodings = tokenizer(
             features["target_sentence"],
             return_tensors="pt",
             max_length=TASK["bucc2018"]["max seq length"],
             truncation=True,
+            padding="max_length",
         )
         return {
             "source_tokens": source_encodings.input_ids.long(),
@@ -1252,12 +1275,14 @@ class tatoebaDataset(torch.utils.data.Dataset):
             return_tensors="pt",
             max_length=TASK["tatoeba"]["max seq length"],
             truncation=True,
+            padding="max_length",
         )
         target_encodings = tokenizer(
             features["target_sentence"],
             return_tensors="pt",
             max_length=TASK["tatoeba"]["max seq length"],
             truncation=True,
+            padding="max_length",
         )
         return {
             "source_tokens": source_encodings.input_ids.long(),
