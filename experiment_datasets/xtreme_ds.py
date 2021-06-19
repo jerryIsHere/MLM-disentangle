@@ -15,6 +15,7 @@ TASK = {
     "tatoeba": {},  # retrival
 }
 TASK["udpos"]["train"] = (custom_xtreme_path, "udpos.English", "train")
+TASK["udpos"]["num_labels"] = 17 
 TASK["udpos"]["epochs"] = 10
 TASK["udpos"]["max seq length"] = 128
 TASK["udpos"]["learning rate"] = 2e-5
@@ -58,6 +59,7 @@ TASK["udpos"]["test"]["yo"] = (custom_xtreme_path, "udpos.Yoruba", "test")
 
 
 TASK["panx"]["train"] = ("xtreme", "PAN-X.en", "train")
+TASK["panx"]["num_labels"] = 7
 TASK["panx"]["epochs"] = 10
 TASK["panx"]["max seq length"] = 128
 TASK["panx"]["learning rate"] = 2e-5
@@ -108,6 +110,7 @@ TASK["panx"]["test"]["yo"] = ("xtreme", "PAN-X.yo", "test")
 TASK["panx"]["test"]["zh"] = ("xtreme", "PAN-X.zh", "test")
 
 TASK["xnli"]["train"] = ("multi_nli", None, "train")
+TASK["xnli"]["num_labels"] = 3
 TASK["xnli"]["epochs"] = 5
 TASK["xnli"]["max seq length"] = 128
 TASK["xnli"]["learning rate"] = 2e-5
@@ -119,6 +122,7 @@ TASK["xnli"]["validation"]["mismatched"] = ("multi_nli", None, "validation_misma
 TASK["xnli"]["test"] = ("xtreme", "XNLI", "test")
 
 TASK["pawsx"]["train"] = ("xtreme", "PAWS-X.en", "train")
+TASK["pawsx"]["num_labels"] = 2
 TASK["pawsx"]["epochs"] = 5
 TASK["pawsx"]["max seq length"] = 128
 TASK["pawsx"]["learning rate"] = 2e-5
