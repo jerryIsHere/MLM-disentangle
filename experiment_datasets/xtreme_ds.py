@@ -1014,7 +1014,7 @@ class xquadTestDataset(torch.utils.data.Dataset):
 #             return_tensors="pt",
 #             max_length=TASK["mlqa"]["max seq length"],
 #             truncation=True,
-            padding="max_length",
+#             padding="max_length",
 #         )
 #         return {
 #             "tokens": train_encodings.input_ids.long(),
@@ -1046,7 +1046,7 @@ class xquadTestDataset(torch.utils.data.Dataset):
 #             return_tensors="pt",
 #             max_length=TASK["mlqa"]["max seq length"],
 #             truncation=True,
-            padding="max_length",
+#             padding="max_length",
 #         )
 #         return {
 #             "tokens": train_encodings.input_ids.long(),
