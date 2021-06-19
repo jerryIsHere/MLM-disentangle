@@ -580,7 +580,7 @@ class udposTestDataset(torch.utils.data.Dataset):
             self.dataset[lan] = get_dataset(set_name, subset_name)[split]
 
     def __len__(self):
-        return sum(map(lambda x: len(x), self.dataset.items))
+        return sum(map(len, self.dataset.values()))
 
     def __getitem__(self, id_absolute):
         for lan in self.dataset:
@@ -682,7 +682,7 @@ class panxTestDataset(torch.utils.data.Dataset):
             self.dataset[lan] = get_dataset(set_name, subset_name)[split]
 
     def __len__(self):
-        return sum(map(lambda x: len(x), self.dataset.items))
+        return sum(map(len, self.dataset.values()))
 
     def __getitem__(self, id_absolute):
         for lan in self.dataset:
@@ -750,7 +750,7 @@ class xnliValidationDataset(torch.utils.data.Dataset):
             self.dataset[split] = get_dataset(set_name, subset_name)[split]
 
     def __len__(self):
-        return sum(map(lambda x: len(x), self.dataset.items))
+        return sum(map(len, self.dataset.values()))
 
     def __getitem__(self, id_absolute):
         for split in self.dataset:
@@ -870,7 +870,7 @@ class pawsxTestDataset(torch.utils.data.Dataset):
             self.dataset[lan] = get_dataset(set_name, subset_name)[split]
 
     def __len__(self):
-        return sum(map(lambda x: len(x), self.dataset.items))
+        return sum(map(len, self.dataset.values()))
 
     def __getitem__(self, id_absolute):
         for lan in self.dataset:
@@ -969,7 +969,7 @@ class xquadTestDataset(torch.utils.data.Dataset):
             self.dataset[lan] = get_dataset(set_name, subset_name)[split]
 
     def __len__(self):
-        return sum(map(lambda x: len(x), self.dataset.items))
+        return sum(map(len, self.dataset.values()))
 
     def __getitem__(self, id_absolute):
         for lan in self.dataset:
@@ -1074,7 +1074,7 @@ class mlqaTestDataset(torch.utils.data.Dataset):
             self.dataset[lan] = get_dataset(set_name, subset_name)[split]
 
     def __len__(self):
-        return sum(map(lambda x: len(x), self.dataset.items))
+        return sum(map(len, self.dataset.values()))
 
     def __getitem__(self, id_absolute):
         for lan in self.dataset:
@@ -1225,7 +1225,7 @@ class bucc2018tDataset(torch.utils.data.Dataset):
             self.dataset[lan] = get_dataset(set_name, subset_name)[split]
 
     def __len__(self):
-        return sum(map(lambda x: len(x), self.dataset.items))
+        return sum(map(len, self.dataset.values()))
 
     def __getitem__(self, id_absolute):
         for lan in self.dataset:
@@ -1264,7 +1264,7 @@ class tatoebaDataset(torch.utils.data.Dataset):
             self.dataset[lan] = get_dataset(set_name, subset_name)[split]
 
     def __len__(self):
-        return sum(map(lambda x: len(x), self.dataset.items))
+        return sum(map(len, self.dataset.values()))
 
     def __getitem__(self, id_absolute):
         for lan in self.dataset:
