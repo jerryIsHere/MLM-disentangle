@@ -94,7 +94,7 @@ model_path = (
     "/gpfs1/home/ckchan666/mlm_disentangle_experiment/model/"
     + os.path.dirname(os.path.abspath(__file__)).split("/")[-1]
     + "/"
-    + experiment_config_dict["training"].model_name,
+    + experiment_config_dict["training"].model_name
 )
 print("building time: " + str(time.time() - start_time) + "s")
 start_time = time.time()
