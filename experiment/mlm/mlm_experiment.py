@@ -157,6 +157,7 @@ for i, batch in enumerate(dataloader):
         experiment_config_dict["training"].gradient_acc_size
         / experiment_config_dict["training"].batch_size
     ) == 0:
+        torch.nn.utils.clip_grad_norm_(multitask_model.parameters(), 1.0)
         optimizermlm.step()
         multitask_model.taskmodels_dict["mlm"].zero_grad()
         multitask_model.taskmodels_dict["disentangle"].zero_grad()

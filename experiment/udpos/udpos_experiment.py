@@ -65,10 +65,29 @@ finetune_model.add_task(
 )
 
 # training
-optimizer = torch.optim.Adam(
-    finetune_model.parameters(),
-    lr=xtreme_ds.TASK[task]["learning rate"],
-    eps=xtreme_ds.TASK[task]["weight decay"],
+no_decay = ["bias", "LayerNorm.weight"]
+optimizer_grouped_parameters = [
+    {
+        "params": [
+            p
+            for n, p in finetune_model.named_parameters()
+            if not any(nd in n for nd in no_decay)
+        ],
+        "weight_decay": xtreme_ds.TASK[task]["weight_decay"],
+    },
+    {
+        "params": [
+            p
+            for n, p in finetune_model.named_parameters()
+            if any(nd in n for nd in no_decay)
+        ],
+        "weight_decay": 0.0,
+    },
+]
+optimizer = transformers.AdamW(
+    optimizer_grouped_parameters,
+    lr=xtreme_ds.TASK[task]["learning_rate"],
+    eps=xtreme_ds.TASK[task]["adam_epsilon"],
 )
 
 from torch.utils.tensorboard import SummaryWriter
@@ -93,11 +112,11 @@ udpos_ds = xtreme_ds.udposTrainDataset()
 udpos_ds_dataloader = torch.utils.data.DataLoader(
     udpos_ds, batch_size=2, num_workers=0, shuffle=True
 )
-gradient_acc_size = 16
-batch_size = 2
+gradient_acc_size = xtreme_ds.TASK[task]["gradient_acc_size"]
+batch_size = xtreme_ds.TASK[task]["batch_size"]
 scheduler = transformers.get_linear_schedule_with_warmup(
     optimizer,
-    num_warmup_steps=xtreme_ds.TASK[task]["warmup step"],
+    num_warmup_steps=xtreme_ds.TASK[task]["warmup_steps"],
     num_training_steps=len(udpos_ds)
     // gradient_acc_size
     * xtreme_ds.TASK[task]["epochs"],
@@ -180,6 +199,7 @@ for _ in range(xtreme_ds.TASK[task]["epochs"]):
         del batch
 
         if (i + 1) % (gradient_acc_size / batch_size) == 0:
+            torch.nn.utils.clip_grad_norm_(finetune_model.parameters(), 1.0)
             scheduler.step()
             finetune_model.taskmodels_dict[task].zero_grad()
             finetune_model.taskmodels_dict["disentangle"].zero_grad()
@@ -225,7 +245,7 @@ print(str(time.time() - start_time) + " seconds elapsed for training")
 
 # testing
 test_dataloader = torch.utils.data.DataLoader(
-    xtreme_ds.udposTestDataset(), batch_size=2, num_workers=0, shuffle=True
+    xtreme_ds.udposTestDataset(), batch_size=1, num_workers=0, shuffle=True
 )
 metric = xtreme_ds.METRIC_FUNCTION[task]()
 lan_metric = {}
@@ -236,7 +256,6 @@ for batch in test_dataloader:
     with torch.no_grad():
         #  input to gpu
         batch["tokens"] = batch["tokens"].cuda()
-
         Output = finetune_model.taskmodels_dict[task](input_ids=batch["tokens"])
         predictions = torch.argmax(Output["logits"], dim=2)
         for i, lan in enumerate(batch["lan"]):

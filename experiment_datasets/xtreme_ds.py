@@ -15,12 +15,15 @@ TASK = {
     "tatoeba": {},  # retrival
 }
 TASK["udpos"]["train"] = (custom_xtreme_path, "udpos.English", "train")
-TASK["udpos"]["num_labels"] = 17 
-TASK["udpos"]["epochs"] = 10
-TASK["udpos"]["max seq length"] = 128
-TASK["udpos"]["learning rate"] = 2e-5
-TASK["udpos"]["weight decay"] = 0
-TASK["udpos"]["warmup step"] = 0
+TASK["udpos"]["num_labels"] = 17
+TASK["udpos"]["epochs"] = 10  # NUM_EPOCHS
+TASK["udpos"]["max seq length"] = 128  # MAX_LENGTH
+TASK["udpos"]["learning_rate"] = 2e-5  # LR
+TASK["udpos"]["adam_epsilon"] = 1e-8  # default
+TASK["udpos"]["weight_decay "] = 0  # default
+TASK["udpos"]["warmup_steps"] = 0  # default
+TASK["udpos"]["gradient_acc_size"] = 16  # GRAD_ACC
+TASK["udpos"]["batch_size"] = 2  # BATCH_SIZE
 TASK["udpos"]["validation"] = (custom_xtreme_path, "udpos.English", "validation")
 TASK["udpos"]["test"] = {}
 TASK["udpos"]["test"]["en"] = (custom_xtreme_path, "udpos.English", "test")
@@ -60,11 +63,14 @@ TASK["udpos"]["test"]["yo"] = (custom_xtreme_path, "udpos.Yoruba", "test")
 
 TASK["panx"]["train"] = ("xtreme", "PAN-X.en", "train")
 TASK["panx"]["num_labels"] = 7
-TASK["panx"]["epochs"] = 10
-TASK["panx"]["max seq length"] = 128
-TASK["panx"]["learning rate"] = 2e-5
-TASK["panx"]["warmup step"] = 0
-TASK["panx"]["weight decay"] = 0
+TASK["panx"]["epochs"] = 10  # NUM_EPOCHS
+TASK["panx"]["max seq length"] = 128  # MAX_LENGTH
+TASK["panx"]["learning_rate"] = 2e-5  # LR
+TASK["panx"]["warmup_steps"] = 0  # default
+TASK["panx"]["weight_decay "] = 0  # default
+TASK["panx"]["adam_epsilon"] = 1e-8  # default
+TASK["panx"]["gradient_acc_size"] = 16  # GRAD_ACC
+TASK["panx"]["batch_size"] = 2  # BATCH_SIZE
 TASK["panx"]["validation"] = ("xtreme", "PAN-X.en", "validation")
 TASK["panx"]["test"] = {}
 TASK["panx"]["test"]["en"] = ("xtreme", "PAN-X.en", "test")
@@ -111,11 +117,14 @@ TASK["panx"]["test"]["zh"] = ("xtreme", "PAN-X.zh", "test")
 
 TASK["xnli"]["train"] = ("multi_nli", None, "train")
 TASK["xnli"]["num_labels"] = 3
-TASK["xnli"]["epochs"] = 5
-TASK["xnli"]["max seq length"] = 128
-TASK["xnli"]["learning rate"] = 2e-5
-TASK["xnli"]["warmup step"] = 0
-TASK["xnli"]["weight decay"] = 0
+TASK["xnli"]["epochs"] = 5  # EPOCH
+TASK["xnli"]["max seq length"] = 128  # MAXL
+TASK["xnli"]["learning_rate"] = 2e-5  # LR
+TASK["xnli"]["warmup_steps"] = 0  # default
+TASK["xnli"]["weight_decay "] = 0  # default
+TASK["xnli"]["adam_epsilon"] = 1e-8  # default
+TASK["xnli"]["gradient_acc_size"] = 16  # GRAD_ACC
+TASK["xnli"]["batch_size"] = 2  # BATCH_SIZE
 TASK["xnli"]["validation"] = {}
 TASK["xnli"]["validation"]["matched"] = ("multi_nli", None, "validation_matched")
 TASK["xnli"]["validation"]["mismatched"] = ("multi_nli", None, "validation_mismatched")
@@ -123,11 +132,14 @@ TASK["xnli"]["test"] = ("xtreme", "XNLI", "test")
 
 TASK["pawsx"]["train"] = ("xtreme", "PAWS-X.en", "train")
 TASK["pawsx"]["num_labels"] = 2
-TASK["pawsx"]["epochs"] = 5
-TASK["pawsx"]["max seq length"] = 128
-TASK["pawsx"]["learning rate"] = 2e-5
-TASK["pawsx"]["warmup step"] = 0
-TASK["pawsx"]["weight decay"] = 0
+TASK["pawsx"]["epochs"] = 5  # EPOCH
+TASK["pawsx"]["max seq length"] = 128  # MAXL
+TASK["pawsx"]["learning_rate"] = 2e-5  # LR
+TASK["pawsx"]["warmup_steps"] = 0  # default
+TASK["pawsx"]["weight_decay "] = 0  # default
+TASK["pawsx"]["adam_epsilon"] = 1e-8  # defualt
+TASK["pawsx"]["gradient_acc_size"] = 16  # GRAD_ACC
+TASK["pawsx"]["batch_size"] = 2  # BATCH_SIZE
 TASK["pawsx"]["validation"] = ("xtreme", "PAWS-X.en", "validation")
 TASK["pawsx"]["test"] = {}
 TASK["pawsx"]["test"]["en"] = ("xtreme", "PAWS-X.en", "test")
@@ -139,11 +151,14 @@ TASK["pawsx"]["test"]["ko"] = ("xtreme", "PAWS-X.ko", "test")
 TASK["pawsx"]["test"]["zh"] = ("xtreme", "PAWS-X.zh", "test")
 
 TASK["xquad"]["train"] = ("xtreme", "SQuAD", "train")
-TASK["xquad"]["epochs"] = 2
-TASK["xquad"]["max seq length"] = 384
-TASK["xquad"]["learning rate"] = 3e-5
-TASK["xquad"]["warmup step"] = 500
-TASK["xquad"]["weight decay"] = 0.0001
+TASK["xquad"]["epochs"] = 2  # NUM_EPOCHS
+TASK["xquad"]["max seq length"] = 384  # MAXL
+TASK["xquad"]["learning_rate"] = 3e-5  # LR
+TASK["xquad"]["warmup_steps"] = 500  # warmup_steps 500
+TASK["xquad"]["weight_decay "] = 0.0001  # weight_decay 0.0001
+TASK["xquad"]["adam_epsilon"] = 1e-8  # defualt
+TASK["xquad"]["gradient_acc_size"] = 4  # gradient_accumulation_steps 4
+TASK["xquad"]["batch_size"] = 4  # per_gpu_train_batch_size 4
 TASK["xquad"]["validation"] = ("xtreme", "SQuAD", "validation")
 TASK["xquad"]["test"] = {}
 TASK["xquad"]["test"]["ar"] = ("xtreme", "XQuAD.ar", "validation")
@@ -170,11 +185,14 @@ for lang in en es de ar hi vi zh; do
 done
 """
 TASK["mlqa"]["train"] = ("xtreme", "SQuAD", "train")
-TASK["mlqa"]["epochs"] = 2
-TASK["mlqa"]["max seq length"] = 384
-TASK["mlqa"]["learning rate"] = 3e-5
-TASK["mlqa"]["warmup step"] = 500
-TASK["mlqa"]["weight decay"] = 0.0001
+TASK["mlqa"]["epochs"] = 2  # NUM_EPOCHS
+TASK["mlqa"]["max seq length"] = 384  # MAXL
+TASK["mlqa"]["learning_rate"] = 3e-5  # LR
+TASK["mlqa"]["warmup_steps"] = 500  # warmup_steps 500
+TASK["mlqa"]["weight_decay "] = 0.0001  # weight_decay 0.0001
+TASK["mlqa"]["adam_epsilon"] = 1e-8  # defualt
+TASK["mlqa"]["gradient_acc_size"] = 4  # gradient_accumulation_steps 4
+TASK["mlqa"]["batch_size"] = 4  # per_gpu_train_batch_size 4
 TASK["mlqa"]["validation"] = ("xtreme", "SQuAD", "validation")
 TASK["mlqa"]["test"] = {}
 TASK["mlqa"]["test"]["ar"] = ("xtreme", "MLQA.ar.ar", "test")
@@ -186,11 +204,14 @@ TASK["mlqa"]["test"]["es"] = ("xtreme", "MLQA.es.es", "test")
 TASK["mlqa"]["test"]["hi"] = ("xtreme", "MLQA.hi.hi", "test")
 
 TASK["tydiqa"]["train"] = ("xtreme", "tydiqa", "train")
-TASK["tydiqa"]["epochs"] = 2
-TASK["tydiqa"]["max seq length"] = 384
-TASK["tydiqa"]["learning rate"] = 3e-5
-TASK["tydiqa"]["warmup step"] = 500
-TASK["tydiqa"]["weight decay"] = 0.0001
+TASK["tydiqa"]["epochs"] = 2  # NUM_EPOCHS
+TASK["tydiqa"]["max seq length"] = 384  # MAXL
+TASK["tydiqa"]["learning_rate"] = 3e-5  # LR
+TASK["tydiqa"]["warmup_steps"] = 500  # warmup_steps 500
+TASK["tydiqa"]["weight_decay "] = 0.0001  # weight_decay 0.0001
+TASK["tydiqa"]["adam_epsilon"] = 1e-8  # defualt
+TASK["tydiqa"]["gradient_acc_size"] = 4  # gradient_accumulation_steps 4
+TASK["tydiqa"]["batch_size"] = 4  # per_gpu_train_batch_size 4
 TASK["tydiqa"]["test"] = ("xtreme", "tydiqa", "validation")
 
 TASK["bucc2018"]["src"] = {}
@@ -317,7 +338,7 @@ TASK2LANGS = {
     "mlqa": "en,es,de,ar,hi,vi,zh".split(","),
     "tydiqa": "en,ar,bn,fi,id,ko,ru,sw,te".split(","),
 }
-keywords = ["epochs", "learning rate", "warmup step", "weight decay"]
+keywords = ["epochs", "learning_rate", "warmup_steps", "adam_epsilon"]
 
 
 def sanity_check():
@@ -532,9 +553,10 @@ class udposTrainDataset(torch.utils.data.Dataset):
         labels = np.ones(len(train_encodings.input_ids), dtype=int) * -100
         ids = np.array(train_encodings.input_ids)
         arr_offset = np.array(train_encodings.offset_mapping)
-        labels[
-            (arr_offset[:, 0] == 0) & (arr_offset[:, 1] != 0) & (ids[:] != 6)
-        ] = self.dataset[id]["pos_tags"]
+        label_index = (arr_offset[:, 0] == 0) & (arr_offset[:, 1] != 0) & (ids[:] != 6)
+        labels[label_index] = self.dataset[id]["pos_tags"][
+            : np.count_nonzero(label_index)
+        ]
         return {
             "tokens": torch.from_numpy(ids).long(),
             "pos_tags": torch.from_numpy(labels).long(),
@@ -563,9 +585,10 @@ class udposValidationDataset(torch.utils.data.Dataset):
         labels = np.ones(len(train_encodings.input_ids), dtype=int) * -100
         ids = np.array(train_encodings.input_ids)
         arr_offset = np.array(train_encodings.offset_mapping)
-        labels[
-            (arr_offset[:, 0] == 0) & (arr_offset[:, 1] != 0) & (ids[:] != 6)
-        ] = self.dataset[id]["pos_tags"]
+        label_index = (arr_offset[:, 0] == 0) & (arr_offset[:, 1] != 0) & (ids[:] != 6)
+        labels[label_index] = self.dataset[id]["pos_tags"][
+            : np.count_nonzero(label_index)
+        ]
         return {
             "tokens": torch.from_numpy(ids).long(),
             "pos_tags": torch.from_numpy(labels).long(),
@@ -594,7 +617,7 @@ class udposTestDataset(torch.utils.data.Dataset):
         train_encodings = tokenizer(
             txt,
             is_split_into_words=True,
-            max_length=TASK["udpos"]["max seq length"],
+            max_length=None,
             truncation=True,
             padding="max_length",
             return_offsets_mapping=True,
@@ -602,9 +625,10 @@ class udposTestDataset(torch.utils.data.Dataset):
         labels = np.ones(len(train_encodings.input_ids), dtype=int) * -100
         ids = np.array(train_encodings.input_ids)
         arr_offset = np.array(train_encodings.offset_mapping)
-        labels[
-            (arr_offset[:, 0] == 0) & (arr_offset[:, 1] != 0) & (ids[:] != 6)
-        ] = self.dataset[lan][id]["pos_tags"]
+        label_index = (arr_offset[:, 0] == 0) & (arr_offset[:, 1] != 0) & (ids[:] != 6)
+        labels[label_index] = self.dataset[id]["pos_tags"][
+            : np.count_nonzero(label_index)
+        ]
         return {
             "tokens": torch.from_numpy(ids).long(),
             "pos_tags": torch.from_numpy(labels).long(),
@@ -696,7 +720,7 @@ class panxTestDataset(torch.utils.data.Dataset):
         train_encodings = tokenizer(
             txt,
             is_split_into_words=True,
-            max_length=TASK["panx"]["max seq length"],
+            max_length=None,
             truncation=True,
             padding="max_length",
             return_offsets_mapping=True,
@@ -792,7 +816,7 @@ class xnliTestDataset(torch.utils.data.Dataset):
             features["sentence1"],
             features["sentence2"],
             return_tensors="pt",
-            max_length=TASK["xnli"]["max seq length"],
+            max_length=None,
             truncation=True,
             padding="max_length",
         )
@@ -884,7 +908,7 @@ class pawsxTestDataset(torch.utils.data.Dataset):
             features["sentence1"],
             features["sentence2"],
             return_tensors="pt",
-            max_length=TASK["pawsx"]["max seq length"],
+            max_length=None,
             truncation=True,
             padding="max_length",
         )
@@ -983,7 +1007,7 @@ class xquadTestDataset(torch.utils.data.Dataset):
             features["question"],
             features["context"],
             return_tensors="pt",
-            max_length=TASK["xquad"]["max seq length"],
+            max_length=None,
             truncation=True,
             padding="max_length",
         )
@@ -1088,7 +1112,7 @@ class mlqaTestDataset(torch.utils.data.Dataset):
             features["question"],
             features["context"],
             return_tensors="pt",
-            max_length=TASK["mlqa"]["max seq length"],
+            max_length=None,
             truncation=True,
             padding="max_length",
         )
@@ -1198,7 +1222,7 @@ class tydiqaTestDataset(torch.utils.data.Dataset):
             features["question"],
             features["context"],
             return_tensors="pt",
-            max_length=TASK["tydiqa"]["max seq length"],
+            max_length=None,
             truncation=True,
             padding="max_length",
         )
@@ -1238,14 +1262,14 @@ class bucc2018tDataset(torch.utils.data.Dataset):
         source_encodings = tokenizer(
             features["source_sentence"],
             return_tensors="pt",
-            max_length=TASK["bucc2018"]["max seq length"],
+            max_length=None,
             truncation=True,
             padding="max_length",
         )
         target_encodings = tokenizer(
             features["target_sentence"],
             return_tensors="pt",
-            max_length=TASK["bucc2018"]["max seq length"],
+            max_length=None,
             truncation=True,
             padding="max_length",
         )
@@ -1277,14 +1301,14 @@ class tatoebaDataset(torch.utils.data.Dataset):
         source_encodings = tokenizer(
             features["source_sentence"],
             return_tensors="pt",
-            max_length=TASK["tatoeba"]["max seq length"],
+            max_length=None,
             truncation=True,
             padding="max_length",
         )
         target_encodings = tokenizer(
             features["target_sentence"],
             return_tensors="pt",
-            max_length=TASK["tatoeba"]["max seq length"],
+            max_length=None,
             truncation=True,
             padding="max_length",
         )
