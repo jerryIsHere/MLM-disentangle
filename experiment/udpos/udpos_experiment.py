@@ -254,7 +254,6 @@ def test(finetune_model):
 
 
 if __name__ == "__main__":
-    start_time = time.time()
     parser = argparse.ArgumentParser(description="udpos disentangle experinment")
     parser.add_argument(
         "--config_json",
@@ -278,7 +277,7 @@ if __name__ == "__main__":
         + experiment_config_dict["training"].model_name
         + "/pytorch_model.bin",
     )
-    start_time = time.time(experiment_config_dict)
+    start_time = time.time()
     from torch.utils.tensorboard import SummaryWriter
 
     writer = SummaryWriter(
@@ -295,6 +294,6 @@ if __name__ == "__main__":
     )
     MLMD_ds = oscar_corpus.get_custom_corpus()
     MLMD_ds.set_format(type="torch")
-    train(fintues_model=model, writer=writer, model_path=model_path, MLMD_ds=MLMD_ds)
+    train(finetune_model=model, writer=writer, model_path=model_path, MLMD_ds=MLMD_ds)
     print(str(time.time() - start_time) + " seconds elapsed for training")
     test(model)
