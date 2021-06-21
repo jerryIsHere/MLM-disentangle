@@ -47,7 +47,13 @@ def build_model(experiment_config_dict, mlm_model_path):
     return finetune_model
 
 
-def train(finetune_model, writer, model_path):
+def train(
+    finetune_model,
+    writer,
+    model_path,
+    MLMD_ds,
+    custom_stop_condition=lambda gradient_step: False,
+):
     no_decay = ["bias", "LayerNorm.weight"]
     optimizer_grouped_parameters = [
         {
@@ -73,8 +79,6 @@ def train(finetune_model, writer, model_path):
         eps=task_config["adam_epsilon"],
     )
 
-    MLMD_ds = oscar_corpus.get_custom_corpus()
-    MLMD_ds.set_format(type="torch")
     disentangle_dataloader = torch.utils.data.DataLoader(
         MLMD_ds,
         batch_size=task_config["batch_size"],
@@ -208,6 +212,8 @@ def train(finetune_model, writer, model_path):
                     udposLoss = 0
                     disentangleLoss = 0
                     finetune_model.save_pretrained(model_path)
+                if custom_stop_condition(gradient_step):
+                    break
             gc.collect()
             i += 1
 
@@ -287,10 +293,8 @@ if __name__ == "__main__":
         + "/"
         + experiment_config_dict["training"].model_name
     )
-    train(
-        fintues_model=model,
-        writer=writer,
-        model_path=model_path,
-    )
+    MLMD_ds = oscar_corpus.get_custom_corpus()
+    MLMD_ds.set_format(type="torch")
+    train(fintues_model=model, writer=writer, model_path=model_path, MLMD_ds=MLMD_ds)
     print(str(time.time() - start_time) + " seconds elapsed for training")
     test(model)
