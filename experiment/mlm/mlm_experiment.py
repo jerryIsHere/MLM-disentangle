@@ -16,7 +16,7 @@ parser.add_argument(
     metavar="path",
     type=str,
     help="path to configuration json file",
-    default=os.path.join(os.path.dirname(os.path.abspath(__file__)), "/default.json"),
+    default=os.path.join(os.path.dirname(os.path.abspath(__file__)), "default.json"),
 )
 parser.add_argument(
     "time",
