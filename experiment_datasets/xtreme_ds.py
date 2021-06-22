@@ -542,6 +542,8 @@ class udposTrainDataset(torch.utils.data.Dataset):
     def __getitem__(self, id):
         features = self.dataset[id]
         txt = features["tokens"]
+        for i, each in enumerate(txt):
+            txt[i] = tokenizer._tokenizer.normalizer.normalize_str(txt[i])
         train_encodings = tokenizer(
             txt,
             is_split_into_words=True,
@@ -574,6 +576,8 @@ class udposValidationDataset(torch.utils.data.Dataset):
     def __getitem__(self, id):
         features = self.dataset[id]
         txt = features["tokens"]
+        for i, each in enumerate(txt):
+            txt[i] = tokenizer._tokenizer.normalizer.normalize_str(txt[i])
         train_encodings = tokenizer(
             txt,
             is_split_into_words=True,
@@ -612,6 +616,8 @@ class udposTestDataset(torch.utils.data.Dataset):
                 id = id_absolute
                 features = self.dataset[lan][id]
                 txt = features["tokens"]
+                for i, each in enumerate(txt):
+                    txt[i] = tokenizer._tokenizer.normalizer.normalize_str(txt[i])
                 train_encodings = tokenizer(
                     txt,
                     is_split_into_words=True,
@@ -647,6 +653,8 @@ class panxTrainDataset(torch.utils.data.Dataset):
     def __getitem__(self, id):
         features = self.dataset[id]
         txt = features["tokens"]
+        for i, each in enumerate(txt):
+            txt[i] = tokenizer._tokenizer.normalizer.normalize_str(txt[i])
         train_encodings = tokenizer(
             txt,
             is_split_into_words=True,
@@ -678,6 +686,8 @@ class panxValidationDataset(torch.utils.data.Dataset):
     def __getitem__(self, id):
         features = self.dataset[id]
         txt = features["tokens"]
+        for i, each in enumerate(txt):
+            txt[i] = tokenizer._tokenizer.normalizer.normalize_str(txt[i])
         train_encodings = tokenizer(
             txt,
             is_split_into_words=True,
@@ -715,6 +725,8 @@ class panxTestDataset(torch.utils.data.Dataset):
                 id = id_absolute
                 features = self.dataset[lan][id]
                 txt = features["tokens"]
+                for i, each in enumerate(txt):
+                    txt[i] = tokenizer._tokenizer.normalizer.normalize_str(txt[i])
                 train_encodings = tokenizer(
                     txt,
                     is_split_into_words=True,
@@ -1162,37 +1174,37 @@ class tydiqaTrainDataset(torch.utils.data.Dataset):
             ).long(),
         }
 
+# this does not exist
+# class tydiqaValidationDataset(torch.utils.data.Dataset):
+#     def __init__(self):
+#         set_name, subset_name, split = TASK["tydiqa"]["validation"]
+#         self.dataset = get_dataset(set_name, subset_name)[split]
 
-class tydiqaValidationDataset(torch.utils.data.Dataset):
-    def __init__(self):
-        set_name, subset_name, split = TASK["tydiqa"]["validation"]
-        self.dataset = get_dataset(set_name, subset_name)[split]
+#     def __len__(self):
+#         return len(self.dataset)
 
-    def __len__(self):
-        return len(self.dataset)
-
-    def __getitem__(self, id):
-        features = self.dataset[id]
-        train_encodings = tokenizer(
-            features["question"],
-            features["context"],
-            return_tensors="pt",
-            max_length=TASK["tydiqa"]["max seq length"],
-            truncation=True,
-            padding="max_length",
-        )
-        return {
-            "tokens": train_encodings.input_ids.long(),
-            "start_positions": torch.Tensor(
-                [features["answers"]["answer_start"][0]]
-            ).long(),
-            "end_positions": torch.Tensor(
-                [
-                    features["answers"]["answer_start"][0]
-                    + len(features["answers"]["text"][0])
-                ]
-            ).long(),
-        }
+#     def __getitem__(self, id):
+#         features = self.dataset[id]
+#         train_encodings = tokenizer(
+#             features["question"],
+#             features["context"],
+#             return_tensors="pt",
+#             max_length=TASK["tydiqa"]["max seq length"],
+#             truncation=True,
+#             padding="max_length",
+#         )
+#         return {
+#             "tokens": train_encodings.input_ids.long(),
+#             "start_positions": torch.Tensor(
+#                 [features["answers"]["answer_start"][0]]
+#             ).long(),
+#             "end_positions": torch.Tensor(
+#                 [
+#                     features["answers"]["answer_start"][0]
+#                     + len(features["answers"]["text"][0])
+#                 ]
+#             ).long(),
+#         }
 
 
 LANG2ISO = {
