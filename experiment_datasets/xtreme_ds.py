@@ -610,32 +610,30 @@ class udposTestDataset(torch.utils.data.Dataset):
             length = len(self.dataset[lan])
             if id_absolute < length:
                 id = id_absolute
-                break
+                features = self.dataset[lan][id]
+                txt = features["tokens"]
+                train_encodings = tokenizer(
+                    txt,
+                    is_split_into_words=True,
+                    max_length=None,
+                    truncation=True,
+                    padding="max_length",
+                    return_offsets_mapping=True,
+                )
+                labels = np.ones(len(train_encodings.input_ids), dtype=int) * -100
+                ids = np.array(train_encodings.input_ids)
+                arr_offset = np.array(train_encodings.offset_mapping)
+                label_index = (arr_offset[:, 0] == 0) & (arr_offset[:, 1] != 0) & (ids[:] != 6)
+                labels[label_index] = self.dataset[lan][id]["pos_tags"][
+                    : np.count_nonzero(label_index)
+                ]
+                return {
+                    "tokens": torch.from_numpy(ids).long(),
+                    "pos_tags": torch.from_numpy(labels).long(),
+                    "lan": lan,
+                }
             id_absolute -= length
-        if id is None:
-            raise StopIteration
-        features = self.dataset[lan][id]
-        txt = features["tokens"]
-        train_encodings = tokenizer(
-            txt,
-            is_split_into_words=True,
-            max_length=None,
-            truncation=True,
-            padding="max_length",
-            return_offsets_mapping=True,
-        )
-        labels = np.ones(len(train_encodings.input_ids), dtype=int) * -100
-        ids = np.array(train_encodings.input_ids)
-        arr_offset = np.array(train_encodings.offset_mapping)
-        label_index = (arr_offset[:, 0] == 0) & (arr_offset[:, 1] != 0) & (ids[:] != 6)
-        labels[label_index] = self.dataset[lan][id]["pos_tags"][
-            : np.count_nonzero(label_index)
-        ]
-        return {
-            "tokens": torch.from_numpy(ids).long(),
-            "pos_tags": torch.from_numpy(labels).long(),
-            "lan": lan,
-        }
+        raise StopIteration
 
 
 class panxTrainDataset(torch.utils.data.Dataset):
@@ -715,31 +713,29 @@ class panxTestDataset(torch.utils.data.Dataset):
             length = len(self.dataset[lan])
             if id_absolute < length:
                 id = id_absolute
-                break
+                features = self.dataset[lan][id]
+                txt = features["tokens"]
+                train_encodings = tokenizer(
+                    txt,
+                    is_split_into_words=True,
+                    max_length=None,
+                    truncation=True,
+                    padding="max_length",
+                    return_offsets_mapping=True,
+                )
+                labels = np.ones(len(train_encodings.input_ids), dtype=int) * -100
+                ids = np.array(train_encodings.input_ids)
+                arr_offset = np.array(train_encodings.offset_mapping)
+                labels[
+                    (arr_offset[:, 0] == 0) & (arr_offset[:, 1] != 0) & (ids[:] != 6)
+                ] = self.dataset[lan][id]["ner_tags"]
+                return {
+                    "tokens": torch.from_numpy(ids).long(),
+                    "ner_tags": torch.from_numpy(labels).long(),
+                    "lan": lan,
+                }
             id_absolute -= length
-        if id is None:
-            raise StopIteration
-        features = self.dataset[lan][id]
-        txt = features["tokens"]
-        train_encodings = tokenizer(
-            txt,
-            is_split_into_words=True,
-            max_length=None,
-            truncation=True,
-            padding="max_length",
-            return_offsets_mapping=True,
-        )
-        labels = np.ones(len(train_encodings.input_ids), dtype=int) * -100
-        ids = np.array(train_encodings.input_ids)
-        arr_offset = np.array(train_encodings.offset_mapping)
-        labels[
-            (arr_offset[:, 0] == 0) & (arr_offset[:, 1] != 0) & (ids[:] != 6)
-        ] = self.dataset[lan][id]["ner_tags"]
-        return {
-            "tokens": torch.from_numpy(ids).long(),
-            "ner_tags": torch.from_numpy(labels).long(),
-            "lan": lan,
-        }
+        raise StopIteration
 
 
 class xnliTrainDataset(torch.utils.data.Dataset):
@@ -785,25 +781,23 @@ class xnliValidationDataset(torch.utils.data.Dataset):
             length = len(self.dataset[split])
             if id_absolute < length:
                 id = id_absolute
-                break
+                features = self.dataset[split][id]
+                train_encodings = tokenizer(
+                    features["premise"],
+                    features["hypothesis"],
+                    return_tensors="pt",
+                    max_length=TASK["xnli"]["max seq length"],
+                    truncation=True,
+                    padding="max_length",
+                )
+                return {
+                    "tokens": train_encodings.input_ids.long(),
+                    "label": torch.Tensor(
+                        [xnliTrainDataset.class_label.index(features["label"])]
+                    ).long(),
+                }
             id_absolute -= length
-        if id is None:
-            raise StopIteration
-        features = self.dataset[split][id]
-        train_encodings = tokenizer(
-            features["premise"],
-            features["hypothesis"],
-            return_tensors="pt",
-            max_length=TASK["xnli"]["max seq length"],
-            truncation=True,
-            padding="max_length",
-        )
-        return {
-            "tokens": train_encodings.input_ids.long(),
-            "label": torch.Tensor(
-                [xnliTrainDataset.class_label.index(features["label"])]
-            ).long(),
-        }
+        raise StopIteration
 
 
 class xnliTestDataset(torch.utils.data.Dataset):
@@ -907,26 +901,24 @@ class pawsxTestDataset(torch.utils.data.Dataset):
             length = len(self.dataset[lan])
             if id_absolute < length:
                 id = id_absolute
-                break
+                features = self.dataset[lan][id]
+                train_encodings = tokenizer(
+                    features["sentence1"],
+                    features["sentence2"],
+                    return_tensors="pt",
+                    max_length=None,
+                    truncation=True,
+                    padding="max_length",
+                )
+                return {
+                    "tokens": train_encodings.input_ids.long(),
+                    "label": torch.Tensor(
+                        [pawsxTrainDataset.class_label.index(features["label"])]
+                    ).long(),
+                    "lan": lan,
+                }
             id_absolute -= length
-        if id is None:
-            raise StopIteration
-        features = self.dataset[lan][id]
-        train_encodings = tokenizer(
-            features["sentence1"],
-            features["sentence2"],
-            return_tensors="pt",
-            max_length=None,
-            truncation=True,
-            padding="max_length",
-        )
-        return {
-            "tokens": train_encodings.input_ids.long(),
-            "label": torch.Tensor(
-                [pawsxTrainDataset.class_label.index(features["label"])]
-            ).long(),
-            "lan": lan,
-        }
+        raise StopIteration
 
 
 class xquadTrainDataset(torch.utils.data.Dataset):
@@ -1008,32 +1000,30 @@ class xquadTestDataset(torch.utils.data.Dataset):
             length = len(self.dataset[lan])
             if id_absolute < length:
                 id = id_absolute
-                break
+                features = self.dataset[lan][id]
+                train_encodings = tokenizer(
+                    features["question"],
+                    features["context"],
+                    return_tensors="pt",
+                    max_length=None,
+                    truncation=True,
+                    padding="max_length",
+                )
+                return {
+                    "tokens": train_encodings.input_ids.long(),
+                    "start_positions": torch.Tensor(
+                        [features["answers"]["answer_start"][0]]
+                    ).long(),
+                    "end_positions": torch.Tensor(
+                        [
+                            features["answers"]["answer_start"][0]
+                            + len(features["answers"]["text"][0])
+                        ]
+                    ).long(),
+                    "lan": lan,
+                }
             id_absolute -= length
-        if id is None:
-            raise StopIteration
-        features = self.dataset[lan][id]
-        train_encodings = tokenizer(
-            features["question"],
-            features["context"],
-            return_tensors="pt",
-            max_length=None,
-            truncation=True,
-            padding="max_length",
-        )
-        return {
-            "tokens": train_encodings.input_ids.long(),
-            "start_positions": torch.Tensor(
-                [features["answers"]["answer_start"][0]]
-            ).long(),
-            "end_positions": torch.Tensor(
-                [
-                    features["answers"]["answer_start"][0]
-                    + len(features["answers"]["text"][0])
-                ]
-            ).long(),
-            "lan": lan,
-        }
+        raise StopIteration
 
 
 # class mlqaTrainDataset(torch.utils.data.Dataset):
@@ -1115,32 +1105,30 @@ class mlqaTestDataset(torch.utils.data.Dataset):
             length = len(self.dataset[lan])
             if id_absolute < length:
                 id = id_absolute
-                break
+                features = self.dataset[lan][id]
+                train_encodings = tokenizer(
+                    features["question"],
+                    features["context"],
+                    return_tensors="pt",
+                    max_length=None,
+                    truncation=True,
+                    padding="max_length",
+                )
+                return {
+                    "tokens": train_encodings.input_ids.long(),
+                    "start_positions": torch.Tensor(
+                        [features["answers"]["answer_start"][0]]
+                    ).long(),
+                    "end_positions": torch.Tensor(
+                        [
+                            features["answers"]["answer_start"][0]
+                            + len(features["answers"]["text"][0])
+                        ]
+                    ).long(),
+                    "lan": lan,
+                }
             id_absolute -= length
-        if id is None:
-            raise StopIteration
-        features = self.dataset[lan][id]
-        train_encodings = tokenizer(
-            features["question"],
-            features["context"],
-            return_tensors="pt",
-            max_length=None,
-            truncation=True,
-            padding="max_length",
-        )
-        return {
-            "tokens": train_encodings.input_ids.long(),
-            "start_positions": torch.Tensor(
-                [features["answers"]["answer_start"][0]]
-            ).long(),
-            "end_positions": torch.Tensor(
-                [
-                    features["answers"]["answer_start"][0]
-                    + len(features["answers"]["text"][0])
-                ]
-            ).long(),
-            "lan": lan,
-        }
+        raise StopIteration
 
 
 class tydiqaTrainDataset(torch.utils.data.Dataset):
@@ -1268,30 +1256,29 @@ class bucc2018tDataset(torch.utils.data.Dataset):
             length = len(self.dataset[lan])
             if id_absolute < length:
                 id = id_absolute
-                break
+                features = self.dataset[lan][id]
+                source_encodings = tokenizer(
+                    features["source_sentence"],
+                    return_tensors="pt",
+                    max_length=None,
+                    truncation=True,
+                    padding="max_length",
+                )
+                target_encodings = tokenizer(
+                    features["target_sentence"],
+                    return_tensors="pt",
+                    max_length=None,
+                    truncation=True,
+                    padding="max_length",
+                )
+                return {
+                    "source_tokens": source_encodings.input_ids.long(),
+                    "target_tokens": target_encodings.input_ids.long(),
+                    "lan": lan,
+                }
             id_absolute -= length
-        if id is None:
-            raise StopIteration
-        features = self.dataset[lan][id]
-        source_encodings = tokenizer(
-            features["source_sentence"],
-            return_tensors="pt",
-            max_length=None,
-            truncation=True,
-            padding="max_length",
-        )
-        target_encodings = tokenizer(
-            features["target_sentence"],
-            return_tensors="pt",
-            max_length=None,
-            truncation=True,
-            padding="max_length",
-        )
-        return {
-            "source_tokens": source_encodings.input_ids.long(),
-            "target_tokens": target_encodings.input_ids.long(),
-            "lan": lan,
-        }
+        raise StopIteration
+        
 
 
 class tatoebaDataset(torch.utils.data.Dataset):
@@ -1309,27 +1296,25 @@ class tatoebaDataset(torch.utils.data.Dataset):
             length = len(self.dataset[lan])
             if id_absolute < length:
                 id = id_absolute
-                break
+                features = self.dataset[lan][id]
+                source_encodings = tokenizer(
+                    features["source_sentence"],
+                    return_tensors="pt",
+                    max_length=None,
+                    truncation=True,
+                    padding="max_length",
+                )
+                target_encodings = tokenizer(
+                    features["target_sentence"],
+                    return_tensors="pt",
+                    max_length=None,
+                    truncation=True,
+                    padding="max_length",
+                )
+                return {
+                    "source_tokens": source_encodings.input_ids.long(),
+                    "target_tokens": target_encodings.input_ids.long(),
+                    "lan": lan,
+                }
             id_absolute -= length
-        if id is None:
-            raise StopIteration
-        features = self.dataset[lan][id]
-        source_encodings = tokenizer(
-            features["source_sentence"],
-            return_tensors="pt",
-            max_length=None,
-            truncation=True,
-            padding="max_length",
-        )
-        target_encodings = tokenizer(
-            features["target_sentence"],
-            return_tensors="pt",
-            max_length=None,
-            truncation=True,
-            padding="max_length",
-        )
-        return {
-            "source_tokens": source_encodings.input_ids.long(),
-            "target_tokens": target_encodings.input_ids.long(),
-            "lan": lan,
-        }
+        raise StopIteration
