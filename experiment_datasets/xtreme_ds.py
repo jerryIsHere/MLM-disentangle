@@ -612,6 +612,8 @@ class udposTestDataset(torch.utils.data.Dataset):
                 id = id_absolute
                 break
             id_absolute -= length
+        if id is None:
+            raise StopIteration
         features = self.dataset[lan][id]
         txt = features["tokens"]
         train_encodings = tokenizer(
@@ -715,6 +717,8 @@ class panxTestDataset(torch.utils.data.Dataset):
                 id = id_absolute
                 break
             id_absolute -= length
+        if id is None:
+            raise StopIteration
         features = self.dataset[lan][id]
         txt = features["tokens"]
         train_encodings = tokenizer(
@@ -777,13 +781,14 @@ class xnliValidationDataset(torch.utils.data.Dataset):
         return sum(map(len, self.dataset.values()))
 
     def __getitem__(self, id_absolute):
-        print(id_absolute)
         for split in self.dataset:
             length = len(self.dataset[split])
             if id_absolute < length:
                 id = id_absolute
                 break
             id_absolute -= length
+        if id is None:
+            raise StopIteration
         features = self.dataset[split][id]
         train_encodings = tokenizer(
             features["premise"],
@@ -904,6 +909,8 @@ class pawsxTestDataset(torch.utils.data.Dataset):
                 id = id_absolute
                 break
             id_absolute -= length
+        if id is None:
+            raise StopIteration
         features = self.dataset[lan][id]
         train_encodings = tokenizer(
             features["sentence1"],
@@ -1003,6 +1010,8 @@ class xquadTestDataset(torch.utils.data.Dataset):
                 id = id_absolute
                 break
             id_absolute -= length
+        if id is None:
+            raise StopIteration
         features = self.dataset[lan][id]
         train_encodings = tokenizer(
             features["question"],
@@ -1108,6 +1117,8 @@ class mlqaTestDataset(torch.utils.data.Dataset):
                 id = id_absolute
                 break
             id_absolute -= length
+        if id is None:
+            raise StopIteration
         features = self.dataset[lan][id]
         train_encodings = tokenizer(
             features["question"],
@@ -1259,6 +1270,8 @@ class bucc2018tDataset(torch.utils.data.Dataset):
                 id = id_absolute
                 break
             id_absolute -= length
+        if id is None:
+            raise StopIteration
         features = self.dataset[lan][id]
         source_encodings = tokenizer(
             features["source_sentence"],
@@ -1298,6 +1311,8 @@ class tatoebaDataset(torch.utils.data.Dataset):
                 id = id_absolute
                 break
             id_absolute -= length
+        if id is None:
+            raise StopIteration
         features = self.dataset[lan][id]
         source_encodings = tokenizer(
             features["source_sentence"],
