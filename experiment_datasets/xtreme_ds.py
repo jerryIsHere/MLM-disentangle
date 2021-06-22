@@ -777,6 +777,7 @@ class xnliValidationDataset(torch.utils.data.Dataset):
         return sum(map(len, self.dataset.values()))
 
     def __getitem__(self, id_absolute):
+        print(id_absolute)
         for split in self.dataset:
             length = len(self.dataset[split])
             if id_absolute < length:
