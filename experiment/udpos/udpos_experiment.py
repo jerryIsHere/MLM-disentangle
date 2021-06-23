@@ -235,8 +235,10 @@ def test(finetune_model):
             del batch
 
     for lan in lan_metric:
-        lan_metric[lan].compute()
-    metric.compute()
+        print(lan)
+        print(lan_metric[lan].compute(average="micro"))
+    print("overall f1 score:")
+    print(metric.compute(average="micro"))
 
 
 if __name__ == "__main__":
