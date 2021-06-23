@@ -89,7 +89,7 @@ for task in multitask_model.taskmodels_dict:
     multitask_model.taskmodels_dict[task].cpu()
 mlmLoss = 0.0
 disentangleLoss = 0.0
-gradient_step = 0
+gradient_step_counter = 0
 model_path = (
     "/gpfs1/home/ckchan666/mlm_disentangle_experiment/model/"
     + os.path.dirname(os.path.abspath(__file__)).split("/")[-1]
@@ -160,17 +160,17 @@ for i, batch in enumerate(dataloader):
         torch.nn.utils.clip_grad_norm_(multitask_model.parameters(), 1.0)
         optimizermlm.step()
         multitask_model.zero_grad()
-        gradient_step += 1
-        if gradient_step == 1:
+        gradient_step_counter += 1
+        if gradient_step_counter == 1:
             print(
                 "mlm loss ("
-                + str(gradient_step)
+                + str(gradient_step_counter)
                 + "): "
                 + str(mlmLoss / experiment_config_dict["training"].gradient_acc_size)
             )
             print(
                 "disentangle loss ("
-                + str(gradient_step)
+                + str(gradient_step_counter)
                 + "): "
                 + str(
                     disentangleLoss
@@ -180,19 +180,19 @@ for i, batch in enumerate(dataloader):
             writer.add_scalar(
                 "mlm loss",
                 mlmLoss / experiment_config_dict["training"].gradient_acc_size,
-                gradient_step,
+                gradient_step_counter,
             )
             writer.add_scalar(
                 "disentangle loss",
                 disentangleLoss / experiment_config_dict["training"].gradient_acc_size,
-                gradient_step,
+                gradient_step_counter,
             )
-        if gradient_step % experiment_config_dict["training"].log_step == 0:
+        if gradient_step_counter % experiment_config_dict["training"].log_step == 0:
             # writer.add_scalar("mlm lr", scheduler.get_lr()[0], global_step)
             # writer.add_scalar("disentangle lr", scheduler.get_lr()[0], global_step)
             print(
                 "mlm loss ("
-                + str(gradient_step)
+                + str(gradient_step_counter)
                 + "): "
                 + str(
                     mlmLoss
@@ -204,7 +204,7 @@ for i, batch in enumerate(dataloader):
             )
             print(
                 "disentangle loss ("
-                + str(gradient_step)
+                + str(gradient_step_counter)
                 + "): "
                 + str(
                     disentangleLoss
@@ -221,7 +221,7 @@ for i, batch in enumerate(dataloader):
                     experiment_config_dict["training"].log_step
                     * experiment_config_dict["training"].gradient_acc_size
                 ),
-                gradient_step,
+                gradient_step_counter,
             )
             writer.add_scalar(
                 "disentangle loss",
@@ -230,16 +230,16 @@ for i, batch in enumerate(dataloader):
                     experiment_config_dict["training"].log_step
                     * experiment_config_dict["training"].gradient_acc_size
                 ),
-                gradient_step,
+                gradient_step_counter,
             )
             mlmLoss = 0
             disentangleLoss = 0
             multitask_model.save_pretrained(model_path)
-        if gradient_step >= experiment_config_dict["training"].max_step:
+        if gradient_step_counter >= experiment_config_dict["training"].max_step:
             break
         if time.time() - start_time > 0.9 * args.time:
             print(str(time.time() - start_time) + "s exceed 0.9 of the time limit")
-            print(str(gradient_step) + "th gradient step")
+            print(str(gradient_step_counter) + "th gradient step")
             break
     gc.collect()
 

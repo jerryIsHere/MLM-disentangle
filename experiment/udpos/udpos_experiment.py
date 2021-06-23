@@ -104,7 +104,7 @@ def train(
         finetune_model.taskmodels_dict[task].cpu()
     udposLoss = 0.0
     disentangleLoss = 0.0
-    gradient_step = 0
+    gradient_step_counter = 0
     print(
         "run for "
         + str(task_config["epochs"])
@@ -169,36 +169,36 @@ def train(
                 torch.nn.utils.clip_grad_norm_(finetune_model.parameters(), 1.0)
                 scheduler.step()
                 finetune_model.zero_grad()
-                gradient_step += 1
-                if gradient_step % log_step_size == 0:
+                gradient_step_counter += 1
+                if gradient_step_counter % log_step_size == 0:
                     writer.add_scalar("lr", scheduler.get_lr()[0], i)
                     writer.add_scalar("disentangle lr", scheduler.get_lr()[0], i)
                     print(
                         " loss ("
-                        + str(gradient_step)
+                        + str(gradient_step_counter)
                         + "): "
                         + str(udposLoss / (log_step_size * gradient_acc_size))
                     )
                     print(
                         "disentangle loss ("
-                        + str(gradient_step)
+                        + str(gradient_step_counter)
                         + "): "
                         + str(disentangleLoss / (log_step_size * gradient_acc_size))
                     )
                     writer.add_scalar(
                         " loss",
                         udposLoss / (log_step_size * gradient_acc_size),
-                        gradient_step,
+                        gradient_step_counter,
                     )
                     writer.add_scalar(
                         "disentangle loss",
                         disentangleLoss / (log_step_size * gradient_acc_size),
-                        gradient_step,
+                        gradient_step_counter,
                     )
                     udposLoss = 0
                     disentangleLoss = 0
                     finetune_model.save_pretrained(model_path)
-                if custom_stop_condition(gradient_step):
+                if custom_stop_condition(gradient_step_counter):
                     break
             gc.collect()
             i += 1
