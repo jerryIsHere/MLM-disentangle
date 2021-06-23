@@ -959,8 +959,6 @@ class xquadTrainDataset(torch.utils.data.Dataset):
             [len(answer_txt) for answer_txt in features["answers"]["text"]]
         )
         for i, position in enumerate(endposition):
-            print(i)
-            print(position)
             endposition[i] = train_encodings.char_to_token(position - 1)
         return {
             "tokens": torch.LongTensor(train_encodings.input_ids),
