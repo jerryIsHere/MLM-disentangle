@@ -629,7 +629,9 @@ class udposTestDataset(torch.utils.data.Dataset):
                 labels = np.ones(len(train_encodings.input_ids), dtype=int) * -100
                 ids = np.array(train_encodings.input_ids)
                 arr_offset = np.array(train_encodings.offset_mapping)
-                label_index = (arr_offset[:, 0] == 0) & (arr_offset[:, 1] != 0) & (ids[:] != 6)
+                label_index = (
+                    (arr_offset[:, 0] == 0) & (arr_offset[:, 1] != 0) & (ids[:] != 6)
+                )
                 labels[label_index] = self.dataset[lan][id]["pos_tags"][
                     : np.count_nonzero(label_index)
                 ]
@@ -666,9 +668,10 @@ class panxTrainDataset(torch.utils.data.Dataset):
         labels = np.ones(len(train_encodings.input_ids), dtype=int) * -100
         ids = np.array(train_encodings.input_ids)
         arr_offset = np.array(train_encodings.offset_mapping)
-        labels[
-            (arr_offset[:, 0] == 0) & (arr_offset[:, 1] != 0) & (ids[:] != 6)
-        ] = self.dataset[id]["ner_tags"]
+        label_index = (arr_offset[:, 0] == 0) & (arr_offset[:, 1] != 0) & (ids[:] != 6)
+        labels[label_index] = self.dataset[id]["ner_tags"][
+            : np.count_nonzero(label_index)
+        ]
         return {
             "tokens": torch.from_numpy(ids).long(),
             "ner_tags": torch.from_numpy(labels).long(),
@@ -699,9 +702,10 @@ class panxValidationDataset(torch.utils.data.Dataset):
         labels = np.ones(len(train_encodings.input_ids), dtype=int) * -100
         ids = np.array(train_encodings.input_ids)
         arr_offset = np.array(train_encodings.offset_mapping)
-        labels[
-            (arr_offset[:, 0] == 0) & (arr_offset[:, 1] != 0) & (ids[:] != 6)
-        ] = self.dataset[id]["ner_tags"]
+        label_index = (arr_offset[:, 0] == 0) & (arr_offset[:, 1] != 0) & (ids[:] != 6)
+        labels[label_index] = self.dataset[id]["ner_tags"][
+            : np.count_nonzero(label_index)
+        ]
         return {
             "tokens": torch.from_numpy(ids).long(),
             "ner_tags": torch.from_numpy(labels).long(),
@@ -738,9 +742,10 @@ class panxTestDataset(torch.utils.data.Dataset):
                 labels = np.ones(len(train_encodings.input_ids), dtype=int) * -100
                 ids = np.array(train_encodings.input_ids)
                 arr_offset = np.array(train_encodings.offset_mapping)
-                labels[
-                    (arr_offset[:, 0] == 0) & (arr_offset[:, 1] != 0) & (ids[:] != 6)
-                ] = self.dataset[lan][id]["ner_tags"]
+                label_index = (arr_offset[:, 0] == 0) & (arr_offset[:, 1] != 0) & (ids[:] != 6)
+                labels[label_index] = self.dataset[id]["ner_tags"][
+                    : np.count_nonzero(label_index)
+                ]
                 return {
                     "tokens": torch.from_numpy(ids).long(),
                     "ner_tags": torch.from_numpy(labels).long(),
@@ -1174,6 +1179,7 @@ class tydiqaTrainDataset(torch.utils.data.Dataset):
             ).long(),
         }
 
+
 # this does not exist
 # class tydiqaValidationDataset(torch.utils.data.Dataset):
 #     def __init__(self):
@@ -1290,7 +1296,6 @@ class bucc2018tDataset(torch.utils.data.Dataset):
                 }
             id_absolute -= length
         raise StopIteration
-        
 
 
 class tatoebaDataset(torch.utils.data.Dataset):
