@@ -742,7 +742,9 @@ class panxTestDataset(torch.utils.data.Dataset):
                 labels = np.ones(len(train_encodings.input_ids), dtype=int) * -100
                 ids = np.array(train_encodings.input_ids)
                 arr_offset = np.array(train_encodings.offset_mapping)
-                label_index = (arr_offset[:, 0] == 0) & (arr_offset[:, 1] != 0) & (ids[:] != 6)
+                label_index = (
+                    (arr_offset[:, 0] == 0) & (arr_offset[:, 1] != 0) & (ids[:] != 6)
+                )
                 labels[label_index] = self.dataset[lan][id]["ner_tags"][
                     : np.count_nonzero(label_index)
                 ]
@@ -770,13 +772,12 @@ class xnliTrainDataset(torch.utils.data.Dataset):
         train_encodings = tokenizer(
             features["premise"],
             features["hypothesis"],
-            return_tensors="pt",
             max_length=TASK["xnli"]["max seq length"],
             truncation=True,
             padding="max_length",
         )
         return {
-            "tokens": train_encodings.input_ids.long(),
+            "tokens": torch.LongTensor(train_encodings.input_ids),
             "label": torch.Tensor(
                 [xnliTrainDataset.class_label.index(features["label"])]
             ).long(),
@@ -802,13 +803,12 @@ class xnliValidationDataset(torch.utils.data.Dataset):
                 train_encodings = tokenizer(
                     features["premise"],
                     features["hypothesis"],
-                    return_tensors="pt",
                     max_length=TASK["xnli"]["max seq length"],
                     truncation=True,
                     padding="max_length",
                 )
                 return {
-                    "tokens": train_encodings.input_ids.long(),
+                    "tokens": torch.LongTensor(train_encodings.input_ids),
                     "label": torch.Tensor(
                         [xnliTrainDataset.class_label.index(features["label"])]
                     ).long(),
@@ -832,13 +832,12 @@ class xnliTestDataset(torch.utils.data.Dataset):
         train_encodings = tokenizer(
             features["sentence1"],
             features["sentence2"],
-            return_tensors="pt",
             max_length=None,
             truncation=True,
             padding="max_length",
         )
         return {
-            "tokens": train_encodings.input_ids.long(),
+            "tokens": torch.LongTensor(train_encodings.input_ids),
             "label": torch.Tensor(
                 [xnliTestDataset.class_label.index(features["gold_label"])]
             ).long(),
@@ -864,13 +863,12 @@ class pawsxTrainDataset(torch.utils.data.Dataset):
         train_encodings = tokenizer(
             features["sentence1"],
             features["sentence2"],
-            return_tensors="pt",
             max_length=TASK["pawsx"]["max seq length"],
             truncation=True,
             padding="max_length",
         )
         return {
-            "tokens": train_encodings.input_ids.long(),
+            "tokens": torch.LongTensor(train_encodings.input_ids),
             "label": torch.Tensor(
                 [pawsxTrainDataset.class_label.index(features["label"])]
             ).long(),
@@ -890,13 +888,12 @@ class pawsxValidationDataset(torch.utils.data.Dataset):
         train_encodings = tokenizer(
             features["sentence1"],
             features["sentence2"],
-            return_tensors="pt",
             max_length=TASK["pawsx"]["max seq length"],
             truncation=True,
             padding="max_length",
         )
         return {
-            "tokens": train_encodings.input_ids.long(),
+            "tokens": torch.LongTensor(train_encodings.input_ids),
             "label": torch.Tensor(
                 [pawsxTrainDataset.class_label.index(features["label"])]
             ).long(),
@@ -922,13 +919,12 @@ class pawsxTestDataset(torch.utils.data.Dataset):
                 train_encodings = tokenizer(
                     features["sentence1"],
                     features["sentence2"],
-                    return_tensors="pt",
                     max_length=None,
                     truncation=True,
                     padding="max_length",
                 )
                 return {
-                    "tokens": train_encodings.input_ids.long(),
+                    "tokens": torch.LongTensor(train_encodings.input_ids),
                     "label": torch.Tensor(
                         [pawsxTrainDataset.class_label.index(features["label"])]
                     ).long(),
@@ -951,13 +947,12 @@ class xquadTrainDataset(torch.utils.data.Dataset):
         train_encodings = tokenizer(
             features["question"],
             features["context"],
-            return_tensors="pt",
             max_length=TASK["xquad"]["max seq length"],
             truncation=True,
             padding="max_length",
         )
         return {
-            "tokens": train_encodings.input_ids.long(),
+            "tokens": torch.LongTensor(train_encodings.input_ids),
             "start_positions": torch.Tensor(
                 [features["answers"]["answer_start"][0]]
             ).long(),
@@ -983,13 +978,12 @@ class xquadValidationDataset(torch.utils.data.Dataset):
         train_encodings = tokenizer(
             features["question"],
             features["context"],
-            return_tensors="pt",
             max_length=TASK["xquad"]["max seq length"],
             truncation=True,
             padding="max_length",
         )
         return {
-            "tokens": train_encodings.input_ids.long(),
+            "tokens": torch.LongTensor(train_encodings.input_ids),
             "start_positions": torch.Tensor(
                 [features["answers"]["answer_start"][0]]
             ).long(),
@@ -1021,13 +1015,12 @@ class xquadTestDataset(torch.utils.data.Dataset):
                 train_encodings = tokenizer(
                     features["question"],
                     features["context"],
-                    return_tensors="pt",
                     max_length=None,
                     truncation=True,
                     padding="max_length",
                 )
                 return {
-                    "tokens": train_encodings.input_ids.long(),
+                    "tokens": torch.LongTensor(train_encodings.input_ids),
                     "start_positions": torch.Tensor(
                         [features["answers"]["answer_start"][0]]
                     ).long(),
@@ -1056,13 +1049,12 @@ class xquadTestDataset(torch.utils.data.Dataset):
 #         train_encodings = tokenizer(
 #             features["question"],
 #             features["context"],
-#             return_tensors="pt",
-#             max_length=TASK["mlqa"]["max seq length"],
+#             #             max_length=TASK["mlqa"]["max seq length"],
 #             truncation=True,
 #             padding="max_length",
 #         )
 #         return {
-#             "tokens": train_encodings.input_ids.long(),
+#             "tokens": torch.LongTensor(train_encodings.input_ids),
 #             "start_positions": torch.Tensor(
 #                 [features["answers"]["answer_start"][0]]
 #             ).long(),
@@ -1088,13 +1080,12 @@ class xquadTestDataset(torch.utils.data.Dataset):
 #         train_encodings = tokenizer(
 #             features["question"],
 #             features["context"],
-#             return_tensors="pt",
-#             max_length=TASK["mlqa"]["max seq length"],
+#             #             max_length=TASK["mlqa"]["max seq length"],
 #             truncation=True,
 #             padding="max_length",
 #         )
 #         return {
-#             "tokens": train_encodings.input_ids.long(),
+#             "tokens": torch.LongTensor(train_encodings.input_ids),
 #             "start_positions": torch.Tensor(
 #                 [features["answers"]["answer_start"][0]]
 #             ).long(),
@@ -1126,13 +1117,12 @@ class mlqaTestDataset(torch.utils.data.Dataset):
                 train_encodings = tokenizer(
                     features["question"],
                     features["context"],
-                    return_tensors="pt",
                     max_length=None,
                     truncation=True,
                     padding="max_length",
                 )
                 return {
-                    "tokens": train_encodings.input_ids.long(),
+                    "tokens": torch.LongTensor(train_encodings.input_ids),
                     "start_positions": torch.Tensor(
                         [features["answers"]["answer_start"][0]]
                     ).long(),
@@ -1161,13 +1151,12 @@ class tydiqaTrainDataset(torch.utils.data.Dataset):
         train_encodings = tokenizer(
             features["question"],
             features["context"],
-            return_tensors="pt",
             max_length=TASK["tydiqa"]["max seq length"],
             truncation=True,
             padding="max_length",
         )
         return {
-            "tokens": train_encodings.input_ids.long(),
+            "tokens": torch.LongTensor(train_encodings.input_ids),
             "start_positions": torch.Tensor(
                 [features["answers"]["answer_start"][0]]
             ).long(),
@@ -1194,13 +1183,12 @@ class tydiqaTrainDataset(torch.utils.data.Dataset):
 #         train_encodings = tokenizer(
 #             features["question"],
 #             features["context"],
-#             return_tensors="pt",
-#             max_length=TASK["tydiqa"]["max seq length"],
+#             #             max_length=TASK["tydiqa"]["max seq length"],
 #             truncation=True,
 #             padding="max_length",
 #         )
 #         return {
-#             "tokens": train_encodings.input_ids.long(),
+#             "tokens": torch.LongTensor(train_encodings.input_ids),
 #             "start_positions": torch.Tensor(
 #                 [features["answers"]["answer_start"][0]]
 #             ).long(),
@@ -1239,13 +1227,12 @@ class tydiqaTestDataset(torch.utils.data.Dataset):
         train_encodings = tokenizer(
             features["question"],
             features["context"],
-            return_tensors="pt",
             max_length=None,
             truncation=True,
             padding="max_length",
         )
         return {
-            "tokens": train_encodings.input_ids.long(),
+            "tokens": torch.LongTensor(train_encodings.input_ids),
             "start_positions": torch.Tensor(
                 [features["answers"]["answer_start"][0]]
             ).long(),
@@ -1277,14 +1264,12 @@ class bucc2018tDataset(torch.utils.data.Dataset):
                 features = self.dataset[lan][id]
                 source_encodings = tokenizer(
                     features["source_sentence"],
-                    return_tensors="pt",
                     max_length=None,
                     truncation=True,
                     padding="max_length",
                 )
                 target_encodings = tokenizer(
                     features["target_sentence"],
-                    return_tensors="pt",
                     max_length=None,
                     truncation=True,
                     padding="max_length",
@@ -1316,14 +1301,12 @@ class tatoebaDataset(torch.utils.data.Dataset):
                 features = self.dataset[lan][id]
                 source_encodings = tokenizer(
                     features["source_sentence"],
-                    return_tensors="pt",
                     max_length=None,
                     truncation=True,
                     padding="max_length",
                 )
                 target_encodings = tokenizer(
                     features["target_sentence"],
-                    return_tensors="pt",
                     max_length=None,
                     truncation=True,
                     padding="max_length",
