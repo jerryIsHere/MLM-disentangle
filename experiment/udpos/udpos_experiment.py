@@ -168,8 +168,7 @@ def train(
             if (i + 1) % (gradient_acc_size / batch_size) == 0:
                 torch.nn.utils.clip_grad_norm_(finetune_model.parameters(), 1.0)
                 scheduler.step()
-                finetune_model.taskmodels_dict[task].zero_grad()
-                finetune_model.taskmodels_dict["disentangle"].zero_grad()
+                finetune_model.zero_grad()
                 gradient_step += 1
                 if gradient_step % log_step_size == 0:
                     writer.add_scalar("lr", scheduler.get_lr()[0], i)

@@ -159,8 +159,7 @@ for i, batch in enumerate(dataloader):
     ) == 0:
         torch.nn.utils.clip_grad_norm_(multitask_model.parameters(), 1.0)
         optimizermlm.step()
-        multitask_model.taskmodels_dict["mlm"].zero_grad()
-        multitask_model.taskmodels_dict["disentangle"].zero_grad()
+        multitask_model.zero_grad()
         gradient_step += 1
         if gradient_step == 1:
             print(
