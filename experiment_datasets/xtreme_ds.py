@@ -743,7 +743,7 @@ class panxTestDataset(torch.utils.data.Dataset):
                 ids = np.array(train_encodings.input_ids)
                 arr_offset = np.array(train_encodings.offset_mapping)
                 label_index = (arr_offset[:, 0] == 0) & (arr_offset[:, 1] != 0) & (ids[:] != 6)
-                labels[label_index] = self.dataset[id]["ner_tags"][
+                labels[label_index] = self.dataset[lan][id]["ner_tags"][
                     : np.count_nonzero(label_index)
                 ]
                 return {
