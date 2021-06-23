@@ -778,8 +778,8 @@ class xnliTrainDataset(torch.utils.data.Dataset):
         )
         return {
             "tokens": torch.LongTensor(train_encodings.input_ids),
-            "label": torch.Tensor(
-                [xnliTrainDataset.class_label.index(features["label"])]
+            "label": torch.tensor(
+                xnliTrainDataset.class_label.index(features["label"])
             ).long(),
         }
 
@@ -809,8 +809,8 @@ class xnliValidationDataset(torch.utils.data.Dataset):
                 )
                 return {
                     "tokens": torch.LongTensor(train_encodings.input_ids),
-                    "label": torch.Tensor(
-                        [xnliTrainDataset.class_label.index(features["label"])]
+                    "label": torch.tensor(
+                        xnliTrainDataset.class_label.index(features["label"])
                     ).long(),
                 }
             id_absolute -= length
@@ -838,8 +838,8 @@ class xnliTestDataset(torch.utils.data.Dataset):
         )
         return {
             "tokens": torch.LongTensor(train_encodings.input_ids),
-            "label": torch.Tensor(
-                [xnliTestDataset.class_label.index(features["gold_label"])]
+            "label": torch.tensor(
+                xnliTestDataset.class_label.index(features["gold_label"])
             ).long(),
             "lan": features["language"],
         }
@@ -869,8 +869,8 @@ class pawsxTrainDataset(torch.utils.data.Dataset):
         )
         return {
             "tokens": torch.LongTensor(train_encodings.input_ids),
-            "label": torch.Tensor(
-                [pawsxTrainDataset.class_label.index(features["label"])]
+            "label": torch.tensor(
+                pawsxTrainDataset.class_label.index(features["label"])
             ).long(),
         }
 
@@ -894,8 +894,8 @@ class pawsxValidationDataset(torch.utils.data.Dataset):
         )
         return {
             "tokens": torch.LongTensor(train_encodings.input_ids),
-            "label": torch.Tensor(
-                [pawsxTrainDataset.class_label.index(features["label"])]
+            "label": torch.tensor(
+                pawsxTrainDataset.class_label.index(features["label"])
             ).long(),
         }
 
@@ -925,8 +925,8 @@ class pawsxTestDataset(torch.utils.data.Dataset):
                 )
                 return {
                     "tokens": torch.LongTensor(train_encodings.input_ids),
-                    "label": torch.Tensor(
-                        [pawsxTrainDataset.class_label.index(features["label"])]
+                    "label": torch.tensor(
+                        pawsxTrainDataset.class_label.index(features["label"])
                     ).long(),
                     "lan": lan,
                 }
