@@ -97,7 +97,7 @@ def train(
         num_warmup_steps=task_config["warmup_steps"],
         num_training_steps=len(udpos_ds) // gradient_acc_size * task_config["epochs"],
     )
-    log_step = len(udpos_ds) // gradient_acc_size * task_config["epochs"] // 20
+    log_step_size = len(udpos_ds) // gradient_acc_size * task_config["epochs"] // 20
     import gc
 
     for task in finetune_model.taskmodels_dict:
@@ -171,42 +171,29 @@ def train(
                 finetune_model.taskmodels_dict[task].zero_grad()
                 finetune_model.taskmodels_dict["disentangle"].zero_grad()
                 gradient_step += 1
-                if gradient_step == 1:
-                    print(
-                        "loss ("
-                        + str(gradient_step)
-                        + "): "
-                        + str(udposLoss / log_step)
-                    )
-                    print(
-                        "disentangle loss ("
-                        + str(gradient_step)
-                        + "): "
-                        + str(disentangleLoss / log_step)
-                    )
-                if gradient_step % log_step == 0:
+                if gradient_step % log_step_size == 0:
                     writer.add_scalar("lr", scheduler.get_lr()[0], i)
                     writer.add_scalar("disentangle lr", scheduler.get_lr()[0], i)
                     print(
                         " loss ("
                         + str(gradient_step)
                         + "): "
-                        + str(udposLoss / log_step)
+                        + str(udposLoss / (log_step_size * gradient_acc_size))
                     )
                     print(
                         "disentangle loss ("
                         + str(gradient_step)
                         + "): "
-                        + str(disentangleLoss / log_step)
+                        + str(disentangleLoss / (log_step_size * gradient_acc_size))
                     )
                     writer.add_scalar(
                         " loss",
-                        udposLoss / log_step,
+                        udposLoss / (log_step_size * gradient_acc_size),
                         gradient_step,
                     )
                     writer.add_scalar(
                         "disentangle loss",
-                        disentangleLoss / log_step,
+                        disentangleLoss / (log_step_size * gradient_acc_size),
                         gradient_step,
                     )
                     udposLoss = 0

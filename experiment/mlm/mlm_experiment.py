@@ -167,13 +167,26 @@ for i, batch in enumerate(dataloader):
                 "mlm loss ("
                 + str(gradient_step)
                 + "): "
-                + str(mlmLoss / experiment_config_dict["training"].log_step)
+                + str(mlmLoss / experiment_config_dict["training"].gradient_acc_size)
             )
             print(
                 "disentangle loss ("
                 + str(gradient_step)
                 + "): "
-                + str(disentangleLoss / experiment_config_dict["training"].log_step)
+                + str(
+                    disentangleLoss
+                    / experiment_config_dict["training"].gradient_acc_size
+                )
+            )
+            writer.add_scalar(
+                "mlm loss",
+                mlmLoss / experiment_config_dict["training"].gradient_acc_size,
+                gradient_step,
+            )
+            writer.add_scalar(
+                "disentangle loss",
+                disentangleLoss / experiment_config_dict["training"].gradient_acc_size,
+                gradient_step,
             )
         if gradient_step % experiment_config_dict["training"].log_step == 0:
             # writer.add_scalar("mlm lr", scheduler.get_lr()[0], global_step)
@@ -182,22 +195,42 @@ for i, batch in enumerate(dataloader):
                 "mlm loss ("
                 + str(gradient_step)
                 + "): "
-                + str(mlmLoss / experiment_config_dict["training"].log_step)
+                + str(
+                    mlmLoss
+                    / (
+                        experiment_config_dict["training"].log_step
+                        * experiment_config_dict["training"].gradient_acc_size
+                    )
+                )
             )
             print(
                 "disentangle loss ("
                 + str(gradient_step)
                 + "): "
-                + str(disentangleLoss / experiment_config_dict["training"].log_step)
+                + str(
+                    disentangleLoss
+                    / (
+                        experiment_config_dict["training"].log_step
+                        * experiment_config_dict["training"].gradient_acc_size
+                    )
+                )
             )
             writer.add_scalar(
                 "mlm loss",
-                mlmLoss / experiment_config_dict["training"].log_step,
+                mlmLoss
+                / (
+                    experiment_config_dict["training"].log_step
+                    * experiment_config_dict["training"].gradient_acc_size
+                ),
                 gradient_step,
             )
             writer.add_scalar(
                 "disentangle loss",
-                disentangleLoss / experiment_config_dict["training"].log_step,
+                disentangleLoss
+                / (
+                    experiment_config_dict["training"].log_step
+                    * experiment_config_dict["training"].gradient_acc_size
+                ),
                 gradient_step,
             )
             mlmLoss = 0
