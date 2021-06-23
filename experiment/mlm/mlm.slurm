@@ -5,10 +5,10 @@
 #SBATCH --cpus-per-task=4
 #SBATCH --gres=gpu:1
 #SBATCH --mem=32GB
-#SBATCH --time=0-28:00:00
+#SBATCH --time=0-48:00:00
 #SBATCH --output=/gpfs1/home/ckchan666/mlm_disentangle_experiment/job/mlm/task.log
 #SBATCH --error=/gpfs1/home/ckchan666/mlm_disentangle_experiment/job/mlm/task.err
 
 module load python37
 source /gpfs1/home/ckchan666/mnlpEnv/bin/activate
-python /gpfs1/home/ckchan666/MLM-disentangle/experiment/mlm/mlm_experiment.py 28:00:00
+python /gpfs1/home/ckchan666/MLM-disentangle/experiment/mlm/mlm_experiment.py 48:00:00

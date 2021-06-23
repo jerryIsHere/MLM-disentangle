@@ -3,7 +3,7 @@
         {
             "dtype": "SingleToken",
             "length": 744,
-            "weight": 0.0004,
+            "weight": 0.00012,
             "num_labels": 40,
             "label_id": "language_id",
             "hidden_size": 384
@@ -11,7 +11,7 @@
         {
             "dtype": "FullSequence",
             "length": 384,
-            "weight": 0.0002,
+            "weight": 0.00006,
             "num_labels": 40,
             "label_id": "language_id",
             "hidden_size": 96,
@@ -21,7 +21,7 @@
         {
             "dtype": "FullSequence",
             "length": 288,
-            "weight": 0.0002,
+            "weight": 0.00006,
             "num_labels": 14,
             "label_id": "family_label",
             "hidden_size": 96,
@@ -31,7 +31,7 @@
         {
             "dtype": "FullSequence",
             "length": 192,
-            "weight": 0.0002,
+            "weight": 0.00006,
             "num_labels": 25,
             "label_id": "genus_label",
             "hidden_size": 96,
@@ -44,7 +44,7 @@
         "model_name": "mlm_disentangle_default",
         "gradient_acc_size": 16,
         "batch_size": 2,
-        "max_step": 2250,
+        "max_step": 3375,
         "log_step": 225,
         "num_frozen_layers": 18,
         "mlm_lr": 4e-4,
