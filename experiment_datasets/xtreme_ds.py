@@ -961,7 +961,7 @@ class xquadTrainDataset(torch.utils.data.Dataset):
         for i, position in enumerate(endposition):
             print(i)
             print(position)
-            endposition[i] = train_encodings.char_to_token(position)
+            endposition[i] = train_encodings.char_to_token(position - 1)
         return {
             "tokens": torch.LongTensor(train_encodings.input_ids),
             "start_positions": torch.Tensor(startposition).long(),
@@ -996,7 +996,7 @@ class xquadValidationDataset(torch.utils.data.Dataset):
             [len(answer_txt) for answer_txt in features["answers"]["text"]]
         )
         for i, position in enumerate(endposition):
-            endposition[i] = train_encodings.char_to_token(position)
+            endposition[i] = train_encodings.char_to_token(position - 1)
         return {
             "tokens": torch.LongTensor(train_encodings.input_ids),
             "start_positions": torch.Tensor(startposition).long(),
@@ -1037,7 +1037,7 @@ class xquadTestDataset(torch.utils.data.Dataset):
                     [len(answer_txt) for answer_txt in features["answers"]["text"]]
                 )
                 for i, position in enumerate(endposition):
-                    endposition[i] = train_encodings.char_to_token(position)
+                    endposition[i] = train_encodings.char_to_token(position - 1)
                 return {
                     "tokens": torch.LongTensor(train_encodings.input_ids),
                     "start_positions": torch.Tensor(startposition).long(),
@@ -1142,7 +1142,7 @@ class mlqaTestDataset(torch.utils.data.Dataset):
                     [len(answer_txt) for answer_txt in features["answers"]["text"]]
                 )
                 for i, position in enumerate(endposition):
-                    endposition[i] = train_encodings.char_to_token(position)
+                    endposition[i] = train_encodings.char_to_token(position - 1)
                 return {
                     "tokens": torch.LongTensor(train_encodings.input_ids),
                     "start_positions": torch.Tensor(startposition).long(),
@@ -1179,7 +1179,7 @@ class tydiqaTrainDataset(torch.utils.data.Dataset):
             [len(answer_txt) for answer_txt in features["answers"]["text"]]
         )
         for i, position in enumerate(endposition):
-            endposition[i] = train_encodings.char_to_token(position)
+            endposition[i] = train_encodings.char_to_token(position - 1)
         return {
             "tokens": torch.LongTensor(train_encodings.input_ids),
             "start_positions": torch.Tensor(startposition).long(),
@@ -1259,7 +1259,7 @@ class tydiqaTestDataset(torch.utils.data.Dataset):
             [len(answer_txt) for answer_txt in features["answers"]["text"]]
         )
         for i, position in enumerate(endposition):
-            endposition[i] = train_encodings.char_to_token(position)
+            endposition[i] = train_encodings.char_to_token(position - 1)
         return {
             "tokens": torch.LongTensor(train_encodings.input_ids),
             "start_positions": torch.Tensor(startposition).long(),
