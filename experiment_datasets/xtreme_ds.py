@@ -945,20 +945,27 @@ class xquadTrainDataset(torch.utils.data.Dataset):
     def __getitem__(self, id):
         features = self.dataset[id]
         train_encodings = tokenizer(
-            features["question"],
             features["context"],
+            features["question"],
             max_length=TASK["xquad"]["max seq length"],
             truncation=True,
             padding="max_length",
         )
+        startposition = np.array(features["answers"]["answer_start"])
+        for i, position in enumerate(startposition):
+            startposition[i] = train_encodings.char_to_token(position)
         endposition = np.array(features["answers"]["answer_start"])
         endposition = endposition + np.array(
             [len(answer_txt) for answer_txt in features["answers"]["text"]]
         )
+        for i, position in enumerate(endposition):
+            endposition[i] = train_encodings.char_to_token(position)
         return {
             "tokens": torch.LongTensor(train_encodings.input_ids),
-            "start_positions": torch.Tensor(features["answers"]["answer_start"]).long(),
+            "start_positions": torch.Tensor(startposition).long(),
             "end_positions": torch.Tensor(endposition).long(),
+            "id": features["id"],
+            "answers": features["answers"],
         }
 
 
@@ -973,20 +980,27 @@ class xquadValidationDataset(torch.utils.data.Dataset):
     def __getitem__(self, id):
         features = self.dataset[id]
         train_encodings = tokenizer(
-            features["question"],
             features["context"],
+            features["question"],
             max_length=TASK["xquad"]["max seq length"],
             truncation=True,
             padding="max_length",
         )
+        startposition = np.array(features["answers"]["answer_start"])
+        for i, position in enumerate(startposition):
+            startposition[i] = train_encodings.char_to_token(position)
         endposition = np.array(features["answers"]["answer_start"])
         endposition = endposition + np.array(
             [len(answer_txt) for answer_txt in features["answers"]["text"]]
         )
+        for i, position in enumerate(endposition):
+            endposition[i] = train_encodings.char_to_token(position)
         return {
             "tokens": torch.LongTensor(train_encodings.input_ids),
-            "start_positions": torch.Tensor(features["answers"]["answer_start"]).long(),
+            "start_positions": torch.Tensor(startposition).long(),
             "end_positions": torch.Tensor(endposition).long(),
+            "id": features["id"],
+            "answers": features["answers"],
         }
 
 
@@ -1005,24 +1019,29 @@ class xquadTestDataset(torch.utils.data.Dataset):
             length = len(self.dataset[lan])
             if id_absolute < length:
                 id = id_absolute
-                features = self.dataset[lan][id]
+                features = self.dataset["lan"][id]
                 train_encodings = tokenizer(
-                    features["question"],
                     features["context"],
-                    max_length=None,
+                    features["question"],
+                    max_length=TASK["xquad"]["max seq length"],
                     truncation=True,
                     padding="max_length",
                 )
+                startposition = np.array(features["answers"]["answer_start"])
+                for i, position in enumerate(startposition):
+                    startposition[i] = train_encodings.char_to_token(position)
                 endposition = np.array(features["answers"]["answer_start"])
                 endposition = endposition + np.array(
                     [len(answer_txt) for answer_txt in features["answers"]["text"]]
                 )
+                for i, position in enumerate(endposition):
+                    endposition[i] = train_encodings.char_to_token(position)
                 return {
                     "tokens": torch.LongTensor(train_encodings.input_ids),
-                    "start_positions": torch.Tensor(
-                        features["answers"]["answer_start"]
-                    ).long(),
+                    "start_positions": torch.Tensor(startposition).long(),
                     "end_positions": torch.Tensor(endposition).long(),
+                    "id": features["id"],
+                    "answers": features["answers"],
                 }
             id_absolute -= length
         raise StopIteration
@@ -1107,24 +1126,27 @@ class mlqaTestDataset(torch.utils.data.Dataset):
                 id = id_absolute
                 features = self.dataset[lan][id]
                 train_encodings = tokenizer(
-                    features["question"],
                     features["context"],
-                    max_length=None,
+                    features["question"],
+                    max_length=TASK["mlqa"]["max seq length"],
                     truncation=True,
                     padding="max_length",
                 )
+                startposition = np.array(features["answers"]["answer_start"])
+                for i, position in enumerate(startposition):
+                    startposition[i] = train_encodings.char_to_token(position)
+                endposition = np.array(features["answers"]["answer_start"])
+                endposition = endposition + np.array(
+                    [len(answer_txt) for answer_txt in features["answers"]["text"]]
+                )
+                for i, position in enumerate(endposition):
+                    endposition[i] = train_encodings.char_to_token(position)
                 return {
                     "tokens": torch.LongTensor(train_encodings.input_ids),
-                    "start_positions": torch.Tensor(
-                        [features["answers"]["answer_start"][0]]
-                    ).long(),
-                    "end_positions": torch.Tensor(
-                        [
-                            features["answers"]["answer_start"][0]
-                            + len(features["answers"]["text"][0])
-                        ]
-                    ).long(),
-                    "lan": lan,
+                    "start_positions": torch.Tensor(startposition).long(),
+                    "end_positions": torch.Tensor(endposition).long(),
+                    "id": features["id"],
+                    "answers": features["answers"],
                 }
             id_absolute -= length
         raise StopIteration
@@ -1141,23 +1163,27 @@ class tydiqaTrainDataset(torch.utils.data.Dataset):
     def __getitem__(self, id):
         features = self.dataset[id]
         train_encodings = tokenizer(
-            features["question"],
             features["context"],
+            features["question"],
             max_length=TASK["tydiqa"]["max seq length"],
             truncation=True,
             padding="max_length",
         )
+        startposition = np.array(features["answers"]["answer_start"])
+        for i, position in enumerate(startposition):
+            startposition[i] = train_encodings.char_to_token(position)
+        endposition = np.array(features["answers"]["answer_start"])
+        endposition = endposition + np.array(
+            [len(answer_txt) for answer_txt in features["answers"]["text"]]
+        )
+        for i, position in enumerate(endposition):
+            endposition[i] = train_encodings.char_to_token(position)
         return {
             "tokens": torch.LongTensor(train_encodings.input_ids),
-            "start_positions": torch.Tensor(
-                [features["answers"]["answer_start"][0]]
-            ).long(),
-            "end_positions": torch.Tensor(
-                [
-                    features["answers"]["answer_start"][0]
-                    + len(features["answers"]["text"][0])
-                ]
-            ).long(),
+            "start_positions": torch.Tensor(startposition).long(),
+            "end_positions": torch.Tensor(endposition).long(),
+            "id": features["id"],
+            "answers": features["answers"],
         }
 
 
@@ -1217,23 +1243,27 @@ class tydiqaTestDataset(torch.utils.data.Dataset):
     def __getitem__(self, id):
         features = self.dataset[id]
         train_encodings = tokenizer(
-            features["question"],
             features["context"],
-            max_length=None,
+            features["question"],
+            max_length=TASK["tydiqa"]["max seq length"],
             truncation=True,
             padding="max_length",
         )
+        startposition = np.array(features["answers"]["answer_start"])
+        for i, position in enumerate(startposition):
+            startposition[i] = train_encodings.char_to_token(position)
+        endposition = np.array(features["answers"]["answer_start"])
+        endposition = endposition + np.array(
+            [len(answer_txt) for answer_txt in features["answers"]["text"]]
+        )
+        for i, position in enumerate(endposition):
+            endposition[i] = train_encodings.char_to_token(position)
         return {
             "tokens": torch.LongTensor(train_encodings.input_ids),
-            "start_positions": torch.Tensor(
-                [features["answers"]["answer_start"][0]]
-            ).long(),
-            "end_positions": torch.Tensor(
-                [
-                    features["answers"]["answer_start"][0]
-                    + len(features["answers"]["text"][0])
-                ]
-            ).long(),
+            "start_positions": torch.Tensor(startposition).long(),
+            "end_positions": torch.Tensor(endposition).long(),
+            "id": features["id"],
+            "answers": features["answers"],
             "lan": LANG2ISO[features["id"].split("-")[0]],
         }
 

@@ -236,9 +236,9 @@ def test(finetune_model):
 
     for lan in lan_metric:
         print(lan)
-        print(lan_metric[lan].compute(average="micro"))
+        print(lan_metric[lan].compute(normalize=True))
     print("overall f1 score:")
-    print(metric.compute(average="micro"))
+    print(metric.compute(normalize=True))
 
 
 if __name__ == "__main__":
