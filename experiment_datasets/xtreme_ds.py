@@ -951,17 +951,14 @@ class xquadTrainDataset(torch.utils.data.Dataset):
             truncation=True,
             padding="max_length",
         )
+        endposition = np.array(features["answers"]["answer_start"])
+        endposition = endposition + np.array(
+            [len(answer_txt) for answer_txt in features["answers"]["text"]]
+        )
         return {
             "tokens": torch.LongTensor(train_encodings.input_ids),
-            "start_positions": torch.Tensor(
-                [features["answers"]["answer_start"][0]]
-            ).long(),
-            "end_positions": torch.Tensor(
-                [
-                    features["answers"]["answer_start"][0]
-                    + len(features["answers"]["text"][0])
-                ]
-            ).long(),
+            "start_positions": torch.Tensor(features["answers"]["answer_start"]).long(),
+            "end_positions": torch.Tensor(endposition).long(),
         }
 
 
@@ -982,17 +979,14 @@ class xquadValidationDataset(torch.utils.data.Dataset):
             truncation=True,
             padding="max_length",
         )
+        endposition = np.array(features["answers"]["answer_start"])
+        endposition = endposition + np.array(
+            [len(answer_txt) for answer_txt in features["answers"]["text"]]
+        )
         return {
             "tokens": torch.LongTensor(train_encodings.input_ids),
-            "start_positions": torch.Tensor(
-                [features["answers"]["answer_start"][0]]
-            ).long(),
-            "end_positions": torch.Tensor(
-                [
-                    features["answers"]["answer_start"][0]
-                    + len(features["answers"]["text"][0])
-                ]
-            ).long(),
+            "start_positions": torch.Tensor(features["answers"]["answer_start"]).long(),
+            "end_positions": torch.Tensor(endposition).long(),
         }
 
 
@@ -1019,18 +1013,16 @@ class xquadTestDataset(torch.utils.data.Dataset):
                     truncation=True,
                     padding="max_length",
                 )
+                endposition = np.array(features["answers"]["answer_start"])
+                endposition = endposition + np.array(
+                    [len(answer_txt) for answer_txt in features["answers"]["text"]]
+                )
                 return {
                     "tokens": torch.LongTensor(train_encodings.input_ids),
                     "start_positions": torch.Tensor(
-                        [features["answers"]["answer_start"][0]]
+                        features["answers"]["answer_start"]
                     ).long(),
-                    "end_positions": torch.Tensor(
-                        [
-                            features["answers"]["answer_start"][0]
-                            + len(features["answers"]["text"][0])
-                        ]
-                    ).long(),
-                    "lan": lan,
+                    "end_positions": torch.Tensor(endposition).long(),
                 }
             id_absolute -= length
         raise StopIteration
