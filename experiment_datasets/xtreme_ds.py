@@ -962,8 +962,8 @@ class xquadTrainDataset(torch.utils.data.Dataset):
             endposition[i] = train_encodings.char_to_token(position - 1)
         return {
             "tokens": torch.LongTensor(train_encodings.input_ids),
-            "start_positions": torch.Tensor(startposition).long(),
-            "end_positions": torch.Tensor(endposition).long(),
+            "start_positions": torch.tensor(startposition).long(),
+            "end_positions": torch.tensor(endposition).long(),
             "id": features["id"],
             "answers": features["answers"],
         }
@@ -997,8 +997,8 @@ class xquadValidationDataset(torch.utils.data.Dataset):
             endposition[i] = train_encodings.char_to_token(position - 1)
         return {
             "tokens": torch.LongTensor(train_encodings.input_ids),
-            "start_positions": torch.Tensor(startposition).long(),
-            "end_positions": torch.Tensor(endposition).long(),
+            "start_positions": torch.tensor(startposition).long(),
+            "end_positions": torch.tensor(endposition).long(),
             "id": features["id"],
             "answers": features["answers"],
         }
@@ -1038,8 +1038,8 @@ class xquadTestDataset(torch.utils.data.Dataset):
                     endposition[i] = train_encodings.char_to_token(position - 1)
                 return {
                     "tokens": torch.LongTensor(train_encodings.input_ids),
-                    "start_positions": torch.Tensor(startposition).long(),
-                    "end_positions": torch.Tensor(endposition).long(),
+                    "start_positions": torch.tensor(startposition).long(),
+                    "end_positions": torch.tensor(endposition).long(),
                     "id": features["id"],
                     "answers": features["answers"],
                     "lan": lan,
@@ -1067,10 +1067,10 @@ class xquadTestDataset(torch.utils.data.Dataset):
 #         )
 #         return {
 #             "tokens": torch.LongTensor(train_encodings.input_ids),
-#             "start_positions": torch.Tensor(
+#             "start_positions": torch.tensor(
 #                 [features["answers"]["answer_start"][0]]
 #             ).long(),
-#             "end_positions": torch.Tensor(
+#             "end_positions": torch.tensor(
 #                 [
 #                     features["answers"]["answer_start"][0]
 #                     + len(features["answers"]["text"][0])
@@ -1098,10 +1098,10 @@ class xquadTestDataset(torch.utils.data.Dataset):
 #         )
 #         return {
 #             "tokens": torch.LongTensor(train_encodings.input_ids),
-#             "start_positions": torch.Tensor(
+#             "start_positions": torch.tensor(
 #                 [features["answers"]["answer_start"][0]]
 #             ).long(),
-#             "end_positions": torch.Tensor(
+#             "end_positions": torch.tensor(
 #                 [
 #                     features["answers"]["answer_start"][0]
 #                     + len(features["answers"]["text"][0])
@@ -1144,8 +1144,8 @@ class mlqaTestDataset(torch.utils.data.Dataset):
                     endposition[i] = train_encodings.char_to_token(position - 1)
                 return {
                     "tokens": torch.LongTensor(train_encodings.input_ids),
-                    "start_positions": torch.Tensor(startposition).long(),
-                    "end_positions": torch.Tensor(endposition).long(),
+                    "start_positions": torch.tensor(startposition).long(),
+                    "end_positions": torch.tensor(endposition).long(),
                     "id": features["id"],
                     "answers": features["answers"],
                     "lan": lan,
@@ -1182,8 +1182,8 @@ class tydiqaTrainDataset(torch.utils.data.Dataset):
             endposition[i] = train_encodings.char_to_token(position - 1)
         return {
             "tokens": torch.LongTensor(train_encodings.input_ids),
-            "start_positions": torch.Tensor(startposition).long(),
-            "end_positions": torch.Tensor(endposition).long(),
+            "start_positions": torch.tensor(startposition).long(),
+            "end_positions": torch.tensor(endposition).long(),
             "id": features["id"],
             "answers": features["answers"],
         }
@@ -1209,10 +1209,10 @@ class tydiqaTrainDataset(torch.utils.data.Dataset):
 #         )
 #         return {
 #             "tokens": torch.LongTensor(train_encodings.input_ids),
-#             "start_positions": torch.Tensor(
+#             "start_positions": torch.tensor(
 #                 [features["answers"]["answer_start"][0]]
 #             ).long(),
-#             "end_positions": torch.Tensor(
+#             "end_positions": torch.tensor(
 #                 [
 #                     features["answers"]["answer_start"][0]
 #                     + len(features["answers"]["text"][0])
@@ -1262,8 +1262,8 @@ class tydiqaTestDataset(torch.utils.data.Dataset):
             endposition[i] = train_encodings.char_to_token(position - 1)
         return {
             "tokens": torch.LongTensor(train_encodings.input_ids),
-            "start_positions": torch.Tensor(startposition).long(),
-            "end_positions": torch.Tensor(endposition).long(),
+            "start_positions": torch.tensor(startposition).long(),
+            "end_positions": torch.tensor(endposition).long(),
             "id": features["id"],
             "answers": features["answers"],
             "lan": LANG2ISO[features["id"].split("-")[0]],
