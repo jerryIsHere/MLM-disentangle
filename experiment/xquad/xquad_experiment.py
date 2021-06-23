@@ -206,9 +206,10 @@ def train(
 
 
 # testing
-def test(finetune_model):
+def test(finetune_model, ds):
+    print(ds.__class__.__name__)
     test_dataloader = torch.utils.data.DataLoader(
-        xtreme_ds.xquadTestDataset(), batch_size=1, num_workers=0, shuffle=True
+        ds, batch_size=1, num_workers=0, shuffle=True
     )
     metric = xtreme_ds.METRIC_FUNCTION[task]()
     lan_metric = {}
@@ -219,17 +220,35 @@ def test(finetune_model):
         with torch.no_grad():
             #  input to gpu
             batch["tokens"] = batch["tokens"].cuda()
-            Output = finetune_model.taskmodels_dict[task](input_ids=batch["tokens"])
-            start_predictions = torch.argmax(Output['start_logits'], dim=1)
-            end_predictions = torch.argmax(Output['end_logits'], dim=1)
+            Output = finetune_model.taskmodels_dict[task](batch["tokens"])
+            start_predictions = torch.argmax(Output["start_logits"], dim=1)
+            end_predictions = torch.argmax(Output["end_logits"], dim=1)
             for i, lan in enumerate(batch["lan"]):
-                for j, token_pred in enumerate(start_predictions[i]):
-                    if batch["label"][i][j] == -100:
-                        continue
-                    lan_metric[lan].add(
-                        prediction=token_pred, reference=batch["label"][i][j]
+                predictions = xtreme_ds.tokenizer.convert_tokens_to_string(
+                    xtreme_ds.tokenizer.convert_ids_to_tokens(
+                        batch["tokens"][i][start_predictions[i] : end_predictions[i]]
                     )
-                    metric.add(prediction=token_pred, reference=batch["label"][i][j])
+                )
+                lan_metric[lan].add(
+                    prediction={"id": batch["id"][i], "prediction_text": predictions},
+                    reference={
+                        "id": batch["id"][i],
+                        "answers": {
+                            "text": batch["answers"]["text"][i],
+                            "answer_start": batch["answers"]["answer_start"][i],
+                        },
+                    },
+                )
+                metric.add(
+                    prediction={"id": batch["id"][i], "prediction_text": predictions},
+                    reference={
+                        "id": batch["id"][i],
+                        "answers": {
+                            "text": batch["answers"]["text"][i],
+                            "answer_start": batch["answers"]["answer_start"][i],
+                        },
+                    },
+                )
             del Output
             batch.clear()
             del batch
@@ -284,4 +303,5 @@ if __name__ == "__main__":
     MLMD_ds.set_format(type="torch")
     train(finetune_model=model, writer=writer, model_path=model_path, MLMD_ds=MLMD_ds)
     print(str(time.time() - start_time) + " seconds elapsed for training")
-    test(model)
+    test(model, xtreme_ds.xquadTestDataset())
+    test(model, xtreme_ds.mlqaTestDataset())

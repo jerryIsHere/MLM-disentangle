@@ -1042,6 +1042,7 @@ class xquadTestDataset(torch.utils.data.Dataset):
                     "end_positions": torch.Tensor(endposition).long(),
                     "id": features["id"],
                     "answers": features["answers"],
+                    "lan": lan,
                 }
             id_absolute -= length
         raise StopIteration
@@ -1147,6 +1148,7 @@ class mlqaTestDataset(torch.utils.data.Dataset):
                     "end_positions": torch.Tensor(endposition).long(),
                     "id": features["id"],
                     "answers": features["answers"],
+                    "lan": lan,
                 }
             id_absolute -= length
         raise StopIteration

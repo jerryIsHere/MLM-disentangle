@@ -10,7 +10,7 @@ import torch
 import time
 import os
 
-task = "pawsx"
+task = "tydiqa"
 task_config = xtreme_ds.TASK[task]
 
 
@@ -39,10 +39,8 @@ def build_model(experiment_config_dict, mlm_model_path):
     finetune_model.taskmodels_dict.pop("mlm")
     finetune_model.add_task(
         task,
-        transformers.XLMRobertaForSequenceClassification,
-        transformers.XLMRobertaConfig.from_pretrained(
-            finetune_model.backbone_name, num_labels=task_config["num_labels"]
-        ),
+        transformers.XLMRobertaForQuestionAnswering,
+        transformers.XLMRobertaConfig.from_pretrained(finetune_model.backbone_name),
     )
     return finetune_model
 
@@ -86,23 +84,23 @@ def train(
         shuffle=True,
     )
     disentangle_iter = iter(disentangle_dataloader)
-    pawsx_ds = xtreme_ds.pawsxTrainDataset()
-    pawsx_ds_dataloader = torch.utils.data.DataLoader(
-        pawsx_ds, batch_size=2, num_workers=0, shuffle=True
+    tydiqa_ds = xtreme_ds.tydiqaTrainDataset()
+    tydiqa_ds_dataloader = torch.utils.data.DataLoader(
+        tydiqa_ds, batch_size=2, num_workers=0, shuffle=True
     )
     gradient_acc_size = task_config["gradient_acc_size"]
     batch_size = task_config["batch_size"]
     scheduler = transformers.get_linear_schedule_with_warmup(
         optimizer,
         num_warmup_steps=task_config["warmup_steps"],
-        num_training_steps=len(pawsx_ds) // gradient_acc_size * task_config["epochs"],
+        num_training_steps=len(tydiqa_ds) // gradient_acc_size * task_config["epochs"],
     )
-    log_step_size = len(pawsx_ds) // gradient_acc_size * task_config["epochs"] // 20
+    log_step_size = len(tydiqa_ds) // gradient_acc_size * task_config["epochs"] // 20
     import gc
 
     for task in finetune_model.taskmodels_dict:
         finetune_model.taskmodels_dict[task].cpu()
-    pawsxLoss = 0.0
+    tydiqaLoss = 0.0
     disentangleLoss = 0.0
     gradient_step_counter = 0
     print(
@@ -114,21 +112,22 @@ def train(
     )
     i = 0
     for _ in range(task_config["epochs"]):
-        for batch in pawsx_ds_dataloader:
+        for batch in tydiqa_ds_dataloader:
             #  input to gpu
             batch["tokens"] = batch["tokens"].cuda()
-            batch["label"] = batch["label"].cuda()
-
+            batch["start_positions"] = batch["start_positions"].cuda()
+            batch["end_positions"] = batch["end_positions"].cuda()
             #  model to gpu
             finetune_model.taskmodels_dict[task].cuda()
             Output = finetune_model.taskmodels_dict[task](
                 input_ids=batch["tokens"],
-                labels=batch["label"],
+                start_positions=batch["start_positions"][:, 0],
+                end_positions=batch["end_positions"][:, 0],
             )
             Output["loss"].backward()
 
             #  model & input to cpu
-            pawsxLoss = pawsxLoss + Output["loss"].item()
+            tydiqaLoss = tydiqaLoss + Output["loss"].item()
             finetune_model.taskmodels_dict[task].cpu()
             del Output
             batch.clear()
@@ -177,7 +176,7 @@ def train(
                         " loss ("
                         + str(gradient_step_counter)
                         + "): "
-                        + str(pawsxLoss / (log_step_size * gradient_acc_size))
+                        + str(tydiqaLoss / (log_step_size * gradient_acc_size))
                     )
                     print(
                         "disentangle loss ("
@@ -187,7 +186,7 @@ def train(
                     )
                     writer.add_scalar(
                         " loss",
-                        pawsxLoss / (log_step_size * gradient_acc_size),
+                        tydiqaLoss / (log_step_size * gradient_acc_size),
                         gradient_step_counter,
                     )
                     writer.add_scalar(
@@ -195,7 +194,7 @@ def train(
                         disentangleLoss / (log_step_size * gradient_acc_size),
                         gradient_step_counter,
                     )
-                    pawsxLoss = 0
+                    tydiqaLoss = 0
                     disentangleLoss = 0
                     finetune_model.save_pretrained(model_path)
                 if custom_stop_condition(gradient_step_counter):
@@ -208,8 +207,9 @@ def train(
 
 # testing
 def test(finetune_model):
+    print(ds.__class__.__name__)
     test_dataloader = torch.utils.data.DataLoader(
-        xtreme_ds.pawsxTestDataset(), batch_size=1, num_workers=0, shuffle=True
+        xtreme_ds.tydiqaTestDataset(), batch_size=1, num_workers=0, shuffle=True
     )
     metric = xtreme_ds.METRIC_FUNCTION[task]()
     lan_metric = {}
@@ -220,24 +220,48 @@ def test(finetune_model):
         with torch.no_grad():
             #  input to gpu
             batch["tokens"] = batch["tokens"].cuda()
-            Output = finetune_model.taskmodels_dict[task](input_ids=batch["tokens"])
-            predictions = torch.argmax(Output["logits"], dim=1)
+            Output = finetune_model.taskmodels_dict[task](batch["tokens"])
+            start_predictions = torch.argmax(Output["start_logits"], dim=1)
+            end_predictions = torch.argmax(Output["end_logits"], dim=1)
             for i, lan in enumerate(batch["lan"]):
-                lan_metric[lan].add(prediction=predictions[i], reference=batch["label"][i])
-                metric.add(prediction=predictions[i], reference=batch["label"][i])
+                predictions = xtreme_ds.tokenizer.convert_tokens_to_string(
+                    xtreme_ds.tokenizer.convert_ids_to_tokens(
+                        batch["tokens"][i][start_predictions[i] : end_predictions[i]]
+                    )
+                )
+                lan_metric[lan].add(
+                    prediction={"id": batch["id"][i], "prediction_text": predictions},
+                    reference={
+                        "id": batch["id"][i],
+                        "answers": {
+                            "text": batch["answers"]["text"][i],
+                            "answer_start": batch["answers"]["answer_start"][i],
+                        },
+                    },
+                )
+                metric.add(
+                    prediction={"id": batch["id"][i], "prediction_text": predictions},
+                    reference={
+                        "id": batch["id"][i],
+                        "answers": {
+                            "text": batch["answers"]["text"][i],
+                            "answer_start": batch["answers"]["answer_start"][i],
+                        },
+                    },
+                )
             del Output
             batch.clear()
             del batch
 
     for lan in lan_metric:
         print(lan)
-        print(lan_metric[lan].compute(normalize=True))
+        print(lan_metric[lan].compute(average="micro"))
     print("overall f1 score:")
-    print(metric.compute(normalize=True))
+    print(metric.compute(average="micro"))
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="pawsx disentangle experinment")
+    parser = argparse.ArgumentParser(description="tydiqa disentangle experinment")
     parser.add_argument(
         "--config_json",
         metavar="path",

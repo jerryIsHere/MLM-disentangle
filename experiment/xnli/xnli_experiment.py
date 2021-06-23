@@ -223,14 +223,8 @@ def test(finetune_model):
             Output = finetune_model.taskmodels_dict[task](input_ids=batch["tokens"])
             predictions = torch.argmax(Output["logits"], dim=1)
             for i, lan in enumerate(batch["lan"]):
-                for j, token_pred in enumerate(predictions[i]):
-                    if batch["label"][i][j] == -100:
-                        continue
-                    lan_metric[lan].add(
-                        prediction=token_pred, reference=batch["label"][i][j]
-                    )
-                    metric.add(prediction=token_pred, reference=batch["label"][i][j])
-            del Output
+                lan_metric[lan].add(prediction=predictions[i], reference=batch["label"][i])
+                metric.add(prediction=predictions[i], reference=batch["label"][i])
             batch.clear()
             del batch
 
