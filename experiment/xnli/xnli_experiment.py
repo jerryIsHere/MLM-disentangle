@@ -226,6 +226,7 @@ def test(finetune_model):
             for i, lan in enumerate(batch["lan"]):
                 lan_metric[lan].add(prediction=predictions[i], reference=batch["label"][i])
                 metric.add(prediction=predictions[i], reference=batch["label"][i])
+            del Output
             batch.clear()
             del batch
 
