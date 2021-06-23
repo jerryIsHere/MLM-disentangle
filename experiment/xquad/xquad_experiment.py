@@ -213,7 +213,7 @@ def test(finetune_model, ds):
     )
     metric = xtreme_ds.METRIC_FUNCTION[task]()
     lan_metric = {}
-    for lan in task_config["test"]:
+    for lan in xtreme_ds.TASK2LANGS[task]:
         lan_metric[lan] = xtreme_ds.METRIC_FUNCTION[task]()
     finetune_model.taskmodels_dict[task].cuda()
     for batch in test_dataloader:
