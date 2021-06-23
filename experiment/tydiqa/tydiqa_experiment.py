@@ -166,6 +166,7 @@ def train(
 
             if (i + 1) % (gradient_acc_size / batch_size) == 0:
                 torch.nn.utils.clip_grad_norm_(finetune_model.parameters(), 1.0)
+                optimizer.step()
                 scheduler.step()
                 finetune_model.zero_grad()
                 gradient_step_counter += 1
