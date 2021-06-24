@@ -1019,7 +1019,7 @@ class xquadTestDataset(torch.utils.data.Dataset):
             length = len(self.dataset[lan])
             if id_absolute < length:
                 id = id_absolute
-                features = self.dataset["lan"][id]
+                features = self.dataset[lan][id]
                 train_encodings = tokenizer(
                     features["context"],
                     features["question"],
