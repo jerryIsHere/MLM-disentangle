@@ -1079,8 +1079,8 @@ class xquadTestDataset(torch.utils.data.Dataset):
                     padding="max_length",
                 )
                 startposition = np.array(features["answers"]["answer_start"])
-                for answer_txt in features["answers"]["text"]:
-                    answer_txt = " ".join(answer_txt.split())
+                for i,answer_txt in enumerate(features["answers"]["text"]):
+                    features["answers"]["text"][i] = " ".join(answer_txt.split())
                 for i, position in enumerate(startposition):
                     position = (
                         position
@@ -1207,8 +1207,8 @@ class mlqaTestDataset(torch.utils.data.Dataset):
                     padding="max_length",
                 )
                 startposition = np.array(features["answers"]["answer_start"])
-                for answer_txt in features["answers"]["text"]:
-                    answer_txt = " ".join(answer_txt.split())
+                for i,answer_txt in enumerate(features["answers"]["text"]):
+                    features["answers"]["text"][i] = " ".join(answer_txt.split())
                 for i, position in enumerate(startposition):
                     position = (
                         position
