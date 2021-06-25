@@ -954,11 +954,11 @@ class xquadTrainDataset(torch.utils.data.Dataset):
         startposition = np.array(features["answers"]["answer_start"])
         for i, position in enumerate(startposition):
             startposition[i] = train_encodings.char_to_token(position)
-        endposition = np.copy(startposition+1)
+        endposition = np.copy(startposition + 1)
         for i, position in enumerate(endposition):
-            while features["answers"]["text"][
-                i
-            ] not in tokenizer.convert_tokens_to_string(
+            while endposition[i] < TASK["xquad"]["max seq length"] and features[
+                "answers"
+            ]["text"][i] not in tokenizer.convert_tokens_to_string(
                 tokenizer.convert_ids_to_tokens(
                     train_encodings.input_ids[startposition[i] : endposition[i]]
                 )
@@ -993,11 +993,11 @@ class xquadValidationDataset(torch.utils.data.Dataset):
         startposition = np.array(features["answers"]["answer_start"])
         for i, position in enumerate(startposition):
             startposition[i] = train_encodings.char_to_token(position)
-        endposition = np.copy(startposition+1)
+        endposition = np.copy(startposition + 1)
         for i, position in enumerate(endposition):
-            while features["answers"]["text"][
-                i
-            ] not in tokenizer.convert_tokens_to_string(
+            while endposition[i] < TASK["xquad"]["max seq length"] and features[
+                "answers"
+            ]["text"][i] not in tokenizer.convert_tokens_to_string(
                 tokenizer.convert_ids_to_tokens(
                     train_encodings.input_ids[startposition[i] : endposition[i]]
                 )
@@ -1038,11 +1038,11 @@ class xquadTestDataset(torch.utils.data.Dataset):
                 startposition = np.array(features["answers"]["answer_start"])
                 for i, position in enumerate(startposition):
                     startposition[i] = train_encodings.char_to_token(position)
-                endposition = np.copy(startposition+1)
+                endposition = np.copy(startposition + 1)
                 for i, position in enumerate(endposition):
-                    while features["answers"]["text"][
-                        i
-                    ] not in tokenizer.convert_tokens_to_string(
+                    while endposition[i] < TASK["xquad"]["max seq length"] and features[
+                        "answers"
+                    ]["text"][i] not in tokenizer.convert_tokens_to_string(
                         tokenizer.convert_ids_to_tokens(
                             train_encodings.input_ids[startposition[i] : endposition[i]]
                         )
@@ -1148,11 +1148,11 @@ class mlqaTestDataset(torch.utils.data.Dataset):
                 startposition = np.array(features["answers"]["answer_start"])
                 for i, position in enumerate(startposition):
                     startposition[i] = train_encodings.char_to_token(position)
-                endposition = np.copy(startposition+1)
+                endposition = np.copy(startposition + 1)
                 for i, position in enumerate(endposition):
-                    while features["answers"]["text"][
-                        i
-                    ] not in tokenizer.convert_tokens_to_string(
+                    while endposition[i] < TASK["mlqa"]["max seq length"] and features[
+                        "answers"
+                    ]["text"][i] not in tokenizer.convert_tokens_to_string(
                         tokenizer.convert_ids_to_tokens(
                             train_encodings.input_ids[startposition[i] : endposition[i]]
                         )
@@ -1190,11 +1190,11 @@ class tydiqaTrainDataset(torch.utils.data.Dataset):
         startposition = np.array(features["answers"]["answer_start"])
         for i, position in enumerate(startposition):
             startposition[i] = train_encodings.char_to_token(position)
-        endposition = np.copy(startposition+1)
+        endposition = np.copy(startposition + 1)
         for i, position in enumerate(endposition):
-            while features["answers"]["text"][
-                i
-            ] not in tokenizer.convert_tokens_to_string(
+            while endposition[i] < TASK["tydiqa"]["max seq length"] and features[
+                "answers"
+            ]["text"][i] not in tokenizer.convert_tokens_to_string(
                 tokenizer.convert_ids_to_tokens(
                     train_encodings.input_ids[startposition[i] : endposition[i]]
                 )
@@ -1274,11 +1274,11 @@ class tydiqaTestDataset(torch.utils.data.Dataset):
         startposition = np.array(features["answers"]["answer_start"])
         for i, position in enumerate(startposition):
             startposition[i] = train_encodings.char_to_token(position)
-        endposition = np.copy(startposition+1)
+        endposition = np.copy(startposition + 1)
         for i, position in enumerate(endposition):
-            while features["answers"]["text"][
-                i
-            ] not in tokenizer.convert_tokens_to_string(
+            while endposition[i] < TASK["tydiqa"]["max seq length"] and features[
+                "answers"
+            ]["text"][i] not in tokenizer.convert_tokens_to_string(
                 tokenizer.convert_ids_to_tokens(
                     train_encodings.input_ids[startposition[i] : endposition[i]]
                 )
