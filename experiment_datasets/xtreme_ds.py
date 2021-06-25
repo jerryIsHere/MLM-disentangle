@@ -960,7 +960,13 @@ class xquadTrainDataset(torch.utils.data.Dataset):
         )
         for i, position in enumerate(endposition):
             endposition[i] = train_encodings.char_to_token(
-                position + (1 if features["context"][position + 1]  == ' ' else 0)
+                position
+                + (
+                    0
+                    if features["context"][position + 1] == " "
+                    or features["context"][position] == "-"
+                    else 1
+                )
             )
 
         return {
@@ -998,7 +1004,13 @@ class xquadValidationDataset(torch.utils.data.Dataset):
         )
         for i, position in enumerate(endposition):
             endposition[i] = train_encodings.char_to_token(
-                position + (1 if features["context"][position + 1]  == ' ' else 0)
+                position
+                + (
+                    0
+                    if features["context"][position + 1] == " "
+                    or features["context"][position] == "-"
+                    else 1
+                )
             )
         return {
             "tokens": torch.LongTensor(train_encodings.input_ids),
@@ -1042,7 +1054,12 @@ class xquadTestDataset(torch.utils.data.Dataset):
                 for i, position in enumerate(endposition):
                     endposition[i] = train_encodings.char_to_token(
                         position
-                        + (1 if features["context"][position + 1]  == ' ' else 0)
+                        + (
+                            0
+                            if features["context"][position + 1] == " "
+                            or features["context"][position] == "-"
+                            else 1
+                        )
                     )
                 return {
                     "tokens": torch.LongTensor(train_encodings.input_ids),
@@ -1151,7 +1168,12 @@ class mlqaTestDataset(torch.utils.data.Dataset):
                 for i, position in enumerate(endposition):
                     endposition[i] = train_encodings.char_to_token(
                         position
-                        + (1 if features["context"][position + 1]  == ' ' else 0)
+                        + (
+                            0
+                            if features["context"][position + 1] == " "
+                            or features["context"][position] == "-"
+                            else 1
+                        )
                     )
                 return {
                     "tokens": torch.LongTensor(train_encodings.input_ids),
@@ -1191,7 +1213,13 @@ class tydiqaTrainDataset(torch.utils.data.Dataset):
         )
         for i, position in enumerate(endposition):
             endposition[i] = train_encodings.char_to_token(
-                position + (1 if features["context"][position + 1]  == ' ' else 0)
+                position
+                + (
+                    0
+                    if features["context"][position + 1] == " "
+                    or features["context"][position] == "-"
+                    else 1
+                )
             )
         return {
             "tokens": torch.LongTensor(train_encodings.input_ids),
@@ -1273,7 +1301,13 @@ class tydiqaTestDataset(torch.utils.data.Dataset):
         )
         for i, position in enumerate(endposition):
             endposition[i] = train_encodings.char_to_token(
-                position + (1 if features["context"][position + 1]  == ' ' else 0)
+                position
+                + (
+                    0
+                    if features["context"][position + 1] == " "
+                    or features["context"][position] == "-"
+                    else 1
+                )
             )
         return {
             "tokens": torch.LongTensor(train_encodings.input_ids),
