@@ -962,10 +962,10 @@ class xquadTrainDataset(torch.utils.data.Dataset):
             endposition[i] = train_encodings.char_to_token(
                 position
                 + (
-                    0
-                    if features["context"][position + 1] == " "
+                    1
+                    if features["context"][position] == " "
                     or features["context"][position] == "-"
-                    else 1
+                    else 0
                 )
             )
 
