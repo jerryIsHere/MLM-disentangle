@@ -49,7 +49,7 @@ for i, each in enumerate(ds):
         id -= length
     tags = each["tags"].numpy()
     tags = tags[tags != -100]
-    assert (tags == np.array(ds.dataset[lan[id]["ner_tags"][0 : len(tags)])).all()
+    assert (tags == np.array(ds.dataset[lan][id]["ner_tags"][0 : len(tags)])).all()
 assert i == len(ds) - 1
 
 
@@ -150,7 +150,7 @@ for i, each in enumerate(ds):
                     ]
                 )
             )
-            == ds.dataset[lan[id]["answers"]["text"][j]
+            == ds.dataset[lan][id]["answers"]["text"][j]
         )
 assert i == len(ds) - 1
 
@@ -172,7 +172,7 @@ for i, each in enumerate(ds):
                     ]
                 )
             )
-            == ds.dataset[lan[id]["answers"]["text"][j]
+            == ds.dataset[lan][id]["answers"]["text"][j]
         )
 assert i == len(ds) - 1
 
