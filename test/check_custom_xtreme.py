@@ -95,7 +95,7 @@ assert i == len(ds) - 1
 ds = xtreme_ds.xquadValidationDataset()
 for i, each in enumerate(ds):
     for j, s_p in enumerate(each["start_positions"]):
-        assert (
+        assert ds.dataset[i]["answers"]["text"][j] in (
             xtreme_ds.tokenizer.convert_tokens_to_string(
                 xtreme_ds.tokenizer.convert_ids_to_tokens(
                     each["tokens"][
@@ -103,7 +103,6 @@ for i, each in enumerate(ds):
                     ]
                 )
             )
-            == ds.dataset[i]["answers"]["text"][j]
         )
 assert i == len(ds) - 1
 ds = xtreme_ds.xquadTestDataset()

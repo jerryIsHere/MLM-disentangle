@@ -954,7 +954,7 @@ class xquadTrainDataset(torch.utils.data.Dataset):
         startposition = np.array(features["answers"]["answer_start"])
         for i, position in enumerate(startposition):
             startposition[i] = train_encodings.char_to_token(position)
-        endposition = np.copy(position)
+        endposition = np.copy(startposition)
         for i, position in enumerate(endposition):
             while features["answers"]["text"][
                 i
@@ -993,7 +993,7 @@ class xquadValidationDataset(torch.utils.data.Dataset):
         startposition = np.array(features["answers"]["answer_start"])
         for i, position in enumerate(startposition):
             startposition[i] = train_encodings.char_to_token(position)
-        endposition = np.copy(position)
+        endposition = np.copy(startposition)
         for i, position in enumerate(endposition):
             while features["answers"]["text"][
                 i
@@ -1038,7 +1038,7 @@ class xquadTestDataset(torch.utils.data.Dataset):
                 startposition = np.array(features["answers"]["answer_start"])
                 for i, position in enumerate(startposition):
                     startposition[i] = train_encodings.char_to_token(position)
-                endposition = np.copy(position)
+                endposition = np.copy(startposition)
                 for i, position in enumerate(endposition):
                     while features["answers"]["text"][
                         i
@@ -1148,7 +1148,7 @@ class mlqaTestDataset(torch.utils.data.Dataset):
                 startposition = np.array(features["answers"]["answer_start"])
                 for i, position in enumerate(startposition):
                     startposition[i] = train_encodings.char_to_token(position)
-                endposition = np.copy(position)
+                endposition = np.copy(startposition)
                 for i, position in enumerate(endposition):
                     while features["answers"]["text"][
                         i
@@ -1190,7 +1190,7 @@ class tydiqaTrainDataset(torch.utils.data.Dataset):
         startposition = np.array(features["answers"]["answer_start"])
         for i, position in enumerate(startposition):
             startposition[i] = train_encodings.char_to_token(position)
-        endposition = np.copy(position)
+        endposition = np.copy(startposition)
         for i, position in enumerate(endposition):
             while features["answers"]["text"][
                 i
@@ -1274,7 +1274,7 @@ class tydiqaTestDataset(torch.utils.data.Dataset):
         startposition = np.array(features["answers"]["answer_start"])
         for i, position in enumerate(startposition):
             startposition[i] = train_encodings.char_to_token(position)
-        endposition = np.copy(position)
+        endposition = np.copy(startposition)
         for i, position in enumerate(endposition):
             while features["answers"]["text"][
                 i
