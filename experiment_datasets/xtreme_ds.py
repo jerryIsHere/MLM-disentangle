@@ -952,6 +952,8 @@ class xquadTrainDataset(torch.utils.data.Dataset):
             padding="max_length",
         )
         startposition = np.array(features["answers"]["answer_start"])
+        for answer_txt in features["answers"]['text']:
+            answer_txt = ' '.join(answer_txt.split())
         for i, position in enumerate(startposition):
             position = (
                 position
@@ -1004,6 +1006,8 @@ class xquadValidationDataset(torch.utils.data.Dataset):
             padding="max_length",
         )
         startposition = np.array(features["answers"]["answer_start"])
+        for answer_txt in features["answers"]['text']:
+            answer_txt = ' '.join(answer_txt.split())
         for i, position in enumerate(startposition):
             position = (
                 position
@@ -1075,6 +1079,8 @@ class xquadTestDataset(torch.utils.data.Dataset):
                     padding="max_length",
                 )
                 startposition = np.array(features["answers"]["answer_start"])
+                for answer_txt in features["answers"]['text']:
+                    answer_txt = ' '.join(answer_txt.split())
                 for i, position in enumerate(startposition):
                     position = (
                         position
@@ -1201,6 +1207,8 @@ class mlqaTestDataset(torch.utils.data.Dataset):
                     padding="max_length",
                 )
                 startposition = np.array(features["answers"]["answer_start"])
+                for answer_txt in features["answers"]['text']:
+                    answer_txt = ' '.join(answer_txt.split())
                 for i, position in enumerate(startposition):
                     position = (
                         position
@@ -1259,6 +1267,8 @@ class tydiqaTrainDataset(torch.utils.data.Dataset):
             padding="max_length",
         )
         startposition = np.array(features["answers"]["answer_start"])
+        for answer_txt in features["answers"]['text']:
+            answer_txt = ' '.join(answer_txt.split())
         for i, position in enumerate(startposition):
             position = (
                 position
@@ -1356,6 +1366,8 @@ class tydiqaTestDataset(torch.utils.data.Dataset):
             padding="max_length",
         )
         startposition = np.array(features["answers"]["answer_start"])
+        for answer_txt in features["answers"]['text']:
+            answer_txt = ' '.join(answer_txt.split())
         for i, position in enumerate(startposition):
             position = (
                 position
