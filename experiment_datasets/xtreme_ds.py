@@ -959,7 +959,7 @@ class xquadTrainDataset(torch.utils.data.Dataset):
             [len(answer_txt) for answer_txt in features["answers"]["text"]]
         )
         for i, position in enumerate(endposition):
-            train_encodings.char_to_token(
+            endposition[i] = train_encodings.char_to_token(
                 position + (0 if features["context"][position + 1] == " " else 1)
             )
 
@@ -997,7 +997,7 @@ class xquadValidationDataset(torch.utils.data.Dataset):
             [len(answer_txt) for answer_txt in features["answers"]["text"]]
         )
         for i, position in enumerate(endposition):
-            train_encodings.char_to_token(
+            endposition[i] = train_encodings.char_to_token(
                 position + (0 if features["context"][position + 1] == " " else 1)
             )
         return {
@@ -1040,7 +1040,7 @@ class xquadTestDataset(torch.utils.data.Dataset):
                     [len(answer_txt) for answer_txt in features["answers"]["text"]]
                 )
                 for i, position in enumerate(endposition):
-                    train_encodings.char_to_token(
+                    endposition[i] = train_encodings.char_to_token(
                         position
                         + (0 if features["context"][position + 1] == " " else 1)
                     )
@@ -1149,7 +1149,7 @@ class mlqaTestDataset(torch.utils.data.Dataset):
                     [len(answer_txt) for answer_txt in features["answers"]["text"]]
                 )
                 for i, position in enumerate(endposition):
-                    train_encodings.char_to_token(
+                    endposition[i] = train_encodings.char_to_token(
                         position
                         + (0 if features["context"][position + 1] == " " else 1)
                     )
@@ -1190,7 +1190,7 @@ class tydiqaTrainDataset(torch.utils.data.Dataset):
             [len(answer_txt) for answer_txt in features["answers"]["text"]]
         )
         for i, position in enumerate(endposition):
-            train_encodings.char_to_token(
+            endposition[i] = train_encodings.char_to_token(
                 position + (0 if features["context"][position + 1] == " " else 1)
             )
         return {
@@ -1272,7 +1272,7 @@ class tydiqaTestDataset(torch.utils.data.Dataset):
             [len(answer_txt) for answer_txt in features["answers"]["text"]]
         )
         for i, position in enumerate(endposition):
-            train_encodings.char_to_token(
+            endposition[i] = train_encodings.char_to_token(
                 position + (0 if features["context"][position + 1] == " " else 1)
             )
         return {
