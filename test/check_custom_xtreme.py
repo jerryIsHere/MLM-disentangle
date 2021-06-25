@@ -1,62 +1,167 @@
 from experiment_datasets import xtreme_ds
+import numpy as np
+
 ds = xtreme_ds.udposTrainDataset()
-for each in ds:
-    pass
+for i, each in enumerate(ds):
+    tags = each["tags"].numpy()
+    tags = tags[tags != -100]
+    assert (tags == np.array(ds.dataset[i]["tags"][0 : len(tags)])).all()
 ds = xtreme_ds.udposValidationDataset()
-for each in ds:
-    pass
+for i, each in enumerate(ds):
+    tags = each["tags"].numpy()
+    tags = tags[tags != -100]
+    assert (tags == np.array(ds.dataset[i]["tags"][0 : len(tags)])).all()
 ds = xtreme_ds.udposTestDataset()
-for each in ds:
-    pass
+for i, each in enumerate(ds):
+    for lan in ds.dataset:
+        length = len(ds.dataset[lan])
+        if i < length:
+            break
+        i -= length
+    tags = each["tags"].numpy()
+    tags = tags[tags != -100]
+    assert (tags == np.array(ds.dataset[lan][i]["tags"][0 : len(tags)])).all()
+
+
 ds = xtreme_ds.panxTrainDataset()
-for each in ds:
-   pass
+for i, each in enumerate(ds):
+    tags = each["tags"].numpy()
+    tags = tags[tags != -100]
+    assert (tags == np.array(ds.dataset[i]["tags"][0 : len(tags)])).all()
 ds = xtreme_ds.panxValidationDataset()
-for each in ds:
-   pass
+for i, each in enumerate(ds):
+    tags = each["tags"].numpy()
+    tags = tags[tags != -100]
+    assert (tags == np.array(ds.dataset[i]["tags"][0 : len(tags)])).all()
 ds = xtreme_ds.panxTestDataset()
-for each in ds:
-   pass
+for i, each in enumerate(ds):
+    for lan in ds.dataset:
+        length = len(ds.dataset[lan])
+        if i < length:
+            break
+        i -= length
+    tags = each["tags"].numpy()
+    tags = tags[tags != -100]
+    assert (tags == np.array(ds.dataset[lan][i]["tags"][0 : len(tags)])).all()
+
+
 ds = xtreme_ds.xnliTrainDataset()
-for each in ds:
-    pass
+for i, each in enumerate(ds):
+    assert each["label"] == xtreme_ds.xnliTrainDataset.class_label.index(
+        ds.dataset[i]["label"]
+    )
 ds = xtreme_ds.xnliValidationDataset()
-for each in ds:
-    pass
+for i, each in enumerate(ds):
+    for split in ds.dataset:
+        length = len(ds.dataset[split])
+        if i < length:
+            break
+        i -= length
+    assert each["label"] == xtreme_ds.xnliTrainDataset.class_label.index(
+        ds.dataset[split][i]["label"]
+    )
 ds = xtreme_ds.xnliTestDataset()
-for each in ds:
-    pass
+for i, each in enumerate(ds):
+    assert each["label"] == xtreme_ds.xnliTrainDataset.class_label.index(
+        ds.dataset[i]["label"]
+    )
+
+
 ds = xtreme_ds.pawsxTrainDataset()
-for each in ds:
-    pass
+for i, each in enumerate(ds):
+    assert each["label"] == xtreme_ds.pawsxTrainDataset.class_label.index(
+        ds.dataset[i]["label"]
+    )
 ds = xtreme_ds.pawsxValidationDataset()
-for each in ds:
-    pass
+for i, each in enumerate(ds):
+    assert each["label"] == xtreme_ds.pawsxTrainDataset.class_label.index(
+        ds.dataset[i]["label"]
+    )
 ds = xtreme_ds.pawsxTestDataset()
-for each in ds:
-    pass
+for i, each in enumerate(ds):
+    for lan in ds.dataset:
+        length = len(ds.dataset[lan])
+        if i < length:
+            break
+        i -= length
+    assert each["label"] == xtreme_ds.pawsxTrainDataset.class_label.index(
+        ds.dataset[i]["label"]
+    )
+
+
 ds = xtreme_ds.xquadTrainDataset()
-for each in ds:
-    pass
+for i, each in enumerate(ds):
+    assert (
+        xtreme_ds.tokenizer.convert_tokens_to_string(
+            xtreme_ds.tokenizer.convert_ids_to_tokens(
+                each["tokens"][each["start_positions"] : each["end_positions"]]
+            )
+        )
+        == ds.dataset[i]["answers"]["text"][0]
+    )
 ds = xtreme_ds.xquadValidationDataset()
-for each in ds:
-    pass
+for i, each in enumerate(ds):
+    assert (
+        xtreme_ds.tokenizer.convert_tokens_to_string(
+            xtreme_ds.tokenizer.convert_ids_to_tokens(
+                each["tokens"][each["start_positions"] : each["end_positions"]]
+            )
+        )
+        == ds.dataset[i]["answers"]["text"][0]
+    )
 ds = xtreme_ds.xquadTestDataset()
-for each in ds:
-    pass
+for i, each in enumerate(ds):
+    for lan in ds.dataset:
+        length = len(ds.dataset[lan])
+        if i < length:
+            break
+        i -= length
+    assert (
+        xtreme_ds.tokenizer.convert_tokens_to_string(
+            xtreme_ds.tokenizer.convert_ids_to_tokens(
+                each["tokens"][each["start_positions"] : each["end_positions"]]
+            )
+        )
+        == ds.dataset[lan][i]["answers"]["text"][0]
+    )
+
+
 ds = xtreme_ds.mlqaTestDataset()
-for each in ds:
-    pass
+for i, each in enumerate(ds):
+    for lan in ds.dataset:
+        length = len(ds.dataset[lan])
+        if i < length:
+            break
+        i -= length
+    assert (
+        xtreme_ds.tokenizer.convert_tokens_to_string(
+            xtreme_ds.tokenizer.convert_ids_to_tokens(
+                each["tokens"][each["start_positions"] : each["end_positions"]]
+            )
+        )
+        == ds.dataset[lan][i]["answers"]["text"][0]
+    )
+
+
 ds = xtreme_ds.tydiqaTrainDataset()
-for each in ds:
+for i, each in enumerate(ds):
     pass
 ds = xtreme_ds.tydiqaTestDataset()
-for each in ds:
-    pass
-ds = xtreme_ds.bucc2018tDataset()
-for each in ds:
+for i, each in enumerate(ds):
+    assert (
+        xtreme_ds.tokenizer.convert_tokens_to_string(
+            xtreme_ds.tokenizer.convert_ids_to_tokens(
+                each["tokens"][each["start_positions"] : each["end_positions"]]
+            )
+        )
+        == ds.dataset[i]["answers"]["text"][0]
+    )
+
+
+ds = xtreme_ds.bucc2018Dataset()
+for i, each in enumerate(ds):
     pass
 ds = xtreme_ds.tatoebaDataset()
-for each in ds:
+for i, each in enumerate(ds):
     pass
 print("all dataset are error free")

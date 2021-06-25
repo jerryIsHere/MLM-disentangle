@@ -117,13 +117,13 @@ def train(
         for batch in udpos_ds_dataloader:
             #  input to gpu
             batch["tokens"] = batch["tokens"].cuda()
-            batch["pos_tags"] = batch["pos_tags"].cuda()
+            batch["tags"] = batch["tags"].cuda()
 
             #  model to gpu
             finetune_model.taskmodels_dict[task].cuda()
             Output = finetune_model.taskmodels_dict[task](
                 input_ids=batch["tokens"],
-                labels=batch["pos_tags"],
+                labels=batch["tags"],
             )
             Output["loss"].backward()
 
@@ -225,12 +225,12 @@ def test(finetune_model):
             predictions = torch.argmax(Output["logits"], dim=2)
             for i, lan in enumerate(batch["lan"]):
                 for j, token_pred in enumerate(predictions[i]):
-                    if batch["pos_tags"][i][j] == -100:
+                    if batch["tags"][i][j] == -100:
                         continue
                     lan_metric[lan].add(
-                        prediction=token_pred, reference=batch["pos_tags"][i][j]
+                        prediction=token_pred, reference=batch["tags"][i][j]
                     )
-                    metric.add(prediction=token_pred, reference=batch["pos_tags"][i][j])
+                    metric.add(prediction=token_pred, reference=batch["tags"][i][j])
             del Output
             batch.clear()
             del batch

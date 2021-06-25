@@ -556,12 +556,12 @@ class udposTrainDataset(torch.utils.data.Dataset):
         ids = np.array(train_encodings.input_ids)
         arr_offset = np.array(train_encodings.offset_mapping)
         label_index = (arr_offset[:, 0] == 0) & (arr_offset[:, 1] != 0) & (ids[:] != 6)
-        labels[label_index] = self.dataset[id]["pos_tags"][
+        labels[label_index] = self.dataset[id]["tags"][
             : np.count_nonzero(label_index)
         ]
         return {
             "tokens": torch.from_numpy(ids).long(),
-            "pos_tags": torch.from_numpy(labels).long(),
+            "tags": torch.from_numpy(labels).long(),
         }
 
 
@@ -590,12 +590,12 @@ class udposValidationDataset(torch.utils.data.Dataset):
         ids = np.array(train_encodings.input_ids)
         arr_offset = np.array(train_encodings.offset_mapping)
         label_index = (arr_offset[:, 0] == 0) & (arr_offset[:, 1] != 0) & (ids[:] != 6)
-        labels[label_index] = self.dataset[id]["pos_tags"][
+        labels[label_index] = self.dataset[id]["tags"][
             : np.count_nonzero(label_index)
         ]
         return {
             "tokens": torch.from_numpy(ids).long(),
-            "pos_tags": torch.from_numpy(labels).long(),
+            "tags": torch.from_numpy(labels).long(),
         }
 
 
@@ -632,12 +632,12 @@ class udposTestDataset(torch.utils.data.Dataset):
                 label_index = (
                     (arr_offset[:, 0] == 0) & (arr_offset[:, 1] != 0) & (ids[:] != 6)
                 )
-                labels[label_index] = self.dataset[lan][id]["pos_tags"][
+                labels[label_index] = self.dataset[lan][id]["tags"][
                     : np.count_nonzero(label_index)
                 ]
                 return {
                     "tokens": torch.from_numpy(ids).long(),
-                    "pos_tags": torch.from_numpy(labels).long(),
+                    "tags": torch.from_numpy(labels).long(),
                     "lan": lan,
                 }
             id_absolute -= length
@@ -669,12 +669,12 @@ class panxTrainDataset(torch.utils.data.Dataset):
         ids = np.array(train_encodings.input_ids)
         arr_offset = np.array(train_encodings.offset_mapping)
         label_index = (arr_offset[:, 0] == 0) & (arr_offset[:, 1] != 0) & (ids[:] != 6)
-        labels[label_index] = self.dataset[id]["ner_tags"][
+        labels[label_index] = self.dataset[id]["tags"][
             : np.count_nonzero(label_index)
         ]
         return {
             "tokens": torch.from_numpy(ids).long(),
-            "ner_tags": torch.from_numpy(labels).long(),
+            "tags": torch.from_numpy(labels).long(),
         }
 
 
@@ -703,12 +703,12 @@ class panxValidationDataset(torch.utils.data.Dataset):
         ids = np.array(train_encodings.input_ids)
         arr_offset = np.array(train_encodings.offset_mapping)
         label_index = (arr_offset[:, 0] == 0) & (arr_offset[:, 1] != 0) & (ids[:] != 6)
-        labels[label_index] = self.dataset[id]["ner_tags"][
+        labels[label_index] = self.dataset[id]["tags"][
             : np.count_nonzero(label_index)
         ]
         return {
             "tokens": torch.from_numpy(ids).long(),
-            "ner_tags": torch.from_numpy(labels).long(),
+            "tags": torch.from_numpy(labels).long(),
         }
 
 
@@ -745,12 +745,12 @@ class panxTestDataset(torch.utils.data.Dataset):
                 label_index = (
                     (arr_offset[:, 0] == 0) & (arr_offset[:, 1] != 0) & (ids[:] != 6)
                 )
-                labels[label_index] = self.dataset[lan][id]["ner_tags"][
+                labels[label_index] = self.dataset[lan][id]["tags"][
                     : np.count_nonzero(label_index)
                 ]
                 return {
                     "tokens": torch.from_numpy(ids).long(),
-                    "ner_tags": torch.from_numpy(labels).long(),
+                    "tags": torch.from_numpy(labels).long(),
                     "lan": lan,
                 }
             id_absolute -= length
@@ -960,7 +960,7 @@ class xquadTrainDataset(torch.utils.data.Dataset):
         )
         for i, position in enumerate(endposition):
             try:
-                endposition[i] = train_encodings.char_to_token(position + 1)
+                endposition[i] = train_encodings.char_to_token(position)
             except:
                 print(id)
                 raise Exception
@@ -998,7 +998,7 @@ class xquadValidationDataset(torch.utils.data.Dataset):
             [len(answer_txt) for answer_txt in features["answers"]["text"]]
         )
         for i, position in enumerate(endposition):
-            endposition[i] = train_encodings.char_to_token(position + 1)
+            endposition[i] = train_encodings.char_to_token(position)
         return {
             "tokens": torch.LongTensor(train_encodings.input_ids),
             "start_positions": torch.tensor(startposition).long(),
@@ -1039,7 +1039,7 @@ class xquadTestDataset(torch.utils.data.Dataset):
                     [len(answer_txt) for answer_txt in features["answers"]["text"]]
                 )
                 for i, position in enumerate(endposition):
-                    endposition[i] = train_encodings.char_to_token(position + 1)
+                    endposition[i] = train_encodings.char_to_token(position)
                 return {
                     "tokens": torch.LongTensor(train_encodings.input_ids),
                     "start_positions": torch.tensor(startposition).long(),
@@ -1145,7 +1145,7 @@ class mlqaTestDataset(torch.utils.data.Dataset):
                     [len(answer_txt) for answer_txt in features["answers"]["text"]]
                 )
                 for i, position in enumerate(endposition):
-                    endposition[i] = train_encodings.char_to_token(position + 1)
+                    endposition[i] = train_encodings.char_to_token(position)
                 return {
                     "tokens": torch.LongTensor(train_encodings.input_ids),
                     "start_positions": torch.tensor(startposition).long(),
@@ -1183,7 +1183,7 @@ class tydiqaTrainDataset(torch.utils.data.Dataset):
             [len(answer_txt) for answer_txt in features["answers"]["text"]]
         )
         for i, position in enumerate(endposition):
-            endposition[i] = train_encodings.char_to_token(position + 1)
+            endposition[i] = train_encodings.char_to_token(position)
         return {
             "tokens": torch.LongTensor(train_encodings.input_ids),
             "start_positions": torch.tensor(startposition).long(),
@@ -1263,7 +1263,7 @@ class tydiqaTestDataset(torch.utils.data.Dataset):
             [len(answer_txt) for answer_txt in features["answers"]["text"]]
         )
         for i, position in enumerate(endposition):
-            endposition[i] = train_encodings.char_to_token(position + 1)
+            endposition[i] = train_encodings.char_to_token(position)
         return {
             "tokens": torch.LongTensor(train_encodings.input_ids),
             "start_positions": torch.tensor(startposition).long(),
@@ -1274,7 +1274,7 @@ class tydiqaTestDataset(torch.utils.data.Dataset):
         }
 
 
-class bucc2018tDataset(torch.utils.data.Dataset):
+class bucc2018Dataset(torch.utils.data.Dataset):
     def __init__(self):
         self.dataset = {}
         for lan in TASK["bucc2018"]["src"]:
