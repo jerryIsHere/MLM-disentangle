@@ -5,12 +5,12 @@ ds = xtreme_ds.udposTrainDataset()
 for i, each in enumerate(ds):
     tags = each["tags"].numpy()
     tags = tags[tags != -100]
-    assert (tags == np.array(ds.dataset[i]["tags"][0 : len(tags)])).all()
+    assert (tags == np.array(ds.dataset[i]["pos_tags"][0 : len(tags)])).all()
 ds = xtreme_ds.udposValidationDataset()
 for i, each in enumerate(ds):
     tags = each["tags"].numpy()
     tags = tags[tags != -100]
-    assert (tags == np.array(ds.dataset[i]["tags"][0 : len(tags)])).all()
+    assert (tags == np.array(ds.dataset[i]["pos_tags"][0 : len(tags)])).all()
 ds = xtreme_ds.udposTestDataset()
 for i, each in enumerate(ds):
     for lan in ds.dataset:
@@ -20,19 +20,19 @@ for i, each in enumerate(ds):
         i -= length
     tags = each["tags"].numpy()
     tags = tags[tags != -100]
-    assert (tags == np.array(ds.dataset[lan][i]["tags"][0 : len(tags)])).all()
+    assert (tags == np.array(ds.dataset[lan][i]["pos_tags"][0 : len(tags)])).all()
 
 
 ds = xtreme_ds.panxTrainDataset()
 for i, each in enumerate(ds):
     tags = each["tags"].numpy()
     tags = tags[tags != -100]
-    assert (tags == np.array(ds.dataset[i]["tags"][0 : len(tags)])).all()
+    assert (tags == np.array(ds.dataset[i]["ner_tags"][0 : len(tags)])).all()
 ds = xtreme_ds.panxValidationDataset()
 for i, each in enumerate(ds):
     tags = each["tags"].numpy()
     tags = tags[tags != -100]
-    assert (tags == np.array(ds.dataset[i]["tags"][0 : len(tags)])).all()
+    assert (tags == np.array(ds.dataset[i]["ner_tags"][0 : len(tags)])).all()
 ds = xtreme_ds.panxTestDataset()
 for i, each in enumerate(ds):
     for lan in ds.dataset:
@@ -42,7 +42,7 @@ for i, each in enumerate(ds):
         i -= length
     tags = each["tags"].numpy()
     tags = tags[tags != -100]
-    assert (tags == np.array(ds.dataset[lan][i]["tags"][0 : len(tags)])).all()
+    assert (tags == np.array(ds.dataset[lan][i]["ner_tags"][0 : len(tags)])).all()
 
 
 ds = xtreme_ds.xnliTrainDataset()

@@ -556,7 +556,7 @@ class udposTrainDataset(torch.utils.data.Dataset):
         ids = np.array(train_encodings.input_ids)
         arr_offset = np.array(train_encodings.offset_mapping)
         label_index = (arr_offset[:, 0] == 0) & (arr_offset[:, 1] != 0) & (ids[:] != 6)
-        labels[label_index] = self.dataset[id]["tags"][
+        labels[label_index] = self.dataset[id]["pos_tags"][
             : np.count_nonzero(label_index)
         ]
         return {
@@ -590,7 +590,7 @@ class udposValidationDataset(torch.utils.data.Dataset):
         ids = np.array(train_encodings.input_ids)
         arr_offset = np.array(train_encodings.offset_mapping)
         label_index = (arr_offset[:, 0] == 0) & (arr_offset[:, 1] != 0) & (ids[:] != 6)
-        labels[label_index] = self.dataset[id]["tags"][
+        labels[label_index] = self.dataset[id]["pos_tags"][
             : np.count_nonzero(label_index)
         ]
         return {
@@ -632,7 +632,7 @@ class udposTestDataset(torch.utils.data.Dataset):
                 label_index = (
                     (arr_offset[:, 0] == 0) & (arr_offset[:, 1] != 0) & (ids[:] != 6)
                 )
-                labels[label_index] = self.dataset[lan][id]["tags"][
+                labels[label_index] = self.dataset[lan][id]["pos_tags"][
                     : np.count_nonzero(label_index)
                 ]
                 return {
@@ -669,7 +669,7 @@ class panxTrainDataset(torch.utils.data.Dataset):
         ids = np.array(train_encodings.input_ids)
         arr_offset = np.array(train_encodings.offset_mapping)
         label_index = (arr_offset[:, 0] == 0) & (arr_offset[:, 1] != 0) & (ids[:] != 6)
-        labels[label_index] = self.dataset[id]["tags"][
+        labels[label_index] = self.dataset[id]["ner_tags"][
             : np.count_nonzero(label_index)
         ]
         return {
@@ -703,7 +703,7 @@ class panxValidationDataset(torch.utils.data.Dataset):
         ids = np.array(train_encodings.input_ids)
         arr_offset = np.array(train_encodings.offset_mapping)
         label_index = (arr_offset[:, 0] == 0) & (arr_offset[:, 1] != 0) & (ids[:] != 6)
-        labels[label_index] = self.dataset[id]["tags"][
+        labels[label_index] = self.dataset[id]["ner_tags"][
             : np.count_nonzero(label_index)
         ]
         return {
@@ -745,7 +745,7 @@ class panxTestDataset(torch.utils.data.Dataset):
                 label_index = (
                     (arr_offset[:, 0] == 0) & (arr_offset[:, 1] != 0) & (ids[:] != 6)
                 )
-                labels[label_index] = self.dataset[lan][id]["tags"][
+                labels[label_index] = self.dataset[lan][id]["ner_tags"][
                     : np.count_nonzero(label_index)
                 ]
                 return {
