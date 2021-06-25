@@ -91,24 +91,30 @@ for i, each in enumerate(ds):
 
 ds = xtreme_ds.xquadTrainDataset()
 for i, each in enumerate(ds):
-    assert (
-        xtreme_ds.tokenizer.convert_tokens_to_string(
-            xtreme_ds.tokenizer.convert_ids_to_tokens(
-                each["tokens"][each["start_positions"] : each["end_positions"]]
+    for j, s_p in enumerate(each["start_positions"]):
+        assert (
+            xtreme_ds.tokenizer.convert_tokens_to_string(
+                xtreme_ds.tokenizer.convert_ids_to_tokens(
+                    each["tokens"][
+                        each["start_positions"][j] : each["end_positions"][j]
+                    ]
+                )
             )
+            == ds.dataset[i]["answers"]["text"][j]
         )
-        == ds.dataset[i]["answers"]["text"][0]
-    )
 ds = xtreme_ds.xquadValidationDataset()
 for i, each in enumerate(ds):
-    assert (
-        xtreme_ds.tokenizer.convert_tokens_to_string(
-            xtreme_ds.tokenizer.convert_ids_to_tokens(
-                each["tokens"][each["start_positions"] : each["end_positions"]]
+    for j, s_p in enumerate(each["start_positions"]):
+        assert (
+            xtreme_ds.tokenizer.convert_tokens_to_string(
+                xtreme_ds.tokenizer.convert_ids_to_tokens(
+                    each["tokens"][
+                        each["start_positions"][j] : each["end_positions"][j]
+                    ]
+                )
             )
+            == ds.dataset[i]["answers"]["text"][j]
         )
-        == ds.dataset[i]["answers"]["text"][0]
-    )
 ds = xtreme_ds.xquadTestDataset()
 for i, each in enumerate(ds):
     for lan in ds.dataset:
@@ -116,14 +122,17 @@ for i, each in enumerate(ds):
         if i < length:
             break
         i -= length
-    assert (
-        xtreme_ds.tokenizer.convert_tokens_to_string(
-            xtreme_ds.tokenizer.convert_ids_to_tokens(
-                each["tokens"][each["start_positions"] : each["end_positions"]]
+    for j, s_p in enumerate(each["start_positions"]):
+        assert (
+            xtreme_ds.tokenizer.convert_tokens_to_string(
+                xtreme_ds.tokenizer.convert_ids_to_tokens(
+                    each["tokens"][
+                        each["start_positions"][j] : each["end_positions"][j]
+                    ]
+                )
             )
+            == ds.dataset[lan][i]["answers"]["text"][j]
         )
-        == ds.dataset[lan][i]["answers"]["text"][0]
-    )
 
 
 ds = xtreme_ds.mlqaTestDataset()
@@ -133,29 +142,45 @@ for i, each in enumerate(ds):
         if i < length:
             break
         i -= length
-    assert (
-        xtreme_ds.tokenizer.convert_tokens_to_string(
-            xtreme_ds.tokenizer.convert_ids_to_tokens(
-                each["tokens"][each["start_positions"] : each["end_positions"]]
+    for j, s_p in enumerate(each["start_positions"]):
+        assert (
+            xtreme_ds.tokenizer.convert_tokens_to_string(
+                xtreme_ds.tokenizer.convert_ids_to_tokens(
+                    each["tokens"][
+                        each["start_positions"][j] : each["end_positions"][j]
+                    ]
+                )
             )
+            == ds.dataset[lan][i]["answers"]["text"][j]
         )
-        == ds.dataset[lan][i]["answers"]["text"][0]
-    )
 
 
 ds = xtreme_ds.tydiqaTrainDataset()
 for i, each in enumerate(ds):
-    pass
+    for j, s_p in enumerate(each["start_positions"]):
+        assert (
+            xtreme_ds.tokenizer.convert_tokens_to_string(
+                xtreme_ds.tokenizer.convert_ids_to_tokens(
+                    each["tokens"][
+                        each["start_positions"][j] : each["end_positions"][j]
+                    ]
+                )
+            )
+            == ds.dataset[i]["answers"]["text"][j]
+        )
 ds = xtreme_ds.tydiqaTestDataset()
 for i, each in enumerate(ds):
-    assert (
-        xtreme_ds.tokenizer.convert_tokens_to_string(
-            xtreme_ds.tokenizer.convert_ids_to_tokens(
-                each["tokens"][each["start_positions"] : each["end_positions"]]
+    for j, s_p in enumerate(each["start_positions"]):
+        assert (
+            xtreme_ds.tokenizer.convert_tokens_to_string(
+                xtreme_ds.tokenizer.convert_ids_to_tokens(
+                    each["tokens"][
+                        each["start_positions"][j] : each["end_positions"][j]
+                    ]
+                )
             )
+            == ds.dataset[i]["answers"]["text"][j]
         )
-        == ds.dataset[i]["answers"]["text"][0]
-    )
 
 
 ds = xtreme_ds.bucc2018Dataset()
