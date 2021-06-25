@@ -959,7 +959,11 @@ class xquadTrainDataset(torch.utils.data.Dataset):
             [len(answer_txt) for answer_txt in features["answers"]["text"]]
         )
         for i, position in enumerate(endposition):
-            endposition[i] = train_encodings.char_to_token(position + 1)
+            try:
+                endposition[i] = train_encodings.char_to_token(position + 1)
+            except:
+                print(id)
+                raise Exception
         return {
             "tokens": torch.LongTensor(train_encodings.input_ids),
             "start_positions": torch.tensor(startposition).long(),
