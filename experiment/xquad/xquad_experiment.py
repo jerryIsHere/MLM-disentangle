@@ -11,10 +11,9 @@ import time
 import os
 
 task = "xquad"
-task_config = xtreme_ds.TASK[task]
 
 
-def build_model(experiment_config_dict, mlm_model_path):
+def qa_build_model(experiment_config_dict, mlm_model_path, task):
     backbone_name = experiment_config_dict["training"].backbone_name
     XLMRConfig = transformers.AutoConfig.from_pretrained(backbone_name)
 
@@ -45,11 +44,13 @@ def build_model(experiment_config_dict, mlm_model_path):
     return finetune_model
 
 
-def train(
+def qa_train(
     finetune_model,
     writer,
     model_path,
     MLMD_ds,
+    qa_ds,
+    task,
     custom_stop_condition=lambda gradient_step: False,
 ):
     no_decay = ["bias", "LayerNorm.weight"]
@@ -60,7 +61,7 @@ def train(
                 for n, p in finetune_model.named_parameters()
                 if not any(nd in n for nd in no_decay)
             ],
-            "weight_decay": task_config["weight_decay"],
+            "weight_decay": xtreme_ds.TASK[task]["weight_decay"],
         },
         {
             "params": [
@@ -73,29 +74,32 @@ def train(
     ]
     optimizer = transformers.AdamW(
         optimizer_grouped_parameters,
-        lr=task_config["learning_rate"],
-        eps=task_config["adam_epsilon"],
+        lr=xtreme_ds.TASK[task]["learning_rate"],
+        eps=xtreme_ds.TASK[task]["adam_epsilon"],
     )
 
     disentangle_dataloader = torch.utils.data.DataLoader(
         MLMD_ds,
-        batch_size=task_config["batch_size"],
+        batch_size=xtreme_ds.TASK[task]["batch_size"],
         num_workers=0,
         shuffle=True,
     )
     disentangle_iter = iter(disentangle_dataloader)
-    xquad_ds = xtreme_ds.xquadTrainDataset()
-    xquad_ds_dataloader = torch.utils.data.DataLoader(
-        xquad_ds, batch_size=2, num_workers=0, shuffle=True
+    qa_ds_dataloader = torch.utils.data.DataLoader(
+        qa_ds, batch_size=2, num_workers=0, shuffle=True
     )
-    gradient_acc_size = task_config["gradient_acc_size"]
-    batch_size = task_config["batch_size"]
+    gradient_acc_size = xtreme_ds.TASK[task]["gradient_acc_size"]
+    batch_size = xtreme_ds.TASK[task]["batch_size"]
     scheduler = transformers.get_linear_schedule_with_warmup(
         optimizer,
-        num_warmup_steps=task_config["warmup_steps"],
-        num_training_steps=len(xquad_ds) // gradient_acc_size * task_config["epochs"],
+        num_warmup_steps=xtreme_ds.TASK[task]["warmup_steps"],
+        num_training_steps=len(qa_ds)
+        // gradient_acc_size
+        * xtreme_ds.TASK[task]["epochs"],
     )
-    log_step_size = len(xquad_ds) // gradient_acc_size * task_config["epochs"] // 20
+    log_step_size = (
+        len(qa_ds) // gradient_acc_size * xtreme_ds.TASK[task]["epochs"] // 20
+    )
     import gc
 
     for task in finetune_model.taskmodels_dict:
@@ -105,14 +109,14 @@ def train(
     gradient_step_counter = 0
     print(
         "run for "
-        + str(task_config["epochs"])
+        + str(xtreme_ds.TASK[task]["epochs"])
         + " epoches with "
         + str(gradient_acc_size)
         + " gradient acc size"
     )
     i = 0
-    for _ in range(task_config["epochs"]):
-        for batch in xquad_ds_dataloader:
+    for _ in range(xtreme_ds.TASK[task]["epochs"]):
+        for batch in qa_ds_dataloader:
             #  input to gpu
             batch["tokens"] = batch["tokens"].cuda()
             batch["start_positions"] = batch["start_positions"].cuda()
@@ -207,10 +211,10 @@ def train(
 
 
 # testing
-def test(finetune_model, ds):
-    print(ds.__class__.__name__)
+def qa_test(finetune_model, qa_ds, task):
+    print(qa_ds.__class__.__name__)
     test_dataloader = torch.utils.data.DataLoader(
-        ds, batch_size=1, num_workers=0, shuffle=True
+        qa_ds, batch_size=1, num_workers=0, shuffle=True
     )
     metric = xtreme_ds.METRIC_FUNCTION[task]()
     lan_metric = {}
@@ -279,7 +283,7 @@ if __name__ == "__main__":
     experiment_config_dict["training"].model_name = (
         os.path.abspath(args.config_json).split("/")[-1].split(".")[0]
     )
-    model = build_model(
+    model = qa_build_model(
         experiment_config_dict=experiment_config_dict,
         mlm_model_path="/gpfs1/home/ckchan666/mlm_disentangle_experiment/model/mlm/"
         + experiment_config_dict["training"].model_name
@@ -302,7 +306,13 @@ if __name__ == "__main__":
     )
     MLMD_ds = oscar_corpus.get_custom_corpus()
     MLMD_ds.set_format(type="torch")
-    train(finetune_model=model, writer=writer, model_path=model_path, MLMD_ds=MLMD_ds)
+    qa_train(
+        finetune_model=model,
+        writer=writer,
+        model_path=model_path,
+        MLMD_ds=MLMD_ds,
+        qa_ds=xtreme_ds.xquadTrainDataset(),
+    )
     print(str(time.time() - start_time) + " seconds elapsed for training")
-    test(model, xtreme_ds.xquadTestDataset())
-    test(model, xtreme_ds.mlqaTestDataset())
+    qa_test(model, qa_ds=xtreme_ds.xquadTestDataset())
+    qa_test(model, qa_ds=xtreme_ds.mlqaTestDataset())

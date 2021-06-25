@@ -10,11 +10,8 @@ import torch
 import time
 import os
 
-task = "xnli"
-task_config = xtreme_ds.TASK[task]
 
-
-def build_model(experiment_config_dict, mlm_model_path):
+def cls_build_model(experiment_config_dict, mlm_model_path, task):
     backbone_name = experiment_config_dict["training"].backbone_name
     XLMRConfig = transformers.AutoConfig.from_pretrained(backbone_name)
 
@@ -41,17 +38,19 @@ def build_model(experiment_config_dict, mlm_model_path):
         task,
         transformers.XLMRobertaForSequenceClassification,
         transformers.XLMRobertaConfig.from_pretrained(
-            finetune_model.backbone_name, num_labels=task_config["num_labels"]
+            finetune_model.backbone_name, num_labels=xtreme_ds.TASK[task]["num_labels"]
         ),
     )
     return finetune_model
 
 
-def train(
+def cls_train(
     finetune_model,
     writer,
     model_path,
     MLMD_ds,
+    cls_ds,
+    task,
     custom_stop_condition=lambda gradient_step: False,
 ):
     no_decay = ["bias", "LayerNorm.weight"]
@@ -62,7 +61,7 @@ def train(
                 for n, p in finetune_model.named_parameters()
                 if not any(nd in n for nd in no_decay)
             ],
-            "weight_decay": task_config["weight_decay"],
+            "weight_decay": xtreme_ds.TASK[task]["weight_decay"],
         },
         {
             "params": [
@@ -75,29 +74,32 @@ def train(
     ]
     optimizer = transformers.AdamW(
         optimizer_grouped_parameters,
-        lr=task_config["learning_rate"],
-        eps=task_config["adam_epsilon"],
+        lr=xtreme_ds.TASK[task]["learning_rate"],
+        eps=xtreme_ds.TASK[task]["adam_epsilon"],
     )
 
     disentangle_dataloader = torch.utils.data.DataLoader(
         MLMD_ds,
-        batch_size=task_config["batch_size"],
+        batch_size=xtreme_ds.TASK[task]["batch_size"],
         num_workers=0,
         shuffle=True,
     )
     disentangle_iter = iter(disentangle_dataloader)
-    xnli_ds = xtreme_ds.xnliTrainDataset()
     xnli_ds_dataloader = torch.utils.data.DataLoader(
-        xnli_ds, batch_size=2, num_workers=0, shuffle=True
+        cls_ds, batch_size=2, num_workers=0, shuffle=True
     )
-    gradient_acc_size = task_config["gradient_acc_size"]
-    batch_size = task_config["batch_size"]
+    gradient_acc_size = xtreme_ds.TASK[task]["gradient_acc_size"]
+    batch_size = xtreme_ds.TASK[task]["batch_size"]
     scheduler = transformers.get_linear_schedule_with_warmup(
         optimizer,
-        num_warmup_steps=task_config["warmup_steps"],
-        num_training_steps=len(xnli_ds) // gradient_acc_size * task_config["epochs"],
+        num_warmup_steps=xtreme_ds.TASK[task]["warmup_steps"],
+        num_training_steps=len(cls_ds)
+        // gradient_acc_size
+        * xtreme_ds.TASK[task]["epochs"],
     )
-    log_step_size = len(xnli_ds) // gradient_acc_size * task_config["epochs"] // 20
+    log_step_size = (
+        len(cls_ds) // gradient_acc_size * xtreme_ds.TASK[task]["epochs"] // 20
+    )
     import gc
 
     for task in finetune_model.taskmodels_dict:
@@ -107,13 +109,13 @@ def train(
     gradient_step_counter = 0
     print(
         "run for "
-        + str(task_config["epochs"])
+        + str(xtreme_ds.TASK[task]["epochs"])
         + " epoches with "
         + str(gradient_acc_size)
         + " gradient acc size"
     )
     i = 0
-    for _ in range(task_config["epochs"]):
+    for _ in range(xtreme_ds.TASK[task]["epochs"]):
         for batch in xnli_ds_dataloader:
             #  input to gpu
             batch["tokens"] = batch["tokens"].cuda()
@@ -208,9 +210,13 @@ def train(
 
 
 # testing
-def test(finetune_model):
+def cls_test(
+    finetune_model,
+    cls_ds,
+    task,
+):
     test_dataloader = torch.utils.data.DataLoader(
-        xtreme_ds.xnliTestDataset(), batch_size=1, num_workers=0, shuffle=True
+        cls_ds, batch_size=1, num_workers=0, shuffle=True
     )
     metric = xtreme_ds.METRIC_FUNCTION[task]()
     lan_metric = {}
@@ -224,7 +230,9 @@ def test(finetune_model):
             Output = finetune_model.taskmodels_dict[task](input_ids=batch["tokens"])
             predictions = torch.argmax(Output["logits"], dim=1)
             for i, lan in enumerate(batch["lan"]):
-                lan_metric[lan].add(prediction=predictions[i], reference=batch["label"][i])
+                lan_metric[lan].add(
+                    prediction=predictions[i], reference=batch["label"][i]
+                )
                 metric.add(prediction=predictions[i], reference=batch["label"][i])
             del Output
             batch.clear()
@@ -255,11 +263,12 @@ if __name__ == "__main__":
     experiment_config_dict["training"].model_name = (
         os.path.abspath(args.config_json).split("/")[-1].split(".")[0]
     )
-    model = build_model(
+    model = cls_build_model(
         experiment_config_dict=experiment_config_dict,
         mlm_model_path="/gpfs1/home/ckchan666/mlm_disentangle_experiment/model/mlm/"
         + experiment_config_dict["training"].model_name
         + "/pytorch_model.bin",
+        task="xnli",
     )
     start_time = time.time()
     from torch.utils.tensorboard import SummaryWriter
@@ -278,6 +287,13 @@ if __name__ == "__main__":
     )
     MLMD_ds = oscar_corpus.get_custom_corpus()
     MLMD_ds.set_format(type="torch")
-    train(finetune_model=model, writer=writer, model_path=model_path, MLMD_ds=MLMD_ds)
+    cls_train(
+        finetune_model=model,
+        writer=writer,
+        model_path=model_path,
+        MLMD_ds=MLMD_ds,
+        cls_ds=xtreme_ds.xnliTrainDataset(),
+        task="xnli",
+    )
     print(str(time.time() - start_time) + " seconds elapsed for training")
-    test(model)
+    cls_test(model, cls_ds=xtreme_ds.xnliTestDataset(), task="xnli")
