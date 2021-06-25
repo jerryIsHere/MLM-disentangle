@@ -385,7 +385,7 @@ _TEXT_FEATURES = {
         "target_lang": "",
     },
     "PAWS-X": {"sentence1": "sentence1", "sentence2": "sentence2"},
-    "udpos": {"tokens": "", "tags": ""},
+    "udpos": {"tokens": "", "pos_tags": ""},
     "SQuAD": {
         "id": "id",
         "title": "title",
@@ -393,7 +393,7 @@ _TEXT_FEATURES = {
         "question": "question",
         "answers": "answers",
     },
-    "PAN-X": {"tokens": "", "tags": "", "lang": ""},
+    "PAN-X": {"tokens": "", "ner_tags": "", "lang": ""},
 }
 _DATA_URLS = {
     "tydiqa": "https://storage.googleapis.com/tydiqa/",
@@ -482,7 +482,7 @@ class Xtreme(datasets.GeneratorBasedBuilder):
             features = datasets.Features(
                 {
                     "tokens": datasets.Sequence(datasets.Value("string")),
-                    "tags": datasets.Sequence(
+                    "pos_tags": datasets.Sequence(
                         datasets.features.ClassLabel(
                             names=[
                                 "ADJ",
@@ -512,7 +512,7 @@ class Xtreme(datasets.GeneratorBasedBuilder):
             features = datasets.Features(
                 {
                     "tokens": datasets.Sequence(datasets.Value("string")),
-                    "tags": datasets.Sequence(
+                    "ner_tags": datasets.Sequence(
                         datasets.features.ClassLabel(
                             names=[
                                 "O",
@@ -1000,35 +1000,35 @@ class Xtreme(datasets.GeneratorBasedBuilder):
                 with open(file, encoding="utf-8") as f:
                     data = csv.reader(f, delimiter="\t", quoting=csv.QUOTE_NONE)
                     tokens = []
-                    tags = []
+                    pos_tags = []
                     for id_row, row in enumerate(data):
                         if len(row) >= 10 and row[1] != "_" and row[3] != "_":
                             tokens.append(row[1])
-                            tags.append(row[3])
+                            pos_tags.append(row[3])
                         if len(row) == 0 and len(tokens) > 0:
                             yield str(id_file) + "_" + str(id_row), {
                                 "tokens": tokens,
-                                "tags": tags,
+                                "pos_tags": pos_tags,
                             }
                             tokens = []
-                            tags = []
+                            pos_tags = []
         if self.config.name.startswith("PAN-X"):
             guid_index = 1
             with open(filepath, encoding="utf-8") as f:
                 tokens = []
-                tags = []
+                ner_tags = []
                 langs = []
                 for line in f:
                     if line == "" or line == "\n":
                         if tokens:
                             yield guid_index, {
                                 "tokens": tokens,
-                                "tags": tags,
+                                "ner_tags": ner_tags,
                                 "langs": langs,
                             }
                             guid_index += 1
                             tokens = []
-                            tags = []
+                            ner_tags = []
                             langs = []
                     else:
                         # pan-x data is tab separated
@@ -1037,7 +1037,7 @@ class Xtreme(datasets.GeneratorBasedBuilder):
                         langs.append(splits[0][:2])
                         tokens.append(splits[0][3:])
                         if len(splits) > 1:
-                            tags.append(splits[-1].replace("\n", ""))
+                            ner_tags.append(splits[-1].replace("\n", ""))
                         else:
                             # examples have no label in test set
-                            tags.append("O")
+                            ner_tags.append("O")
