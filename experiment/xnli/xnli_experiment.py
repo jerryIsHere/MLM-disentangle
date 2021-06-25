@@ -53,6 +53,7 @@ def cls_train(
     task,
     custom_stop_condition=lambda gradient_step: False,
 ):
+    print("training " + task + " with dataset:" + cls_ds.__class__.__name__)
     no_decay = ["bias", "LayerNorm.weight"]
     optimizer_grouped_parameters = [
         {
@@ -215,6 +216,7 @@ def cls_test(
     cls_ds,
     task,
 ):
+    print("evaluating " + task + " with dataset:" + cls_ds.__class__.__name__)
     test_dataloader = torch.utils.data.DataLoader(
         cls_ds, batch_size=1, num_workers=0, shuffle=True
     )

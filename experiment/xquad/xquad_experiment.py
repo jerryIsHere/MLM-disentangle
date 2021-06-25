@@ -53,6 +53,7 @@ def qa_train(
     task,
     custom_stop_condition=lambda gradient_step: False,
 ):
+    print("training " + task + " with dataset:" + qa_ds.__class__.__name__)
     no_decay = ["bias", "LayerNorm.weight"]
     optimizer_grouped_parameters = [
         {
@@ -212,7 +213,7 @@ def qa_train(
 
 # testing
 def qa_test(finetune_model, qa_ds, task):
-    print(qa_ds.__class__.__name__)
+    print("evaluating " + task + " with dataset:" + qa_ds.__class__.__name__)
     test_dataloader = torch.utils.data.DataLoader(
         qa_ds, batch_size=1, num_workers=0, shuffle=True
     )

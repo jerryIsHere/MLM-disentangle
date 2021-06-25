@@ -53,6 +53,7 @@ def tag_train(
     task,
     custom_stop_condition=lambda gradient_step: False,
 ):
+    print("training " + task + " with dataset:" + tag_ds.__class__.__name__)
     no_decay = ["bias", "LayerNorm.weight"]
     optimizer_grouped_parameters = [
         {
@@ -211,6 +212,7 @@ def tag_train(
 
 # testing
 def tag_test(finetune_model, task, tag_ds):
+    print("evaluating " + task + " with dataset:" + tag_ds.__class__.__name__)
     test_dataloader = torch.utils.data.DataLoader(
         tag_ds, batch_size=1, num_workers=0, shuffle=True
     )
