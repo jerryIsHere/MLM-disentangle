@@ -954,21 +954,16 @@ class xquadTrainDataset(torch.utils.data.Dataset):
         startposition = np.array(features["answers"]["answer_start"])
         for i, position in enumerate(startposition):
             startposition[i] = train_encodings.char_to_token(position)
-        endposition = np.array(features["answers"]["answer_start"])
-        endposition = endposition + np.array(
-            [len(answer_txt) for answer_txt in features["answers"]["text"]]
-        )
+        endposition = np.copy(position)
         for i, position in enumerate(endposition):
-            endposition[i] = train_encodings.char_to_token(
-                position
-                + (
-                    1
-                    if features["context"][position] == " "
-                    or features["context"][position] == "-"
-                    else 0
+            while features["answers"]["text"][
+                i
+            ] not in tokenizer.convert_tokens_to_string(
+                tokenizer.convert_ids_to_tokens(
+                    train_encodings.input_ids[startposition[i] : endposition[i]]
                 )
-            )
-
+            ):
+                endposition[i] += 1
         return {
             "tokens": torch.LongTensor(train_encodings.input_ids),
             "start_positions": torch.tensor(startposition).long(),
@@ -998,20 +993,16 @@ class xquadValidationDataset(torch.utils.data.Dataset):
         startposition = np.array(features["answers"]["answer_start"])
         for i, position in enumerate(startposition):
             startposition[i] = train_encodings.char_to_token(position)
-        endposition = np.array(features["answers"]["answer_start"])
-        endposition = endposition + np.array(
-            [len(answer_txt) for answer_txt in features["answers"]["text"]]
-        )
+        endposition = np.copy(position)
         for i, position in enumerate(endposition):
-            endposition[i] = train_encodings.char_to_token(
-                position
-                + (
-                    0
-                    if features["context"][position + 1] == " "
-                    or features["context"][position] == "-"
-                    else 1
+            while features["answers"]["text"][
+                i
+            ] not in tokenizer.convert_tokens_to_string(
+                tokenizer.convert_ids_to_tokens(
+                    train_encodings.input_ids[startposition[i] : endposition[i]]
                 )
-            )
+            ):
+                endposition[i] += 1
         return {
             "tokens": torch.LongTensor(train_encodings.input_ids),
             "start_positions": torch.tensor(startposition).long(),
@@ -1047,20 +1038,16 @@ class xquadTestDataset(torch.utils.data.Dataset):
                 startposition = np.array(features["answers"]["answer_start"])
                 for i, position in enumerate(startposition):
                     startposition[i] = train_encodings.char_to_token(position)
-                endposition = np.array(features["answers"]["answer_start"])
-                endposition = endposition + np.array(
-                    [len(answer_txt) for answer_txt in features["answers"]["text"]]
-                )
+                endposition = np.copy(position)
                 for i, position in enumerate(endposition):
-                    endposition[i] = train_encodings.char_to_token(
-                        position
-                        + (
-                            0
-                            if features["context"][position + 1] == " "
-                            or features["context"][position] == "-"
-                            else 1
+                    while features["answers"]["text"][
+                        i
+                    ] not in tokenizer.convert_tokens_to_string(
+                        tokenizer.convert_ids_to_tokens(
+                            train_encodings.input_ids[startposition[i] : endposition[i]]
                         )
-                    )
+                    ):
+                        endposition[i] += 1
                 return {
                     "tokens": torch.LongTensor(train_encodings.input_ids),
                     "start_positions": torch.tensor(startposition).long(),
@@ -1161,20 +1148,16 @@ class mlqaTestDataset(torch.utils.data.Dataset):
                 startposition = np.array(features["answers"]["answer_start"])
                 for i, position in enumerate(startposition):
                     startposition[i] = train_encodings.char_to_token(position)
-                endposition = np.array(features["answers"]["answer_start"])
-                endposition = endposition + np.array(
-                    [len(answer_txt) for answer_txt in features["answers"]["text"]]
-                )
+                endposition = np.copy(position)
                 for i, position in enumerate(endposition):
-                    endposition[i] = train_encodings.char_to_token(
-                        position
-                        + (
-                            0
-                            if features["context"][position + 1] == " "
-                            or features["context"][position] == "-"
-                            else 1
+                    while features["answers"]["text"][
+                        i
+                    ] not in tokenizer.convert_tokens_to_string(
+                        tokenizer.convert_ids_to_tokens(
+                            train_encodings.input_ids[startposition[i] : endposition[i]]
                         )
-                    )
+                    ):
+                        endposition[i] += 1
                 return {
                     "tokens": torch.LongTensor(train_encodings.input_ids),
                     "start_positions": torch.tensor(startposition).long(),
@@ -1207,20 +1190,16 @@ class tydiqaTrainDataset(torch.utils.data.Dataset):
         startposition = np.array(features["answers"]["answer_start"])
         for i, position in enumerate(startposition):
             startposition[i] = train_encodings.char_to_token(position)
-        endposition = np.array(features["answers"]["answer_start"])
-        endposition = endposition + np.array(
-            [len(answer_txt) for answer_txt in features["answers"]["text"]]
-        )
+        endposition = np.copy(position)
         for i, position in enumerate(endposition):
-            endposition[i] = train_encodings.char_to_token(
-                position
-                + (
-                    0
-                    if features["context"][position + 1] == " "
-                    or features["context"][position] == "-"
-                    else 1
+            while features["answers"]["text"][
+                i
+            ] not in tokenizer.convert_tokens_to_string(
+                tokenizer.convert_ids_to_tokens(
+                    train_encodings.input_ids[startposition[i] : endposition[i]]
                 )
-            )
+            ):
+                endposition[i] += 1
         return {
             "tokens": torch.LongTensor(train_encodings.input_ids),
             "start_positions": torch.tensor(startposition).long(),
@@ -1295,20 +1274,16 @@ class tydiqaTestDataset(torch.utils.data.Dataset):
         startposition = np.array(features["answers"]["answer_start"])
         for i, position in enumerate(startposition):
             startposition[i] = train_encodings.char_to_token(position)
-        endposition = np.array(features["answers"]["answer_start"])
-        endposition = endposition + np.array(
-            [len(answer_txt) for answer_txt in features["answers"]["text"]]
-        )
+        endposition = np.copy(position)
         for i, position in enumerate(endposition):
-            endposition[i] = train_encodings.char_to_token(
-                position
-                + (
-                    0
-                    if features["context"][position + 1] == " "
-                    or features["context"][position] == "-"
-                    else 1
+            while features["answers"]["text"][
+                i
+            ] not in tokenizer.convert_tokens_to_string(
+                tokenizer.convert_ids_to_tokens(
+                    train_encodings.input_ids[startposition[i] : endposition[i]]
                 )
-            )
+            ):
+                endposition[i] += 1
         return {
             "tokens": torch.LongTensor(train_encodings.input_ids),
             "start_positions": torch.tensor(startposition).long(),
