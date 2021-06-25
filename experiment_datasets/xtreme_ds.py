@@ -1077,19 +1077,22 @@ class xquadTestDataset(torch.utils.data.Dataset):
                 startposition = np.array(features["answers"]["answer_start"])
                 for i, position in enumerate(startposition):
                     position = (
-                position
-                if features["context"][
-                    position : position + len(features["answers"]["text"][i])
-                ]
-                == features["answers"]["text"][i]
-                else position - 1
-                if features["context"][
-                    position - 1 : position + len(features["answers"]["text"][i]) - 1
-                ]
-                == features["answers"]["text"][i]
-                else position - 2
-            )
-            startposition[i] = train_encodings.char_to_token(position)
+                        position
+                        if features["context"][
+                            position : position + len(features["answers"]["text"][i])
+                        ]
+                        == features["answers"]["text"][i]
+                        else position - 1
+                        if features["context"][
+                            position
+                            - 1 : position
+                            + len(features["answers"]["text"][i])
+                            - 1
+                        ]
+                        == features["answers"]["text"][i]
+                        else position - 2
+                    )
+                startposition[i] = train_encodings.char_to_token(position)
                 endposition = np.copy(startposition + 1)
                 for i, position in enumerate(endposition):
                     while endposition[i] < TASK["xquad"]["max seq length"] and features[
@@ -1200,19 +1203,22 @@ class mlqaTestDataset(torch.utils.data.Dataset):
                 startposition = np.array(features["answers"]["answer_start"])
                 for i, position in enumerate(startposition):
                     position = (
-                position
-                if features["context"][
-                    position : position + len(features["answers"]["text"][i])
-                ]
-                == features["answers"]["text"][i]
-                else position - 1
-                if features["context"][
-                    position - 1 : position + len(features["answers"]["text"][i]) - 1
-                ]
-                == features["answers"]["text"][i]
-                else position - 2
-            )
-            startposition[i] = train_encodings.char_to_token(position)
+                        position
+                        if features["context"][
+                            position : position + len(features["answers"]["text"][i])
+                        ]
+                        == features["answers"]["text"][i]
+                        else position - 1
+                        if features["context"][
+                            position
+                            - 1 : position
+                            + len(features["answers"]["text"][i])
+                            - 1
+                        ]
+                        == features["answers"]["text"][i]
+                        else position - 2
+                    )
+                    startposition[i] = train_encodings.char_to_token(position)
                 endposition = np.copy(startposition + 1)
                 for i, position in enumerate(endposition):
                     while endposition[i] < TASK["mlqa"]["max seq length"] and features[
