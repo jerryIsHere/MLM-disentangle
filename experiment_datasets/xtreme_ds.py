@@ -975,14 +975,17 @@ class xquadTrainDataset(torch.utils.data.Dataset):
             )
         endposition = np.copy(startposition + 1)
         for i, position in enumerate(endposition):
-            while endposition[i] < TASK["xquad"]["max seq length"] - 1 and features[
-                "answers"
-            ]["text"][i] not in tokenizer.convert_tokens_to_string(
+            while features["answers"]["text"][
+                i
+            ] not in tokenizer.convert_tokens_to_string(
                 tokenizer.convert_ids_to_tokens(
                     train_encodings.input_ids[startposition[i] : endposition[i]]
                 )
             ):
                 if train_encodings.input_ids[endposition[i] + 1] == tokenizer.pad_token:
+                    break
+                if endposition[i] > TASK["xquad"]["max seq length"] - 1:
+                    endposition[i] = TASK["xquad"]["max seq length"] - 1
                     break
                 endposition[i] += 1
         return {
@@ -1048,14 +1051,17 @@ class xquadValidationDataset(torch.utils.data.Dataset):
             )
         endposition = np.copy(startposition + 1)
         for i, position in enumerate(endposition):
-            while endposition[i] < TASK["xquad"]["max seq length"] - 1 and features[
-                "answers"
-            ]["text"][i] not in tokenizer.convert_tokens_to_string(
+            while features["answers"]["text"][
+                i
+            ] not in tokenizer.convert_tokens_to_string(
                 tokenizer.convert_ids_to_tokens(
                     train_encodings.input_ids[startposition[i] : endposition[i]]
                 )
             ):
                 if train_encodings.input_ids[endposition[i] + 1] == tokenizer.pad_token:
+                    break
+                if endposition[i] > TASK["xquad"]["max seq length"] - 1:
+                    endposition[i] = TASK["xquad"]["max seq length"] - 1
                     break
                 endposition[i] += 1
         return {
@@ -1117,9 +1123,7 @@ class xquadTestDataset(torch.utils.data.Dataset):
                 )
                 endposition = np.copy(startposition + 1)
                 for i, position in enumerate(endposition):
-                    while endposition[i] < TASK["xquad"][
-                        "max seq length"
-                    ] - 1 and features["answers"]["text"][
+                    while features["answers"]["text"][
                         i
                     ] not in tokenizer.convert_tokens_to_string(
                         tokenizer.convert_ids_to_tokens(
@@ -1130,6 +1134,9 @@ class xquadTestDataset(torch.utils.data.Dataset):
                             train_encodings.input_ids[endposition[i] + 1]
                             == tokenizer.pad_token
                         ):
+                            break
+                        if endposition[i] > TASK["xquad"]["max seq length"] - 1:
+                            endposition[i] = TASK["xquad"]["max seq length"] - 1
                             break
                         endposition[i] += 1
                 return {
@@ -1256,9 +1263,7 @@ class mlqaTestDataset(torch.utils.data.Dataset):
                     )
                 endposition = np.copy(startposition + 1)
                 for i, position in enumerate(endposition):
-                    while endposition[i] < TASK["mlqa"][
-                        "max seq length"
-                    ] - 1 and features["answers"]["text"][
+                    while features["answers"]["text"][
                         i
                     ] not in tokenizer.convert_tokens_to_string(
                         tokenizer.convert_ids_to_tokens(
@@ -1269,6 +1274,9 @@ class mlqaTestDataset(torch.utils.data.Dataset):
                             train_encodings.input_ids[endposition[i] + 1]
                             == tokenizer.pad_token
                         ):
+                            break
+                        if endposition[i] > TASK["xquad"]["max seq length"] - 1:
+                            endposition[i] = TASK["xquad"]["max seq length"] - 1
                             break
                         endposition[i] += 1
                 return {
@@ -1324,14 +1332,17 @@ class tydiqaTrainDataset(torch.utils.data.Dataset):
             )
         endposition = np.copy(startposition + 1)
         for i, position in enumerate(endposition):
-            while endposition[i] < TASK["tydiqa"]["max seq length"] - 1 and features[
-                "answers"
-            ]["text"][i] not in tokenizer.convert_tokens_to_string(
+            while features["answers"]["text"][
+                i
+            ] not in tokenizer.convert_tokens_to_string(
                 tokenizer.convert_ids_to_tokens(
                     train_encodings.input_ids[startposition[i] : endposition[i]]
                 )
             ):
                 if train_encodings.input_ids[endposition[i] + 1] == tokenizer.pad_token:
+                    break
+                if endposition[i] > TASK["xquad"]["max seq length"] - 1:
+                    endposition[i] = TASK["xquad"]["max seq length"] - 1
                     break
                 endposition[i] += 1
         return {
@@ -1429,14 +1440,17 @@ class tydiqaTestDataset(torch.utils.data.Dataset):
             )
         endposition = np.copy(startposition + 1)
         for i, position in enumerate(endposition):
-            while endposition[i] < TASK["tydiqa"]["max seq length"] - 1 and features[
-                "answers"
-            ]["text"][i] not in tokenizer.convert_tokens_to_string(
+            while features["answers"]["text"][
+                i
+            ] not in tokenizer.convert_tokens_to_string(
                 tokenizer.convert_ids_to_tokens(
                     train_encodings.input_ids[startposition[i] : endposition[i]]
                 )
             ):
                 if train_encodings.input_ids[endposition[i] + 1] == tokenizer.pad_token:
+                    break
+                if endposition[i] > TASK["xquad"]["max seq length"] - 1:
+                    endposition[i] = TASK["xquad"]["max seq length"] - 1
                     break
                 endposition[i] += 1
         return {
