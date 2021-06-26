@@ -112,8 +112,8 @@ for i, each in enumerate(ds):
         id -= length
     l = len(
         xtreme_ds.tokenizer(
-            ds.dataset[split][i]["premise"],
-            ds.dataset[split][i]["hypothesis"],
+            ds.dataset[split][id]["premise"],
+            ds.dataset[split][id]["hypothesis"],
             truncation=False,
         ).input_ids
     )
@@ -168,8 +168,8 @@ for i, each in enumerate(ds):
         id -= length
     l = len(
         xtreme_ds.tokenizer(
-            ds.dataset[lan][i]["sentence1"],
-            ds.dataset[i]["sentence2"],
+            ds.dataset[lan][id]["sentence1"],
+            ds.dataset[id]["sentence2"],
             truncation=False,
         ).input_ids
     )
@@ -212,8 +212,8 @@ for i, each in enumerate(ds):
         id -= length
     l = len(
         xtreme_ds.tokenizer(
-            ds.dataset[lan][i]["context"],
-            ds.dataset[i]["question"],
+            ds.dataset[lan][id]["context"],
+            ds.dataset[id]["question"],
             truncation=False,
         ).input_ids
     )
@@ -232,74 +232,8 @@ for i, each in enumerate(ds):
         id -= length
     l = len(
         xtreme_ds.tokenizer(
-            ds.dataset[lan][i]["context"],
-            ds.dataset[i]["question"],
-            truncation=False,
-        ).input_ids
-    )
-    if l > sequence_length[ds.__class__.__name__]:
-        sequence_length[ds.__class__.__name__] = l
-
-
-ds = xtreme_ds.tydiqaTrainDataset()
-sequence_length[ds.__class__.__name__] = 0
-for i, each in enumerate(ds):
-    l = len(
-        xtreme_ds.tokenizer(
-            ds.dataset[i]["context"],
-            ds.dataset[i]["question"],
-            truncation=False,
-        ).input_ids
-    )
-    if l > sequence_length[ds.__class__.__name__]:
-        sequence_length[ds.__class__.__name__] = l
-ds = xtreme_ds.tydiqaTestDataset()
-sequence_length[ds.__class__.__name__] = 0
-for i, each in enumerate(ds):
-    l = len(
-        xtreme_ds.tokenizer(
-            ds.dataset[i]["context"],
-            ds.dataset[i]["question"],
-            truncation=False,
-        ).input_ids
-    )
-    if l > sequence_length[ds.__class__.__name__]:
-        sequence_length[ds.__class__.__name__] = l
-
-
-ds = xtreme_ds.bucc2018Dataset()
-sequence_length[ds.__class__.__name__] = 0
-for i, each in enumerate(ds):
-    l = len(
-        xtreme_ds.tokenizer(
-            ds.dataset[i]["source_sentence"],
-            truncation=False,
-        ).input_ids
-    )
-    if l > sequence_length[ds.__class__.__name__]:
-        sequence_length[ds.__class__.__name__] = l
-    l = len(
-        xtreme_ds.tokenizer(
-            ds.dataset[i]["target_sentence"],
-            truncation=False,
-        ).input_ids
-    )
-    if l > sequence_length[ds.__class__.__name__]:
-        sequence_length[ds.__class__.__name__] = l
-ds = xtreme_ds.tatoebaDataset()
-sequence_length[ds.__class__.__name__] = 0
-for i, each in enumerate(ds):
-    l = len(
-        xtreme_ds.tokenizer(
-            ds.dataset[i]["source_sentence"],
-            truncation=False,
-        ).input_ids
-    )
-    if l > sequence_length[ds.__class__.__name__]:
-        sequence_length[ds.__class__.__name__] = l
-    l = len(
-        xtreme_ds.tokenizer(
-            ds.dataset[i]["target_sentence"],
+            ds.dataset[lan][id]["context"],
+            ds.dataset[id]["question"],
             truncation=False,
         ).input_ids
     )
