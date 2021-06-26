@@ -991,7 +991,7 @@ class xquadTrainDataset(torch.utils.data.Dataset):
                     break
                 if (
                     train_encodings.input_ids[endposition[i] + 1]
-                    == tokenizer.pad_token_id
+                    == tokenizer.eos_token_id
                 ):
                     break
                 endposition[i] += 1
@@ -1074,7 +1074,7 @@ class xquadValidationDataset(torch.utils.data.Dataset):
                     break
                 if (
                     train_encodings.input_ids[endposition[i] + 1]
-                    == tokenizer.pad_token_id
+                    == tokenizer.eos_token_id
                 ):
                     break
                 endposition[i] += 1
@@ -1153,7 +1153,7 @@ class xquadTestDataset(torch.utils.data.Dataset):
                             break
                         if (
                             train_encodings.input_ids[endposition[i] + 1]
-                            == tokenizer.pad_token_id
+                            == tokenizer.eos_token_id
                         ):
                             break
                         endposition[i] += 1
@@ -1297,7 +1297,7 @@ class mlqaTestDataset(torch.utils.data.Dataset):
                             break
                         if (
                             train_encodings.input_ids[endposition[i] + 1]
-                            == tokenizer.pad_token_id
+                            == tokenizer.eos_token_id
                         ):
                             break
                         endposition[i] += 1
@@ -1370,7 +1370,7 @@ class tydiqaTrainDataset(torch.utils.data.Dataset):
                     break
                 if (
                     train_encodings.input_ids[endposition[i] + 1]
-                    == tokenizer.pad_token_id
+                    == tokenizer.eos_token_id
                 ):
                     break
                 endposition[i] += 1
@@ -1485,7 +1485,7 @@ class tydiqaTestDataset(torch.utils.data.Dataset):
                     break
                 if (
                     train_encodings.input_ids[endposition[i] + 1]
-                    == tokenizer.pad_token_id
+                    == tokenizer.eos_token_id
                 ):
                     break
                 endposition[i] += 1
