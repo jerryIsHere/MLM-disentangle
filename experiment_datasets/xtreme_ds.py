@@ -933,12 +933,14 @@ class pawsxTestDataset(torch.utils.data.Dataset):
             id_absolute -= length
         raise StopIteration
 
+
 def normalize_string(strings):
     if isinstance(strings, str):
         n_s = tokenizer._tokenizer.normalizer.normalize_str(strings)
         return " ".join(n_s.split())
     else:
         return [normalize_string(s) for s in strings]
+
 
 class xquadTrainDataset(torch.utils.data.Dataset):
     def __init__(self):
@@ -998,7 +1000,10 @@ class xquadTrainDataset(torch.utils.data.Dataset):
                     train_encodings.input_ids[endposition[i] + 1]
                     == tokenizer.eos_token_id
                 ):
-                    if train_encodings.input_ids[endposition[i]] != tokenizer.eos_token_id:
+                    if (
+                        train_encodings.input_ids[endposition[i]]
+                        != tokenizer.eos_token_id
+                    ):
                         endposition[i] += 1
                     break
                 endposition[i] += 1
@@ -1069,7 +1074,10 @@ class xquadValidationDataset(torch.utils.data.Dataset):
                     train_encodings.input_ids[endposition[i] + 1]
                     == tokenizer.eos_token_id
                 ):
-                    if train_encodings.input_ids[endposition[i]] != tokenizer.eos_token_id:
+                    if (
+                        train_encodings.input_ids[endposition[i]]
+                        != tokenizer.eos_token_id
+                    ):
                         endposition[i] += 1
                     break
                 endposition[i] += 1
@@ -1149,7 +1157,10 @@ class xquadTestDataset(torch.utils.data.Dataset):
                             train_encodings.input_ids[endposition[i] + 1]
                             == tokenizer.eos_token_id
                         ):
-                            if train_encodings.input_ids[endposition[i]] != tokenizer.eos_token_id:
+                            if (
+                                train_encodings.input_ids[endposition[i]]
+                                != tokenizer.eos_token_id
+                            ):
                                 endposition[i] += 1
                             break
                         endposition[i] += 1
@@ -1232,7 +1243,10 @@ class mlqaTestDataset(torch.utils.data.Dataset):
                             train_encodings.input_ids[endposition[i] + 1]
                             == tokenizer.eos_token_id
                         ):
-                            if train_encodings.input_ids[endposition[i]] != tokenizer.eos_token_id:
+                            if (
+                                train_encodings.input_ids[endposition[i]]
+                                != tokenizer.eos_token_id
+                            ):
                                 endposition[i] += 1
                             break
                         endposition[i] += 1
@@ -1306,7 +1320,10 @@ class tydiqaTrainDataset(torch.utils.data.Dataset):
                     train_encodings.input_ids[endposition[i] + 1]
                     == tokenizer.eos_token_id
                 ):
-                    if train_encodings.input_ids[endposition[i]] != tokenizer.eos_token_id:
+                    if (
+                        train_encodings.input_ids[endposition[i]]
+                        != tokenizer.eos_token_id
+                    ):
                         endposition[i] += 1
                     break
                 endposition[i] += 1
@@ -1390,7 +1407,10 @@ class tydiqaTestDataset(torch.utils.data.Dataset):
                     train_encodings.input_ids[endposition[i] + 1]
                     == tokenizer.eos_token_id
                 ):
-                    if train_encodings.input_ids[endposition[i]] != tokenizer.eos_token_id:
+                    if (
+                        train_encodings.input_ids[endposition[i]]
+                        != tokenizer.eos_token_id
+                    ):
                         endposition[i] += 1
                     break
                 endposition[i] += 1
@@ -1433,8 +1453,8 @@ class bucc2018Dataset(torch.utils.data.Dataset):
                     padding="max_length",
                 )
                 return {
-                    "source_tokens": source_encodings.input_ids.long(),
-                    "target_tokens": target_encodings.input_ids.long(),
+                    "source_tokens": torch.tensor(source_encodings.input_ids).long(),
+                    "target_tokens": torch.tensor(target_encodings.input_ids).long(),
                     "lan": lan,
                 }
             id_absolute -= length
@@ -1470,8 +1490,8 @@ class tatoebaDataset(torch.utils.data.Dataset):
                     padding="max_length",
                 )
                 return {
-                    "source_tokens": source_encodings.input_ids.long(),
-                    "target_tokens": target_encodings.input_ids.long(),
+                    "source_tokens": torch.tensor(source_encodings.input_ids).long(),
+                    "target_tokens": torch.tensor(target_encodings.input_ids).long(),
                     "lan": lan,
                 }
             id_absolute -= length
