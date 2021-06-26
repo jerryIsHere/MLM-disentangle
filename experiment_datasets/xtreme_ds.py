@@ -978,6 +978,7 @@ class xquadTrainDataset(torch.utils.data.Dataset):
                     tokenizer(features["answers"]["text"][i]).input_ids[1:-1]
                 )
             )
+            features["answers"]["text"][i] = " ".join(answer_txt.split())
         endposition = np.copy(startposition + 1)
         for i, position in enumerate(endposition):
             while my_answer[i] not in tokenizer.convert_tokens_to_string(
@@ -1047,6 +1048,7 @@ class xquadValidationDataset(torch.utils.data.Dataset):
                     tokenizer(features["answers"]["text"][i]).input_ids[1:-1]
                 )
             )
+            features["answers"]["text"][i] = " ".join(answer_txt.split())
         endposition = np.copy(startposition + 1)
         for i, position in enumerate(endposition):
             while my_answer[i] not in tokenizer.convert_tokens_to_string(
@@ -1125,6 +1127,7 @@ class xquadTestDataset(torch.utils.data.Dataset):
                             tokenizer(features["answers"]["text"][i]).input_ids[1:-1]
                         )
                     )
+                    features["answers"]["text"][i] = " ".join(answer_txt.split())
                 endposition = np.copy(startposition + 1)
                 for i, position in enumerate(endposition):
                     while my_answer[i] not in tokenizer.convert_tokens_to_string(
@@ -1206,6 +1209,7 @@ class mlqaTestDataset(torch.utils.data.Dataset):
                             tokenizer(features["answers"]["text"][i]).input_ids[1:-1]
                         )
                     )
+                    features["answers"]["text"][i] = " ".join(answer_txt.split())
                 endposition = np.copy(startposition + 1)
                 for i, position in enumerate(endposition):
                     while my_answer[i] not in tokenizer.convert_tokens_to_string(
@@ -1278,6 +1282,7 @@ class tydiqaTrainDataset(torch.utils.data.Dataset):
                     tokenizer(features["answers"]["text"][i]).input_ids[1:-1]
                 )
             )
+            features["answers"]["text"][i] = " ".join(answer_txt.split())
         endposition = np.copy(startposition + 1)
         for i, position in enumerate(endposition):
             while my_answer[i] not in tokenizer.convert_tokens_to_string(
@@ -1360,6 +1365,7 @@ class tydiqaTestDataset(torch.utils.data.Dataset):
                     tokenizer(features["answers"]["text"][i]).input_ids[1:-1]
                 )
             )
+            features["answers"]["text"][i] = " ".join(answer_txt.split())
         endposition = np.copy(startposition + 1)
         for i, position in enumerate(endposition):
             while my_answer[i] not in tokenizer.convert_tokens_to_string(
