@@ -113,7 +113,7 @@ for i, each in enumerate(ds):
                 each["tokens"][each["start_positions"][j] : each["end_positions"][j]]
             )
         )
-        assert each["answers"]["text"][j] in reply or reply == ''
+        assert each["answers"]["text"][j] in reply or reply == '' or reply in each["answers"]["text"][j]
 assert i == len(ds) - 1
 ds = xtreme_ds.xquadValidationDataset()
 for i, each in enumerate(ds):
@@ -123,7 +123,7 @@ for i, each in enumerate(ds):
                 each["tokens"][each["start_positions"][j] : each["end_positions"][j]]
             )
         )
-        assert each["answers"]["text"][j] in reply or reply == ''
+        assert each["answers"]["text"][j] in reply or reply == '' or reply in each["answers"]["text"][j]
 assert i == len(ds) - 1
 ds = xtreme_ds.xquadTestDataset()
 for i, each in enumerate(ds):
@@ -139,7 +139,7 @@ for i, each in enumerate(ds):
                 each["tokens"][each["start_positions"][j] : each["end_positions"][j]]
             )
         )
-        assert each["answers"]["text"][j] in reply or reply == ''
+        assert each["answers"]["text"][j] in reply or reply == '' or reply in each["answers"]["text"][j]
 assert i == len(ds) - 1
 
 
@@ -157,7 +157,7 @@ for i, each in enumerate(ds):
                 each["tokens"][each["start_positions"][j] : each["end_positions"][j]]
             )
         )
-        assert each["answers"]["text"][j] in reply or reply == ''
+        assert each["answers"]["text"][j] in reply or reply == '' or reply in each["answers"]["text"][j]
 assert i == len(ds) - 1
 
 
@@ -169,7 +169,7 @@ for i, each in enumerate(ds):
                 each["tokens"][each["start_positions"][j] : each["end_positions"][j]]
             )
         )
-        assert each["answers"]["text"][j] in reply or reply == ''
+        assert each["answers"]["text"][j] in reply or reply == '' or reply in each["answers"]["text"][j]
 assert i == len(ds) - 1
 ds = xtreme_ds.tydiqaTestDataset()
 for i, each in enumerate(ds):
@@ -179,7 +179,7 @@ for i, each in enumerate(ds):
                 each["tokens"][each["start_positions"][j] : each["end_positions"][j]]
             )
         )
-        assert each["answers"]["text"][j] in reply or reply == ''
+        assert each["answers"]["text"][j] in reply or reply == '' or reply in each["answers"]["text"][j]
 assert i == len(ds) - 1
 
 
