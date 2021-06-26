@@ -978,6 +978,7 @@ class xquadTrainDataset(torch.utils.data.Dataset):
                     tokenizer(features["answers"]["text"][i]).input_ids[1:-1]
                 )
             )
+            features["answers"]["text"][i] = " ".join(answer_txt.split())
             features["answers"]["text"][
                 i
             ] = tokenizer._tokenizer.normalizer.normalize_str(answer_txt)
@@ -1050,6 +1051,7 @@ class xquadValidationDataset(torch.utils.data.Dataset):
                     tokenizer(features["answers"]["text"][i]).input_ids[1:-1]
                 )
             )
+            features["answers"]["text"][i] = " ".join(answer_txt.split())
             features["answers"]["text"][
                 i
             ] = tokenizer._tokenizer.normalizer.normalize_str(answer_txt)
@@ -1131,6 +1133,7 @@ class xquadTestDataset(torch.utils.data.Dataset):
                             tokenizer(features["answers"]["text"][i]).input_ids[1:-1]
                         )
                     )
+                    features["answers"]["text"][i] = " ".join(answer_txt.split())
                     features["answers"]["text"][
                         i
                     ] = tokenizer._tokenizer.normalizer.normalize_str(answer_txt)
@@ -1215,6 +1218,7 @@ class mlqaTestDataset(torch.utils.data.Dataset):
                             tokenizer(features["answers"]["text"][i]).input_ids[1:-1]
                         )
                     )
+                    features["answers"]["text"][i] = " ".join(answer_txt.split())
                     features["answers"]["text"][
                         i
                     ] = tokenizer._tokenizer.normalizer.normalize_str(answer_txt)
@@ -1290,6 +1294,7 @@ class tydiqaTrainDataset(torch.utils.data.Dataset):
                     tokenizer(features["answers"]["text"][i]).input_ids[1:-1]
                 )
             )
+            features["answers"]["text"][i] = " ".join(answer_txt.split())
             features["answers"]["text"][
                 i
             ] = tokenizer._tokenizer.normalizer.normalize_str(answer_txt)
@@ -1375,6 +1380,7 @@ class tydiqaTestDataset(torch.utils.data.Dataset):
                     tokenizer(features["answers"]["text"][i]).input_ids[1:-1]
                 )
             )
+            features["answers"]["text"][i] = " ".join(answer_txt.split())
             features["answers"]["text"][
                 i
             ] = tokenizer._tokenizer.normalizer.normalize_str(answer_txt)
