@@ -124,8 +124,8 @@ sequence_length[ds.__class__.__name__] = 0
 for i, each in enumerate(ds):
     l = len(
         xtreme_ds.tokenizer(
-            ds.dataset[i]["premise"],
-            ds.dataset[i]["hypothesis"],
+            ds.dataset[i]["sentence1"],
+            ds.dataset[i]["sentence2"],
             truncation=False,
         ).input_ids
     )
