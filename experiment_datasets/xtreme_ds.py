@@ -933,6 +933,9 @@ class pawsxTestDataset(torch.utils.data.Dataset):
             id_absolute -= length
         raise StopIteration
 
+def normalize_string(s):
+    s = " ".join(s.split())
+    return tokenizer._tokenizer.normalizer.normalize_str(s)
 
 class xquadTrainDataset(torch.utils.data.Dataset):
     def __init__(self):
