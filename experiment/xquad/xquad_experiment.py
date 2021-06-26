@@ -240,7 +240,9 @@ def qa_test(finetune_model, qa_ds, task):
                     reference={
                         "id": batch["id"][i],
                         "answers": {
-                            "text": batch["answers"]["text"][i],
+                            "text": xtreme_ds.normalize_string(
+                                batch["answers"]["text"][i]
+                            ),
                             "answer_start": batch["answers"]["answer_start"][i],
                         },
                     },
@@ -250,7 +252,9 @@ def qa_test(finetune_model, qa_ds, task):
                     reference={
                         "id": batch["id"][i],
                         "answers": {
-                            "text": batch["answers"]["text"][i],
+                            "text": xtreme_ds.normalize_string(
+                                batch["answers"]["text"][i]
+                            ),
                             "answer_start": batch["answers"]["answer_start"][i],
                         },
                     },
