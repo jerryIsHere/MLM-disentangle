@@ -955,7 +955,7 @@ class xquadTrainDataset(torch.utils.data.Dataset):
         for i, answer_txt in enumerate(features["answers"]["text"]):
             features["answers"]["text"][i] = tokenizer.convert_tokens_to_string(
                 tokenizer.convert_ids_to_tokens(
-                    tokenizer(features["answers"]["text"][i]).input_ids[1:-2]
+                    tokenizer(features["answers"]["text"][i]).input_ids[1:-1]
                 )
             )
         for i, position in enumerate(startposition):
@@ -1025,7 +1025,7 @@ class xquadValidationDataset(torch.utils.data.Dataset):
         for i, answer_txt in enumerate(features["answers"]["text"]):
             features["answers"]["text"][i] = tokenizer.convert_tokens_to_string(
                 tokenizer.convert_ids_to_tokens(
-                    tokenizer(features["answers"]["text"][i]).input_ids[1:-2]
+                    tokenizer(features["answers"]["text"][i]).input_ids[1:-1]
                 )
             )
         for i, position in enumerate(startposition):
@@ -1114,7 +1114,7 @@ class xquadTestDataset(torch.utils.data.Dataset):
                 for i, answer_txt in enumerate(features["answers"]["text"]):
                     features["answers"]["text"][i] = tokenizer.convert_tokens_to_string(
                         tokenizer.convert_ids_to_tokens(
-                            tokenizer(features["answers"]["text"][i]).input_ids[1:-2]
+                            tokenizer(features["answers"]["text"][i]).input_ids[1:-1]
                         )
                     )
                 for i, position in enumerate(startposition):
@@ -1258,7 +1258,7 @@ class mlqaTestDataset(torch.utils.data.Dataset):
                 for i, answer_txt in enumerate(features["answers"]["text"]):
                     features["answers"]["text"][i] = tokenizer.convert_tokens_to_string(
                         tokenizer.convert_ids_to_tokens(
-                            tokenizer(features["answers"]["text"][i]).input_ids[1:-2]
+                            tokenizer(features["answers"]["text"][i]).input_ids[1:-1]
                         )
                     )
                 for i, position in enumerate(startposition):
@@ -1334,7 +1334,7 @@ class tydiqaTrainDataset(torch.utils.data.Dataset):
         for i, answer_txt in enumerate(features["answers"]["text"]):
             features["answers"]["text"][i] = tokenizer.convert_tokens_to_string(
                 tokenizer.convert_ids_to_tokens(
-                    tokenizer(features["answers"]["text"][i]).input_ids[1:-2]
+                    tokenizer(features["answers"]["text"][i]).input_ids[1:-1]
                 )
             )
         for i, position in enumerate(startposition):
@@ -1449,7 +1449,7 @@ class tydiqaTestDataset(torch.utils.data.Dataset):
         for i, answer_txt in enumerate(features["answers"]["text"]):
             features["answers"]["text"][i] = tokenizer.convert_tokens_to_string(
                 tokenizer.convert_ids_to_tokens(
-                    tokenizer(features["answers"]["text"][i]).input_ids[1:-2]
+                    tokenizer(features["answers"]["text"][i]).input_ids[1:-1]
                 )
             )
         for i, position in enumerate(startposition):
