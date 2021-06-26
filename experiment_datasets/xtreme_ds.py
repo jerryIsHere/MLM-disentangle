@@ -952,7 +952,7 @@ class xquadTrainDataset(torch.utils.data.Dataset):
             padding="max_length",
         )
         startposition = np.array(features["answers"]["answer_start"])
-        for i,answer_txt in enumerate(features["answers"]["text"]):
+        for i, answer_txt in enumerate(features["answers"]["text"]):
             features["answers"]["text"][i] = " ".join(answer_txt.split())
         for i, position in enumerate(startposition):
             position = (
@@ -978,6 +978,8 @@ class xquadTrainDataset(torch.utils.data.Dataset):
                     train_encodings.input_ids[startposition[i] : endposition[i]]
                 )
             ):
+                if train_encodings.input_ids[endposition[i] + 1] == tokenizer.pad_token:
+                    break
                 endposition[i] += 1
         return {
             "tokens": torch.LongTensor(train_encodings.input_ids),
@@ -1006,7 +1008,7 @@ class xquadValidationDataset(torch.utils.data.Dataset):
             padding="max_length",
         )
         startposition = np.array(features["answers"]["answer_start"])
-        for i,answer_txt in enumerate(features["answers"]["text"]):
+        for i, answer_txt in enumerate(features["answers"]["text"]):
             features["answers"]["text"][i] = " ".join(answer_txt.split())
         for i, position in enumerate(startposition):
             position = (
@@ -1045,6 +1047,8 @@ class xquadValidationDataset(torch.utils.data.Dataset):
                     train_encodings.input_ids[startposition[i] : endposition[i]]
                 )
             ):
+                if train_encodings.input_ids[endposition[i] + 1] == tokenizer.pad_token:
+                    break
                 endposition[i] += 1
         return {
             "tokens": torch.LongTensor(train_encodings.input_ids),
@@ -1079,7 +1083,7 @@ class xquadTestDataset(torch.utils.data.Dataset):
                     padding="max_length",
                 )
                 startposition = np.array(features["answers"]["answer_start"])
-                for i,answer_txt in enumerate(features["answers"]["text"]):
+                for i, answer_txt in enumerate(features["answers"]["text"]):
                     features["answers"]["text"][i] = " ".join(answer_txt.split())
                 for i, position in enumerate(startposition):
                     position = (
@@ -1108,6 +1112,8 @@ class xquadTestDataset(torch.utils.data.Dataset):
                             train_encodings.input_ids[startposition[i] : endposition[i]]
                         )
                     ):
+                        if train_encodings.input_ids[endposition[i] + 1] == tokenizer.pad_token:
+                            break
                         endposition[i] += 1
                 return {
                     "tokens": torch.LongTensor(train_encodings.input_ids),
@@ -1207,7 +1213,7 @@ class mlqaTestDataset(torch.utils.data.Dataset):
                     padding="max_length",
                 )
                 startposition = np.array(features["answers"]["answer_start"])
-                for i,answer_txt in enumerate(features["answers"]["text"]):
+                for i, answer_txt in enumerate(features["answers"]["text"]):
                     features["answers"]["text"][i] = " ".join(answer_txt.split())
                 for i, position in enumerate(startposition):
                     position = (
@@ -1236,6 +1242,8 @@ class mlqaTestDataset(torch.utils.data.Dataset):
                             train_encodings.input_ids[startposition[i] : endposition[i]]
                         )
                     ):
+                        if train_encodings.input_ids[endposition[i] + 1] == tokenizer.pad_token:
+                            break
                         endposition[i] += 1
                 return {
                     "tokens": torch.LongTensor(train_encodings.input_ids),
@@ -1267,7 +1275,7 @@ class tydiqaTrainDataset(torch.utils.data.Dataset):
             padding="max_length",
         )
         startposition = np.array(features["answers"]["answer_start"])
-        for i,answer_txt in enumerate(features["answers"]["text"]):
+        for i, answer_txt in enumerate(features["answers"]["text"]):
             features["answers"]["text"][i] = " ".join(answer_txt.split())
         for i, position in enumerate(startposition):
             position = (
@@ -1293,6 +1301,8 @@ class tydiqaTrainDataset(torch.utils.data.Dataset):
                     train_encodings.input_ids[startposition[i] : endposition[i]]
                 )
             ):
+                if train_encodings.input_ids[endposition[i] + 1] == tokenizer.pad_token:
+                    break
                 endposition[i] += 1
         return {
             "tokens": torch.LongTensor(train_encodings.input_ids),
@@ -1366,7 +1376,7 @@ class tydiqaTestDataset(torch.utils.data.Dataset):
             padding="max_length",
         )
         startposition = np.array(features["answers"]["answer_start"])
-        for i,answer_txt in enumerate(features["answers"]["text"]):
+        for i, answer_txt in enumerate(features["answers"]["text"]):
             features["answers"]["text"][i] = " ".join(answer_txt.split())
         for i, position in enumerate(startposition):
             position = (
@@ -1392,6 +1402,8 @@ class tydiqaTestDataset(torch.utils.data.Dataset):
                     train_encodings.input_ids[startposition[i] : endposition[i]]
                 )
             ):
+                if train_encodings.input_ids[endposition[i] + 1] == tokenizer.pad_token:
+                    break
                 endposition[i] += 1
         return {
             "tokens": torch.LongTensor(train_encodings.input_ids),
