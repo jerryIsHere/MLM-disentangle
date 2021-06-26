@@ -954,6 +954,11 @@ class xquadTrainDataset(torch.utils.data.Dataset):
         startposition = np.array(features["answers"]["answer_start"])
         for i, answer_txt in enumerate(features["answers"]["text"]):
             features["answers"]["text"][i] = " ".join(answer_txt.split())
+            features["answers"]["text"][
+                i
+            ] = tokenizer._tokenizer.normalizer.normalize_str(
+                features["answers"]["text"][i]
+            )
         for i, position in enumerate(startposition):
             position = (
                 position
@@ -1017,6 +1022,11 @@ class xquadValidationDataset(torch.utils.data.Dataset):
         startposition = np.array(features["answers"]["answer_start"])
         for i, answer_txt in enumerate(features["answers"]["text"]):
             features["answers"]["text"][i] = " ".join(answer_txt.split())
+            features["answers"]["text"][
+                i
+            ] = tokenizer._tokenizer.normalizer.normalize_str(
+                features["answers"]["text"][i]
+            )
         for i, position in enumerate(startposition):
             position = (
                 position
@@ -1099,6 +1109,11 @@ class xquadTestDataset(torch.utils.data.Dataset):
                 startposition = np.array(features["answers"]["answer_start"])
                 for i, answer_txt in enumerate(features["answers"]["text"]):
                     features["answers"]["text"][i] = " ".join(answer_txt.split())
+                    features["answers"]["text"][
+                        i
+                    ] = tokenizer._tokenizer.normalizer.normalize_str(
+                        features["answers"]["text"][i]
+                    )
                 for i, position in enumerate(startposition):
                     position = (
                         position
@@ -1239,6 +1254,11 @@ class mlqaTestDataset(torch.utils.data.Dataset):
                 startposition = np.array(features["answers"]["answer_start"])
                 for i, answer_txt in enumerate(features["answers"]["text"]):
                     features["answers"]["text"][i] = " ".join(answer_txt.split())
+                    features["answers"]["text"][
+                        i
+                    ] = tokenizer._tokenizer.normalizer.normalize_str(
+                        features["answers"]["text"][i]
+                    )
                 for i, position in enumerate(startposition):
                     position = (
                         position
@@ -1311,6 +1331,11 @@ class tydiqaTrainDataset(torch.utils.data.Dataset):
         startposition = np.array(features["answers"]["answer_start"])
         for i, answer_txt in enumerate(features["answers"]["text"]):
             features["answers"]["text"][i] = " ".join(answer_txt.split())
+            features["answers"]["text"][
+                i
+            ] = tokenizer._tokenizer.normalizer.normalize_str(
+                features["answers"]["text"][i]
+            )
         for i, position in enumerate(startposition):
             position = (
                 position
@@ -1419,6 +1444,11 @@ class tydiqaTestDataset(torch.utils.data.Dataset):
         startposition = np.array(features["answers"]["answer_start"])
         for i, answer_txt in enumerate(features["answers"]["text"]):
             features["answers"]["text"][i] = " ".join(answer_txt.split())
+            features["answers"]["text"][
+                i
+            ] = tokenizer._tokenizer.normalizer.normalize_str(
+                features["answers"]["text"][i]
+            )
         for i, position in enumerate(startposition):
             position = (
                 position
