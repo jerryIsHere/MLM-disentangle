@@ -105,6 +105,8 @@ for i, each in enumerate(ds):
 assert i == len(ds) - 1
 
 
+import datasets
+metrics = datasets.load_metric("squad")
 ds = xtreme_ds.xquadTrainDataset()
 for i, each in enumerate(ds):
     for j, s_p in enumerate(each["start_positions"]):
@@ -113,8 +115,17 @@ for i, each in enumerate(ds):
                 each["tokens"][each["start_positions"][j] : each["end_positions"][j]]
             )
         )
-        answer = xtreme_ds.normalize_string(each["answers"]["text"][j])
-        assert answer in reply or reply == "" or reply in answer or "<unk>" in reply
+        metrics.add(prediction={"id": each["id"], "prediction_text": reply},
+                    reference={
+                        "id": each["id"],
+                        "answers": {
+                            "text": xtreme_ds.normalize_string(
+                                each["answers"]["text"]
+                            ),
+                            "answer_start": each["answers"]["answer_start"],
+                        },
+                    },)
+print(metrics.compute())
 assert i == len(ds) - 1
 ds = xtreme_ds.xquadValidationDataset()
 for i, each in enumerate(ds):
@@ -125,7 +136,17 @@ for i, each in enumerate(ds):
             )
         )
         answer = xtreme_ds.normalize_string(each["answers"]["text"][j])
-        assert answer in reply or reply == "" or reply in answer or "<unk>" in reply
+        metrics.add(prediction={"id": each["id"], "prediction_text": reply},
+                    reference={
+                        "id": each["id"],
+                        "answers": {
+                            "text": xtreme_ds.normalize_string(
+                                each["answers"]["text"]
+                            ),
+                            "answer_start": each["answers"]["answer_start"],
+                        },
+                    },)
+print(metrics.compute())
 assert i == len(ds) - 1
 ds = xtreme_ds.xquadTestDataset()
 for i, each in enumerate(ds):
@@ -142,7 +163,17 @@ for i, each in enumerate(ds):
             )
         )
         answer = xtreme_ds.normalize_string(each["answers"]["text"][j])
-        assert answer in reply or reply == "" or reply in answer or "<unk>" in reply
+        metrics.add(prediction={"id": each["id"], "prediction_text": reply},
+                    reference={
+                        "id": each["id"],
+                        "answers": {
+                            "text": xtreme_ds.normalize_string(
+                                each["answers"]["text"]
+                            ),
+                            "answer_start": each["answers"]["answer_start"],
+                        },
+                    },)
+print(metrics.compute())
 assert i == len(ds) - 1
 
 
@@ -161,7 +192,17 @@ for i, each in enumerate(ds):
             )
         )
         answer = xtreme_ds.normalize_string(each["answers"]["text"][j])
-        assert answer in reply or reply == "" or reply in answer or "<unk>" in reply
+        metrics.add(prediction={"id": each["id"], "prediction_text": reply},
+                    reference={
+                        "id": each["id"],
+                        "answers": {
+                            "text": xtreme_ds.normalize_string(
+                                each["answers"]["text"]
+                            ),
+                            "answer_start": each["answers"]["answer_start"],
+                        },
+                    },)
+print(metrics.compute())
 assert i == len(ds) - 1
 
 
@@ -174,7 +215,17 @@ for i, each in enumerate(ds):
             )
         )
         answer = xtreme_ds.normalize_string(each["answers"]["text"][j])
-        assert answer in reply or reply == "" or reply in answer or "<unk>" in reply
+        metrics.add(prediction={"id": each["id"], "prediction_text": reply},
+                    reference={
+                        "id": each["id"],
+                        "answers": {
+                            "text": xtreme_ds.normalize_string(
+                                each["answers"]["text"]
+                            ),
+                            "answer_start": each["answers"]["answer_start"],
+                        },
+                    },)
+print(metrics.compute())
 assert i == len(ds) - 1
 ds = xtreme_ds.tydiqaTestDataset()
 for i, each in enumerate(ds):
@@ -185,7 +236,17 @@ for i, each in enumerate(ds):
             )
         )
         answer = xtreme_ds.normalize_string(each["answers"]["text"][j])
-        assert answer in reply or reply == "" or reply in answer or "<unk>" in reply
+        metrics.add(prediction={"id": each["id"], "prediction_text": reply},
+                    reference={
+                        "id": each["id"],
+                        "answers": {
+                            "text": xtreme_ds.normalize_string(
+                                each["answers"]["text"]
+                            ),
+                            "answer_start": each["answers"]["answer_start"],
+                        },
+                    },)
+print(metrics.compute())
 assert i == len(ds) - 1
 
 
@@ -197,4 +258,4 @@ ds = xtreme_ds.tatoebaDataset()
 for i, each in enumerate(ds):
     pass
 assert i == len(ds) - 1
-print("all dataset are error free")
+print("check done")

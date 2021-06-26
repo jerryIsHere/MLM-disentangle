@@ -152,7 +152,7 @@ TASK["pawsx"]["test"]["zh"] = ("xtreme", "PAWS-X.zh", "test")
 
 TASK["xquad"]["train"] = ("xtreme", "SQuAD", "train")
 TASK["xquad"]["epochs"] = 2  # NUM_EPOCHS
-TASK["xquad"]["max seq length"] = 384  # MAXL
+TASK["xquad"]["max seq length"] = 512  # MAXL
 TASK["xquad"]["learning_rate"] = 3e-5  # LR
 TASK["xquad"]["warmup_steps"] = 500  # warmup_steps 500
 TASK["xquad"]["weight_decay"] = 0.0001  # weight_decay0.0001
@@ -186,7 +186,7 @@ done
 """
 TASK["mlqa"]["train"] = ("xtreme", "SQuAD", "train")
 TASK["mlqa"]["epochs"] = 2  # NUM_EPOCHS
-TASK["mlqa"]["max seq length"] = 384  # MAXL
+TASK["mlqa"]["max seq length"] = 512  # MAXL
 TASK["mlqa"]["learning_rate"] = 3e-5  # LR
 TASK["mlqa"]["warmup_steps"] = 500  # warmup_steps 500
 TASK["mlqa"]["weight_decay"] = 0.0001  # weight_decay0.0001
@@ -205,7 +205,7 @@ TASK["mlqa"]["test"]["hi"] = ("xtreme", "MLQA.hi.hi", "test")
 
 TASK["tydiqa"]["train"] = ("xtreme", "tydiqa", "train")
 TASK["tydiqa"]["epochs"] = 2  # NUM_EPOCHS
-TASK["tydiqa"]["max seq length"] = 384  # MAXL
+TASK["tydiqa"]["max seq length"] = 512  # MAXL
 TASK["tydiqa"]["learning_rate"] = 3e-5  # LR
 TASK["tydiqa"]["warmup_steps"] = 500  # warmup_steps 500
 TASK["tydiqa"]["weight_decay"] = 0.0001  # weight_decay0.0001
