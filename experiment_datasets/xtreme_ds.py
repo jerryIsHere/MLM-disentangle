@@ -934,8 +934,8 @@ class pawsxTestDataset(torch.utils.data.Dataset):
         raise StopIteration
 
 def normalize_string(s):
-    n_s = " ".join(s.split())
-    return tokenizer._tokenizer.normalizer.normalize_str(n_s)
+    n_s = tokenizer._tokenizer.normalizer.normalize_str(s)
+    return " ".join(n_s.split())
 
 class xquadTrainDataset(torch.utils.data.Dataset):
     def __init__(self):
