@@ -169,7 +169,7 @@ for i, each in enumerate(ds):
     l = len(
         xtreme_ds.tokenizer(
             ds.dataset[lan][id]["sentence1"],
-            ds.dataset[id]["sentence2"],
+            ds.dataset[lan][id]["sentence2"],
             truncation=False,
         ).input_ids
     )
