@@ -953,11 +953,10 @@ class xquadTrainDataset(torch.utils.data.Dataset):
         )
         startposition = np.array(features["answers"]["answer_start"])
         for i, answer_txt in enumerate(features["answers"]["text"]):
-            features["answers"]["text"][i] = " ".join(answer_txt.split())
-            features["answers"]["text"][
-                i
-            ] = tokenizer._tokenizer.normalizer.normalize_str(
-                features["answers"]["text"][i]
+            features["answers"]["text"][i] = tokenizer.convert_tokens_to_string(
+                tokenizer.convert_ids_to_tokens(
+                    tokenizer(features["answers"]["text"][i]).input_ids
+                )
             )
         for i, position in enumerate(startposition):
             position = (
@@ -990,7 +989,10 @@ class xquadTrainDataset(torch.utils.data.Dataset):
                 if endposition[i] > TASK["xquad"]["max seq length"] - 1:
                     endposition[i] = TASK["xquad"]["max seq length"] - 1
                     break
-                if train_encodings.input_ids[endposition[i] + 1] == tokenizer.pad_token_id:
+                if (
+                    train_encodings.input_ids[endposition[i] + 1]
+                    == tokenizer.pad_token_id
+                ):
                     break
                 endposition[i] += 1
         return {
@@ -1021,11 +1023,10 @@ class xquadValidationDataset(torch.utils.data.Dataset):
         )
         startposition = np.array(features["answers"]["answer_start"])
         for i, answer_txt in enumerate(features["answers"]["text"]):
-            features["answers"]["text"][i] = " ".join(answer_txt.split())
-            features["answers"]["text"][
-                i
-            ] = tokenizer._tokenizer.normalizer.normalize_str(
-                features["answers"]["text"][i]
+            features["answers"]["text"][i] = tokenizer.convert_tokens_to_string(
+                tokenizer.convert_ids_to_tokens(
+                    tokenizer(features["answers"]["text"][i]).input_ids
+                )
             )
         for i, position in enumerate(startposition):
             position = (
@@ -1071,7 +1072,10 @@ class xquadValidationDataset(torch.utils.data.Dataset):
                 if endposition[i] > TASK["xquad"]["max seq length"] - 1:
                     endposition[i] = TASK["xquad"]["max seq length"] - 1
                     break
-                if train_encodings.input_ids[endposition[i] + 1] == tokenizer.pad_token_id:
+                if (
+                    train_encodings.input_ids[endposition[i] + 1]
+                    == tokenizer.pad_token_id
+                ):
                     break
                 endposition[i] += 1
         return {
@@ -1108,11 +1112,10 @@ class xquadTestDataset(torch.utils.data.Dataset):
                 )
                 startposition = np.array(features["answers"]["answer_start"])
                 for i, answer_txt in enumerate(features["answers"]["text"]):
-                    features["answers"]["text"][i] = " ".join(answer_txt.split())
-                    features["answers"]["text"][
-                        i
-                    ] = tokenizer._tokenizer.normalizer.normalize_str(
-                        features["answers"]["text"][i]
+                    features["answers"]["text"][i] = tokenizer.convert_tokens_to_string(
+                        tokenizer.convert_ids_to_tokens(
+                            tokenizer(features["answers"]["text"][i]).input_ids
+                        )
                     )
                 for i, position in enumerate(startposition):
                     position = (
@@ -1253,11 +1256,10 @@ class mlqaTestDataset(torch.utils.data.Dataset):
                 )
                 startposition = np.array(features["answers"]["answer_start"])
                 for i, answer_txt in enumerate(features["answers"]["text"]):
-                    features["answers"]["text"][i] = " ".join(answer_txt.split())
-                    features["answers"]["text"][
-                        i
-                    ] = tokenizer._tokenizer.normalizer.normalize_str(
-                        features["answers"]["text"][i]
+                    features["answers"]["text"][i] = tokenizer.convert_tokens_to_string(
+                        tokenizer.convert_ids_to_tokens(
+                            tokenizer(features["answers"]["text"][i]).input_ids
+                        )
                     )
                 for i, position in enumerate(startposition):
                     position = (
@@ -1330,11 +1332,10 @@ class tydiqaTrainDataset(torch.utils.data.Dataset):
         )
         startposition = np.array(features["answers"]["answer_start"])
         for i, answer_txt in enumerate(features["answers"]["text"]):
-            features["answers"]["text"][i] = " ".join(answer_txt.split())
-            features["answers"]["text"][
-                i
-            ] = tokenizer._tokenizer.normalizer.normalize_str(
-                features["answers"]["text"][i]
+            features["answers"]["text"][i] = tokenizer.convert_tokens_to_string(
+                tokenizer.convert_ids_to_tokens(
+                    tokenizer(features["answers"]["text"][i]).input_ids
+                )
             )
         for i, position in enumerate(startposition):
             position = (
@@ -1367,7 +1368,10 @@ class tydiqaTrainDataset(torch.utils.data.Dataset):
                 if endposition[i] > TASK["xquad"]["max seq length"] - 1:
                     endposition[i] = TASK["xquad"]["max seq length"] - 1
                     break
-                if train_encodings.input_ids[endposition[i] + 1] == tokenizer.pad_token_id:
+                if (
+                    train_encodings.input_ids[endposition[i] + 1]
+                    == tokenizer.pad_token_id
+                ):
                     break
                 endposition[i] += 1
         return {
@@ -1443,11 +1447,10 @@ class tydiqaTestDataset(torch.utils.data.Dataset):
         )
         startposition = np.array(features["answers"]["answer_start"])
         for i, answer_txt in enumerate(features["answers"]["text"]):
-            features["answers"]["text"][i] = " ".join(answer_txt.split())
-            features["answers"]["text"][
-                i
-            ] = tokenizer._tokenizer.normalizer.normalize_str(
-                features["answers"]["text"][i]
+            features["answers"]["text"][i] = tokenizer.convert_tokens_to_string(
+                tokenizer.convert_ids_to_tokens(
+                    tokenizer(features["answers"]["text"][i]).input_ids
+                )
             )
         for i, position in enumerate(startposition):
             position = (
@@ -1480,7 +1483,10 @@ class tydiqaTestDataset(torch.utils.data.Dataset):
                 if endposition[i] > TASK["xquad"]["max seq length"] - 1:
                     endposition[i] = TASK["xquad"]["max seq length"] - 1
                     break
-                if train_encodings.input_ids[endposition[i] + 1] == tokenizer.pad_token_id:
+                if (
+                    train_encodings.input_ids[endposition[i] + 1]
+                    == tokenizer.pad_token_id
+                ):
                     break
                 endposition[i] += 1
         return {
