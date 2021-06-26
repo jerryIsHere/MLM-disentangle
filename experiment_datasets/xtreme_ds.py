@@ -990,7 +990,7 @@ class xquadTrainDataset(torch.utils.data.Dataset):
                 if endposition[i] > TASK["xquad"]["max seq length"] - 1:
                     endposition[i] = TASK["xquad"]["max seq length"] - 1
                     break
-                if train_encodings.input_ids[endposition[i] + 1] == tokenizer.pad_token:
+                if train_encodings.input_ids[endposition[i] + 1] == tokenizer.pad_token_id:
                     break
                 endposition[i] += 1
         return {
@@ -1071,7 +1071,7 @@ class xquadValidationDataset(torch.utils.data.Dataset):
                 if endposition[i] > TASK["xquad"]["max seq length"] - 1:
                     endposition[i] = TASK["xquad"]["max seq length"] - 1
                     break
-                if train_encodings.input_ids[endposition[i] + 1] == tokenizer.pad_token:
+                if train_encodings.input_ids[endposition[i] + 1] == tokenizer.pad_token_id:
                     break
                 endposition[i] += 1
         return {
@@ -1150,7 +1150,7 @@ class xquadTestDataset(torch.utils.data.Dataset):
                             break
                         if (
                             train_encodings.input_ids[endposition[i] + 1]
-                            == tokenizer.pad_token
+                            == tokenizer.pad_token_id
                         ):
                             break
                         endposition[i] += 1
@@ -1295,7 +1295,7 @@ class mlqaTestDataset(torch.utils.data.Dataset):
                             break
                         if (
                             train_encodings.input_ids[endposition[i] + 1]
-                            == tokenizer.pad_token
+                            == tokenizer.pad_token_id
                         ):
                             break
                         endposition[i] += 1
@@ -1367,7 +1367,7 @@ class tydiqaTrainDataset(torch.utils.data.Dataset):
                 if endposition[i] > TASK["xquad"]["max seq length"] - 1:
                     endposition[i] = TASK["xquad"]["max seq length"] - 1
                     break
-                if train_encodings.input_ids[endposition[i] + 1] == tokenizer.pad_token:
+                if train_encodings.input_ids[endposition[i] + 1] == tokenizer.pad_token_id:
                     break
                 endposition[i] += 1
         return {
@@ -1480,7 +1480,7 @@ class tydiqaTestDataset(torch.utils.data.Dataset):
                 if endposition[i] > TASK["xquad"]["max seq length"] - 1:
                     endposition[i] = TASK["xquad"]["max seq length"] - 1
                     break
-                if train_encodings.input_ids[endposition[i] + 1] == tokenizer.pad_token:
+                if train_encodings.input_ids[endposition[i] + 1] == tokenizer.pad_token_id:
                     break
                 endposition[i] += 1
         return {
