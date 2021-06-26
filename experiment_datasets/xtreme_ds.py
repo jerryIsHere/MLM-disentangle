@@ -952,6 +952,11 @@ class xquadTrainDataset(torch.utils.data.Dataset):
             padding="max_length",
         )
         startposition = np.array(features["answers"]["answer_start"])
+        features["context"] = tokenizer.convert_tokens_to_string(
+            tokenizer.convert_ids_to_tokens(
+                tokenizer(features["context"]).input_ids[1:-1]
+            )
+        )
         for i, answer_txt in enumerate(features["answers"]["text"]):
             features["answers"]["text"][i] = tokenizer.convert_tokens_to_string(
                 tokenizer.convert_ids_to_tokens(
@@ -1022,6 +1027,11 @@ class xquadValidationDataset(torch.utils.data.Dataset):
             padding="max_length",
         )
         startposition = np.array(features["answers"]["answer_start"])
+        features["context"] = tokenizer.convert_tokens_to_string(
+            tokenizer.convert_ids_to_tokens(
+                tokenizer(features["context"]).input_ids[1:-1]
+            )
+        )
         for i, answer_txt in enumerate(features["answers"]["text"]):
             features["answers"]["text"][i] = tokenizer.convert_tokens_to_string(
                 tokenizer.convert_ids_to_tokens(
@@ -1111,6 +1121,11 @@ class xquadTestDataset(torch.utils.data.Dataset):
                     padding="max_length",
                 )
                 startposition = np.array(features["answers"]["answer_start"])
+                features["context"] = tokenizer.convert_tokens_to_string(
+                    tokenizer.convert_ids_to_tokens(
+                        tokenizer(features["context"]).input_ids[1:-1]
+                    )
+                )
                 for i, answer_txt in enumerate(features["answers"]["text"]):
                     features["answers"]["text"][i] = tokenizer.convert_tokens_to_string(
                         tokenizer.convert_ids_to_tokens(
@@ -1255,6 +1270,11 @@ class mlqaTestDataset(torch.utils.data.Dataset):
                     padding="max_length",
                 )
                 startposition = np.array(features["answers"]["answer_start"])
+                features["context"] = tokenizer.convert_tokens_to_string(
+                    tokenizer.convert_ids_to_tokens(
+                        tokenizer(features["context"]).input_ids[1:-1]
+                    )
+                )
                 for i, answer_txt in enumerate(features["answers"]["text"]):
                     features["answers"]["text"][i] = tokenizer.convert_tokens_to_string(
                         tokenizer.convert_ids_to_tokens(
@@ -1331,6 +1351,11 @@ class tydiqaTrainDataset(torch.utils.data.Dataset):
             padding="max_length",
         )
         startposition = np.array(features["answers"]["answer_start"])
+        features["context"] = tokenizer.convert_tokens_to_string(
+            tokenizer.convert_ids_to_tokens(
+                tokenizer(features["context"]).input_ids[1:-1]
+            )
+        )
         for i, answer_txt in enumerate(features["answers"]["text"]):
             features["answers"]["text"][i] = tokenizer.convert_tokens_to_string(
                 tokenizer.convert_ids_to_tokens(
@@ -1446,6 +1471,11 @@ class tydiqaTestDataset(torch.utils.data.Dataset):
             padding="max_length",
         )
         startposition = np.array(features["answers"]["answer_start"])
+        features["context"] = tokenizer.convert_tokens_to_string(
+            tokenizer.convert_ids_to_tokens(
+                tokenizer(features["context"]).input_ids[1:-1]
+            )
+        )
         for i, answer_txt in enumerate(features["answers"]["text"]):
             features["answers"]["text"][i] = tokenizer.convert_tokens_to_string(
                 tokenizer.convert_ids_to_tokens(
