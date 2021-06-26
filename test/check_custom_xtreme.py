@@ -27,6 +27,32 @@ for i, each in enumerate(ds):
 assert i == len(ds) - 1
 
 
+ds = xtreme_ds.panxTrainDataset()
+for i, each in enumerate(ds):
+    tags = each["tags"].numpy()
+    tags = tags[tags != -100]
+    assert (tags == np.array(ds.dataset[i]["ner_tags"][0 : len(tags)])).all()
+assert i == len(ds) - 1
+ds = xtreme_ds.panxValidationDataset()
+for i, each in enumerate(ds):
+    tags = each["tags"].numpy()
+    tags = tags[tags != -100]
+    assert (tags == np.array(ds.dataset[i]["ner_tags"][0 : len(tags)])).all()
+assert i == len(ds) - 1
+ds = xtreme_ds.panxTestDataset()
+for i, each in enumerate(ds):
+    id = i
+    for lan in ds.dataset:
+        length = len(ds.dataset[lan])
+        if id < length:
+            break
+        id -= length
+    tags = each["tags"].numpy()
+    tags = tags[tags != -100]
+    assert (tags == np.array(ds.dataset[lan][id]["ner_tags"][0 : len(tags)])).all()
+assert i == len(ds) - 1
+
+
 ds = xtreme_ds.xnliTrainDataset()
 for i, each in enumerate(ds):
     assert each["label"] == xtreme_ds.xnliTrainDataset.class_label.index(
