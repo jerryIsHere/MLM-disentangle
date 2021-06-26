@@ -981,7 +981,9 @@ class xquadTrainDataset(torch.utils.data.Dataset):
             features["answers"]["text"][i] = " ".join(answer_txt.split())
             features["answers"]["text"][
                 i
-            ] = tokenizer._tokenizer.normalizer.normalize_str(answer_txt)
+            ] = tokenizer._tokenizer.normalizer.normalize_str(
+                features["answers"]["text"][i]
+            )
         endposition = np.copy(startposition + 1)
         for i, position in enumerate(endposition):
             while my_answer[i] not in tokenizer.convert_tokens_to_string(
@@ -1054,7 +1056,9 @@ class xquadValidationDataset(torch.utils.data.Dataset):
             features["answers"]["text"][i] = " ".join(answer_txt.split())
             features["answers"]["text"][
                 i
-            ] = tokenizer._tokenizer.normalizer.normalize_str(answer_txt)
+            ] = tokenizer._tokenizer.normalizer.normalize_str(
+                features["answers"]["text"][i]
+            )
         endposition = np.copy(startposition + 1)
         for i, position in enumerate(endposition):
             while my_answer[i] not in tokenizer.convert_tokens_to_string(
@@ -1136,7 +1140,9 @@ class xquadTestDataset(torch.utils.data.Dataset):
                     features["answers"]["text"][i] = " ".join(answer_txt.split())
                     features["answers"]["text"][
                         i
-                    ] = tokenizer._tokenizer.normalizer.normalize_str(answer_txt)
+                    ] = tokenizer._tokenizer.normalizer.normalize_str(
+                        features["answers"]["text"][i]
+                    )
                 endposition = np.copy(startposition + 1)
                 for i, position in enumerate(endposition):
                     while my_answer[i] not in tokenizer.convert_tokens_to_string(
@@ -1221,7 +1227,9 @@ class mlqaTestDataset(torch.utils.data.Dataset):
                     features["answers"]["text"][i] = " ".join(answer_txt.split())
                     features["answers"]["text"][
                         i
-                    ] = tokenizer._tokenizer.normalizer.normalize_str(answer_txt)
+                    ] = tokenizer._tokenizer.normalizer.normalize_str(
+                        features["answers"]["text"][i]
+                    )
                 endposition = np.copy(startposition + 1)
                 for i, position in enumerate(endposition):
                     while my_answer[i] not in tokenizer.convert_tokens_to_string(
@@ -1297,7 +1305,9 @@ class tydiqaTrainDataset(torch.utils.data.Dataset):
             features["answers"]["text"][i] = " ".join(answer_txt.split())
             features["answers"]["text"][
                 i
-            ] = tokenizer._tokenizer.normalizer.normalize_str(answer_txt)
+            ] = tokenizer._tokenizer.normalizer.normalize_str(
+                features["answers"]["text"][i]
+            )
         endposition = np.copy(startposition + 1)
         for i, position in enumerate(endposition):
             while my_answer[i] not in tokenizer.convert_tokens_to_string(
@@ -1383,7 +1393,9 @@ class tydiqaTestDataset(torch.utils.data.Dataset):
             features["answers"]["text"][i] = " ".join(answer_txt.split())
             features["answers"]["text"][
                 i
-            ] = tokenizer._tokenizer.normalizer.normalize_str(answer_txt)
+            ] = tokenizer._tokenizer.normalizer.normalize_str(
+                features["answers"]["text"][i]
+            )
         endposition = np.copy(startposition + 1)
         for i, position in enumerate(endposition):
             while my_answer[i] not in tokenizer.convert_tokens_to_string(
