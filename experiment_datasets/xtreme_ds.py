@@ -995,6 +995,7 @@ class xquadTrainDataset(torch.utils.data.Dataset):
                     train_encodings.input_ids[endposition[i] + 1]
                     == tokenizer.eos_token_id
                 ):
+                    endposition[i] += 1
                     break
                 endposition[i] += 1
         return {
@@ -1064,6 +1065,7 @@ class xquadValidationDataset(torch.utils.data.Dataset):
                     train_encodings.input_ids[endposition[i] + 1]
                     == tokenizer.eos_token_id
                 ):
+                    endposition[i] += 1
                     break
                 endposition[i] += 1
         return {
@@ -1142,6 +1144,7 @@ class xquadTestDataset(torch.utils.data.Dataset):
                             train_encodings.input_ids[endposition[i] + 1]
                             == tokenizer.eos_token_id
                         ):
+                            endposition[i] += 1
                             break
                         endposition[i] += 1
                 return {
@@ -1223,6 +1226,7 @@ class mlqaTestDataset(torch.utils.data.Dataset):
                             train_encodings.input_ids[endposition[i] + 1]
                             == tokenizer.eos_token_id
                         ):
+                            endposition[i] += 1
                             break
                         endposition[i] += 1
                 return {
@@ -1295,6 +1299,7 @@ class tydiqaTrainDataset(torch.utils.data.Dataset):
                     train_encodings.input_ids[endposition[i] + 1]
                     == tokenizer.eos_token_id
                 ):
+                    endposition[i] += 1
                     break
                 endposition[i] += 1
         return {
@@ -1377,6 +1382,7 @@ class tydiqaTestDataset(torch.utils.data.Dataset):
                     train_encodings.input_ids[endposition[i] + 1]
                     == tokenizer.eos_token_id
                 ):
+                    endposition[i] += 1
                     break
                 endposition[i] += 1
         return {
