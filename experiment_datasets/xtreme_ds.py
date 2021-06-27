@@ -987,6 +987,7 @@ class pawsxTestDataset(torch.utils.data.Dataset):
             id_absolute -= length
         raise StopIteration
 
+
 class xquadTrainDataset(torch.utils.data.Dataset):
     def __init__(self):
         set_name, subset_name, split = TASK["xquad"]["train"]
@@ -1363,6 +1364,7 @@ class xquadTestDataset(torch.utils.data.Dataset):
                                     "end_positions": torch.tensor(e_p).long(),
                                     "answer_offset": i,
                                     "features": features,
+                                    "lan": lan,
                                 }
                                 yielded = True
                             else:
@@ -1396,13 +1398,14 @@ class xquadTestDataset(torch.utils.data.Dataset):
                                     "end_positions": torch.tensor(e_p).long(),
                                     "answer_offset": i,
                                     "features": features,
+                                    "lan": lan,
                                 }
                                 yielded = True
                         if yielded:
                             break
                     if yielded:
                         break
-                print(lan)
+            print(lan)
 
 
 class mlqaTestDataset(torch.utils.data.Dataset):
@@ -1508,6 +1511,7 @@ class mlqaTestDataset(torch.utils.data.Dataset):
                                     "end_positions": torch.tensor(e_p).long(),
                                     "answer_offset": i,
                                     "features": features,
+                                    "lan": lan,
                                 }
                                 yielded = True
                             else:
@@ -1541,6 +1545,7 @@ class mlqaTestDataset(torch.utils.data.Dataset):
                                     "end_positions": torch.tensor(e_p).long(),
                                     "answer_offset": i,
                                     "features": features,
+                                    "lan": lan,
                                 }
                                 yielded = True
                         if yielded:
@@ -1794,6 +1799,7 @@ class tydiqaTestDataset(torch.utils.data.Dataset):
                                 "end_positions": torch.tensor(e_p).long(),
                                 "answer_offset": i,
                                 "features": features,
+                                "lan": LANG2ISO[features["id"].split("-")[0]],
                             }
                             yielded = True
                         else:
@@ -1826,6 +1832,7 @@ class tydiqaTestDataset(torch.utils.data.Dataset):
                                 "end_positions": torch.tensor(e_p).long(),
                                 "answer_offset": i,
                                 "features": features,
+                                "lan": LANG2ISO[features["id"].split("-")[0]],
                             }
                             yielded = True
                     if yielded:
