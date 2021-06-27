@@ -1048,9 +1048,6 @@ class xquadTrainDataset(torch.utils.data.Dataset):
                         context_encodings.input_ids[startposition[i] : endposition[i]]
                     )
                 ):
-                    if endposition[i] > TASK["xquad"]["max seq length"] - 1:
-                        endposition[i] = TASK["xquad"]["max seq length"] - 1
-                        break
                     if (
                         context_encodings.input_ids[endposition[i] + 1]
                         == tokenizer.eos_token_id
@@ -1187,9 +1184,7 @@ class xquadValidationDataset(torch.utils.data.Dataset):
                         context_encodings.input_ids[startposition[i] : endposition[i]]
                     )
                 ):
-                    if endposition[i] > TASK["xquad"]["max seq length"] - 1:
-                        endposition[i] = TASK["xquad"]["max seq length"] - 1
-                        break
+
                     if (
                         context_encodings.input_ids[endposition[i] + 1]
                         == tokenizer.eos_token_id
@@ -1331,9 +1326,6 @@ class xquadTestDataset(torch.utils.data.Dataset):
                             ]
                         )
                     ):
-                        if endposition[i] > TASK["xquad"]["max seq length"] - 1:
-                            endposition[i] = TASK["xquad"]["max seq length"] - 1
-                            break
                         if (
                             context_encodings.input_ids[endposition[i] + 1]
                             == tokenizer.eos_token_id
@@ -1478,9 +1470,6 @@ class mlqaTestDataset(torch.utils.data.Dataset):
                             ]
                         )
                     ):
-                        if endposition[i] > TASK["mlqa"]["max seq length"] - 1:
-                            endposition[i] = TASK["mlqa"]["max seq length"] - 1
-                            break
                         if (
                             context_encodings.input_ids[endposition[i] + 1]
                             == tokenizer.eos_token_id
@@ -1620,9 +1609,6 @@ class tydiqaTrainDataset(torch.utils.data.Dataset):
                         context_encodings.input_ids[startposition[i] : endposition[i]]
                     )
                 ):
-                    if endposition[i] > TASK["tydiqa"]["max seq length"] - 1:
-                        endposition[i] = TASK["tydiqa"]["max seq length"] - 1
-                        break
                     if (
                         context_encodings.input_ids[endposition[i] + 1]
                         == tokenizer.eos_token_id
@@ -1772,9 +1758,6 @@ class tydiqaTestDataset(torch.utils.data.Dataset):
                         context_encodings.input_ids[startposition[i] : endposition[i]]
                     )
                 ):
-                    if endposition[i] > TASK["tydiqa"]["max seq length"] - 1:
-                        endposition[i] = TASK["tydiqa"]["max seq length"] - 1
-                        break
                     if (
                         context_encodings.input_ids[endposition[i] + 1]
                         == tokenizer.eos_token_id
