@@ -1405,7 +1405,6 @@ class xquadTestDataset(torch.utils.data.Dataset):
                             break
                     if yielded:
                         break
-            print(lan)
 
 
 class mlqaTestDataset(torch.utils.data.Dataset):
