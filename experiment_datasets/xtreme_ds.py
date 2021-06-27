@@ -987,6 +987,7 @@ class pawsxTestDataset(torch.utils.data.Dataset):
             id_absolute -= length
         raise StopIteration
 
+
 class xquadTrainDataset(torch.utils.data.Dataset):
     def __init__(self):
         set_name, subset_name, split = TASK["xquad"]["train"]
@@ -1000,8 +1001,13 @@ class xquadTrainDataset(torch.utils.data.Dataset):
             question_encodings = tokenizer(features["question"])
             startposition = np.array(features["answers"]["answer_start"])
             for i, position in enumerate(startposition):
-                if tokenizer._tokenizer.normalizer.normalize_str(features["context"][position]) == ' ':
-                    position = position +1
+                if (
+                    tokenizer._tokenizer.normalizer.normalize_str(
+                        features["context"][position]
+                    )
+                    == " "
+                ):
+                    position = position + 1
                     features["answers"]["text"][i] = features["answers"]["text"][i][1:]
                 position = (
                     position
@@ -1139,8 +1145,13 @@ class xquadValidationDataset(torch.utils.data.Dataset):
             question_encodings = tokenizer(features["question"])
             startposition = np.array(features["answers"]["answer_start"])
             for i, position in enumerate(startposition):
-                if tokenizer._tokenizer.normalizer.normalize_str(features["context"][position]) == ' ':
-                    position = position +1
+                if (
+                    tokenizer._tokenizer.normalizer.normalize_str(
+                        features["context"][position]
+                    )
+                    == " "
+                ):
+                    position = position + 1
                     features["answers"]["text"][i] = features["answers"]["text"][i][1:]
                 position = (
                     position
@@ -1282,9 +1293,16 @@ class xquadTestDataset(torch.utils.data.Dataset):
                 question_encodings = tokenizer(features["question"])
                 startposition = np.array(features["answers"]["answer_start"])
                 for i, position in enumerate(startposition):
-                    if tokenizer._tokenizer.normalizer.normalize_str(features["context"][position]) == ' ':
-                        position = position +1
-                        features["answers"]["text"][i] = features["answers"]["text"][i][1:]
+                    if (
+                        tokenizer._tokenizer.normalizer.normalize_str(
+                            features["context"][position]
+                        )
+                        == " "
+                    ):
+                        position = position + 1
+                        features["answers"]["text"][i] = features["answers"]["text"][i][
+                            1:
+                        ]
                     position = (
                         position
                         if features["context"][
@@ -1431,9 +1449,16 @@ class mlqaTestDataset(torch.utils.data.Dataset):
                 question_encodings = tokenizer(features["question"])
                 startposition = np.array(features["answers"]["answer_start"])
                 for i, position in enumerate(startposition):
-                    if tokenizer._tokenizer.normalizer.normalize_str(features["context"][position]) == ' ':
-                        position = position +1
-                        features["answers"]["text"][i] = features["answers"]["text"][i][1:]
+                    if (
+                        tokenizer._tokenizer.normalizer.normalize_str(
+                            features["context"][position]
+                        )
+                        == " "
+                    ):
+                        position = position + 1
+                        features["answers"]["text"][i] = features["answers"]["text"][i][
+                            1:
+                        ]
                     position = (
                         position
                         if features["context"][
@@ -1571,14 +1596,21 @@ class tydiqaTrainDataset(torch.utils.data.Dataset):
 
     def __iter__(self):
         for features in self.dataset:
+            if "lan": LANG2ISO[features["id"].split("-")[0]] != 'en':
+                break
             context_encodings = tokenizer(
                 features["context"],
             )
             question_encodings = tokenizer(features["question"])
             startposition = np.array(features["answers"]["answer_start"])
             for i, position in enumerate(startposition):
-                if tokenizer._tokenizer.normalizer.normalize_str(features["context"][position]) == ' ':
-                    position = position +1
+                if (
+                    tokenizer._tokenizer.normalizer.normalize_str(
+                        features["context"][position]
+                    )
+                    == " "
+                ):
+                    position = position + 1
                     features["answers"]["text"][i] = features["answers"]["text"][i][1:]
                 position = (
                     position
@@ -1729,8 +1761,13 @@ class tydiqaTestDataset(torch.utils.data.Dataset):
             question_encodings = tokenizer(features["question"])
             startposition = np.array(features["answers"]["answer_start"])
             for i, position in enumerate(startposition):
-                if tokenizer._tokenizer.normalizer.normalize_str(features["context"][position]) == ' ':
-                    position = position +1
+                if (
+                    tokenizer._tokenizer.normalizer.normalize_str(
+                        features["context"][position]
+                    )
+                    == " "
+                ):
+                    position = position + 1
                     features["answers"]["text"][i] = features["answers"]["text"][i][1:]
                 position = (
                     position
