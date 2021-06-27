@@ -15,8 +15,8 @@ task = "xquad"
 
 
 def normalize_string(txt):
-    if re.search("^[\d]+$", tokenized_detokenized):
-        return tokenized_detokenized
+    if re.search("^[\d]+$", txt):
+        return txt
     tokenized_detokenized = " ".join(
         xtreme_ds.tokenizer.convert_ids_to_tokens(
             xtreme_ds.tokenizer(txt).input_ids[1:-1]
