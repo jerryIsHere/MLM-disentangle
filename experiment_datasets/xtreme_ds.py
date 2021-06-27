@@ -1065,6 +1065,7 @@ class xquadTrainDataset(torch.utils.data.Dataset):
             block_size = TASK["xquad"]["max seq length"]
             question_size = len(question_encodings.input_ids)
             max_context_size = block_size - question_size
+            yielded = False
             for block_id in range(
                 1 + (len(context_encodings.input_ids) // max_context_size)
             ):
@@ -1080,25 +1081,58 @@ class xquadTrainDataset(torch.utils.data.Dataset):
                 ids_block[:context_question_size] = np.hstack(
                     (chosen_context, question_encodings.input_ids)
                 )
-                s_p = max_context_size
-                e_p = max_context_size
                 for i, s_potition in enumerate(startposition):
                     if (
                         context_start <= startposition[i]
                         and startposition[i] < context_end
-                        and context_start <= endposition[i]
-                        and endposition[i] < context_end
                     ):
-                        s_p = startposition[i]
-                        e_p = endposition[i]
+                        if endposition[i] < context_end:
+                            s_p = startposition[i] - context_start
+                            e_p = endposition[i] - context_start
+                            yield {
+                                "tokens": torch.from_numpy(ids_block).long(),
+                                "start_positions": torch.tensor(s_p).long(),
+                                "end_positions": torch.tensor(e_p).long(),
+                                "answer_offset": i,
+                                "features": features,
+                            }
+                            yielded = True
+                        else:
+                            offset = endposition[i] - context_end
+                            context_size = min(
+                                max_context_size,
+                                len(context_encodings.input_ids)
+                                - block_id * max_context_size
+                                - offset,
+                            )
+                            context_question_size = context_size + question_size
+                            ids_block = (
+                                np.ones(block_size, dtype=int) * tokenizer.pad_token_id
+                            )
+                            context_start = block_id * max_context_size + offset
+                            context_end = (
+                                block_id * max_context_size + context_size + offset
+                            )
+                            chosen_context = context_encodings.input_ids[
+                                context_start:context_end
+                            ]
+                            ids_block[:context_question_size] = np.hstack(
+                                (chosen_context, question_encodings.input_ids)
+                            )
+                            s_p = startposition[i] - context_start
+                            e_p = endposition[i] - context_start
+                            yield {
+                                "tokens": torch.from_numpy(ids_block).long(),
+                                "start_positions": torch.tensor(s_p).long(),
+                                "end_positions": torch.tensor(e_p).long(),
+                                "answer_offset": i,
+                                "features": features,
+                            }
+                            yielded = True
+                    if yielded:
                         break
-                yield {
-                    "tokens": torch.from_numpy(ids_block).long(),
-                    "start_positions": torch.tensor(s_p).long(),
-                    "end_positions": torch.tensor(e_p).long(),
-                    "answer_offset": i,
-                    "features": features,
-                }
+                if yielded:
+                    break
 
 
 class xquadValidationDataset(torch.utils.data.Dataset):
@@ -1185,25 +1219,58 @@ class xquadValidationDataset(torch.utils.data.Dataset):
                 ids_block[:context_question_size] = np.hstack(
                     (chosen_context, question_encodings.input_ids)
                 )
-                s_p = max_context_size
-                e_p = max_context_size
                 for i, s_potition in enumerate(startposition):
                     if (
                         context_start <= startposition[i]
                         and startposition[i] < context_end
-                        and context_start <= endposition[i]
-                        and endposition[i] < context_end
                     ):
-                        s_p = startposition[i]
-                        e_p = endposition[i]
+                        if endposition[i] < context_end:
+                            s_p = startposition[i] - context_start
+                            e_p = endposition[i] - context_start
+                            yield {
+                                "tokens": torch.from_numpy(ids_block).long(),
+                                "start_positions": torch.tensor(s_p).long(),
+                                "end_positions": torch.tensor(e_p).long(),
+                                "answer_offset": i,
+                                "features": features,
+                            }
+                            yielded = True
+                        else:
+                            offset = endposition[i] - context_end
+                            context_size = min(
+                                max_context_size,
+                                len(context_encodings.input_ids)
+                                - block_id * max_context_size
+                                - offset,
+                            )
+                            context_question_size = context_size + question_size
+                            ids_block = (
+                                np.ones(block_size, dtype=int) * tokenizer.pad_token_id
+                            )
+                            context_start = block_id * max_context_size + offset
+                            context_end = (
+                                block_id * max_context_size + context_size + offset
+                            )
+                            chosen_context = context_encodings.input_ids[
+                                context_start:context_end
+                            ]
+                            ids_block[:context_question_size] = np.hstack(
+                                (chosen_context, question_encodings.input_ids)
+                            )
+                            s_p = startposition[i] - context_start
+                            e_p = endposition[i] - context_start
+                            yield {
+                                "tokens": torch.from_numpy(ids_block).long(),
+                                "start_positions": torch.tensor(s_p).long(),
+                                "end_positions": torch.tensor(e_p).long(),
+                                "answer_offset": i,
+                                "features": features,
+                            }
+                            yielded = True
+                    if yielded:
                         break
-                yield {
-                    "tokens": torch.from_numpy(ids_block).long(),
-                    "start_positions": torch.tensor(s_p).long(),
-                    "end_positions": torch.tensor(e_p).long(),
-                    "answer_offset": i,
-                    "features": features,
-                }
+                if yielded:
+                    break
 
 
 class xquadTestDataset(torch.utils.data.Dataset):
@@ -1297,26 +1364,59 @@ class xquadTestDataset(torch.utils.data.Dataset):
                     ids_block[:context_question_size] = np.hstack(
                         (chosen_context, question_encodings.input_ids)
                     )
-                    s_p = max_context_size
-                    e_p = max_context_size
                     for i, s_potition in enumerate(startposition):
                         if (
                             context_start <= startposition[i]
                             and startposition[i] < context_end
-                            and context_start <= endposition[i]
-                            and endposition[i] < context_end
                         ):
-                            s_p = startposition[i]
-                            e_p = endposition[i]
+                            if endposition[i] < context_end:
+                                s_p = startposition[i] - context_start
+                                e_p = endposition[i] - context_start
+                                yield {
+                                    "tokens": torch.from_numpy(ids_block).long(),
+                                    "start_positions": torch.tensor(s_p).long(),
+                                    "end_positions": torch.tensor(e_p).long(),
+                                    "answer_offset": i,
+                                    "features": features,
+                                }
+                                yielded = True
+                            else:
+                                offset = endposition[i] - context_end
+                                context_size = min(
+                                    max_context_size,
+                                    len(context_encodings.input_ids)
+                                    - block_id * max_context_size
+                                    - offset,
+                                )
+                                context_question_size = context_size + question_size
+                                ids_block = (
+                                    np.ones(block_size, dtype=int)
+                                    * tokenizer.pad_token_id
+                                )
+                                context_start = block_id * max_context_size + offset
+                                context_end = (
+                                    block_id * max_context_size + context_size + offset
+                                )
+                                chosen_context = context_encodings.input_ids[
+                                    context_start:context_end
+                                ]
+                                ids_block[:context_question_size] = np.hstack(
+                                    (chosen_context, question_encodings.input_ids)
+                                )
+                                s_p = startposition[i] - context_start
+                                e_p = endposition[i] - context_start
+                                yield {
+                                    "tokens": torch.from_numpy(ids_block).long(),
+                                    "start_positions": torch.tensor(s_p).long(),
+                                    "end_positions": torch.tensor(e_p).long(),
+                                    "answer_offset": i,
+                                    "features": features,
+                                }
+                                yielded = True
+                        if yielded:
                             break
-                    yield {
-                        "tokens": torch.from_numpy(ids_block).long(),
-                        "start_positions": torch.tensor(s_p).long(),
-                        "end_positions": torch.tensor(e_p).long(),
-                        "answer_offset": i,
-                        "features": features,
-                        "lan": lan,
-                    }
+                    if yielded:
+                        break
 
 
 class mlqaTestDataset(torch.utils.data.Dataset):
@@ -1410,26 +1510,59 @@ class mlqaTestDataset(torch.utils.data.Dataset):
                     ids_block[:context_question_size] = np.hstack(
                         (chosen_context, question_encodings.input_ids)
                     )
-                    s_p = max_context_size
-                    e_p = max_context_size
                     for i, s_potition in enumerate(startposition):
                         if (
                             context_start <= startposition[i]
                             and startposition[i] < context_end
-                            and context_start <= endposition[i]
-                            and endposition[i] < context_end
                         ):
-                            s_p = startposition[i]
-                            e_p = endposition[i]
+                            if endposition[i] < context_end:
+                                s_p = startposition[i] - context_start
+                                e_p = endposition[i] - context_start
+                                yield {
+                                    "tokens": torch.from_numpy(ids_block).long(),
+                                    "start_positions": torch.tensor(s_p).long(),
+                                    "end_positions": torch.tensor(e_p).long(),
+                                    "answer_offset": i,
+                                    "features": features,
+                                }
+                                yielded = True
+                            else:
+                                offset = endposition[i] - context_end
+                                context_size = min(
+                                    max_context_size,
+                                    len(context_encodings.input_ids)
+                                    - block_id * max_context_size
+                                    - offset,
+                                )
+                                context_question_size = context_size + question_size
+                                ids_block = (
+                                    np.ones(block_size, dtype=int)
+                                    * tokenizer.pad_token_id
+                                )
+                                context_start = block_id * max_context_size + offset
+                                context_end = (
+                                    block_id * max_context_size + context_size + offset
+                                )
+                                chosen_context = context_encodings.input_ids[
+                                    context_start:context_end
+                                ]
+                                ids_block[:context_question_size] = np.hstack(
+                                    (chosen_context, question_encodings.input_ids)
+                                )
+                                s_p = startposition[i] - context_start
+                                e_p = endposition[i] - context_start
+                                yield {
+                                    "tokens": torch.from_numpy(ids_block).long(),
+                                    "start_positions": torch.tensor(s_p).long(),
+                                    "end_positions": torch.tensor(e_p).long(),
+                                    "answer_offset": i,
+                                    "features": features,
+                                }
+                                yielded = True
+                        if yielded:
                             break
-                    yield {
-                        "tokens": torch.from_numpy(ids_block).long(),
-                        "start_positions": torch.tensor(s_p).long(),
-                        "end_positions": torch.tensor(e_p).long(),
-                        "answer_offset": i,
-                        "features": features,
-                        "lan": lan,
-                    }
+                    if yielded:
+                        break
 
 
 class tydiqaTrainDataset(torch.utils.data.Dataset):
@@ -1516,25 +1649,58 @@ class tydiqaTrainDataset(torch.utils.data.Dataset):
                 ids_block[:context_question_size] = np.hstack(
                     (chosen_context, question_encodings.input_ids)
                 )
-                s_p = max_context_size
-                e_p = max_context_size
                 for i, s_potition in enumerate(startposition):
                     if (
                         context_start <= startposition[i]
                         and startposition[i] < context_end
-                        and context_start <= endposition[i]
-                        and endposition[i] < context_end
                     ):
-                        s_p = startposition[i]
-                        e_p = endposition[i]
+                        if endposition[i] < context_end:
+                            s_p = startposition[i] - context_start
+                            e_p = endposition[i] - context_start
+                            yield {
+                                "tokens": torch.from_numpy(ids_block).long(),
+                                "start_positions": torch.tensor(s_p).long(),
+                                "end_positions": torch.tensor(e_p).long(),
+                                "answer_offset": i,
+                                "features": features,
+                            }
+                            yielded = True
+                        else:
+                            offset = endposition[i] - context_end
+                            context_size = min(
+                                max_context_size,
+                                len(context_encodings.input_ids)
+                                - block_id * max_context_size
+                                - offset,
+                            )
+                            context_question_size = context_size + question_size
+                            ids_block = (
+                                np.ones(block_size, dtype=int) * tokenizer.pad_token_id
+                            )
+                            context_start = block_id * max_context_size + offset
+                            context_end = (
+                                block_id * max_context_size + context_size + offset
+                            )
+                            chosen_context = context_encodings.input_ids[
+                                context_start:context_end
+                            ]
+                            ids_block[:context_question_size] = np.hstack(
+                                (chosen_context, question_encodings.input_ids)
+                            )
+                            s_p = startposition[i] - context_start
+                            e_p = endposition[i] - context_start
+                            yield {
+                                "tokens": torch.from_numpy(ids_block).long(),
+                                "start_positions": torch.tensor(s_p).long(),
+                                "end_positions": torch.tensor(e_p).long(),
+                                "answer_offset": i,
+                                "features": features,
+                            }
+                            yielded = True
+                    if yielded:
                         break
-                yield {
-                    "tokens": torch.from_numpy(ids_block).long(),
-                    "start_positions": torch.tensor(s_p).long(),
-                    "end_positions": torch.tensor(e_p).long(),
-                    "answer_offset": i,
-                    "features": features,
-                }
+                if yielded:
+                    break
 
 
 LANG2ISO = {
@@ -1634,26 +1800,58 @@ class tydiqaTestDataset(torch.utils.data.Dataset):
                 ids_block[:context_question_size] = np.hstack(
                     (chosen_context, question_encodings.input_ids)
                 )
-                s_p = max_context_size
-                e_p = max_context_size
                 for i, s_potition in enumerate(startposition):
                     if (
                         context_start <= startposition[i]
                         and startposition[i] < context_end
-                        and context_start <= endposition[i]
-                        and endposition[i] < context_end
                     ):
-                        s_p = startposition[i]
-                        e_p = endposition[i]
+                        if endposition[i] < context_end:
+                            s_p = startposition[i] - context_start
+                            e_p = endposition[i] - context_start
+                            yield {
+                                "tokens": torch.from_numpy(ids_block).long(),
+                                "start_positions": torch.tensor(s_p).long(),
+                                "end_positions": torch.tensor(e_p).long(),
+                                "answer_offset": i,
+                                "features": features,
+                            }
+                            yielded = True
+                        else:
+                            offset = endposition[i] - context_end
+                            context_size = min(
+                                max_context_size,
+                                len(context_encodings.input_ids)
+                                - block_id * max_context_size
+                                - offset,
+                            )
+                            context_question_size = context_size + question_size
+                            ids_block = (
+                                np.ones(block_size, dtype=int) * tokenizer.pad_token_id
+                            )
+                            context_start = block_id * max_context_size + offset
+                            context_end = (
+                                block_id * max_context_size + context_size + offset
+                            )
+                            chosen_context = context_encodings.input_ids[
+                                context_start:context_end
+                            ]
+                            ids_block[:context_question_size] = np.hstack(
+                                (chosen_context, question_encodings.input_ids)
+                            )
+                            s_p = startposition[i] - context_start
+                            e_p = endposition[i] - context_start
+                            yield {
+                                "tokens": torch.from_numpy(ids_block).long(),
+                                "start_positions": torch.tensor(s_p).long(),
+                                "end_positions": torch.tensor(e_p).long(),
+                                "answer_offset": i,
+                                "features": features,
+                            }
+                            yielded = True
+                    if yielded:
                         break
-                yield {
-                    "tokens": torch.from_numpy(ids_block).long(),
-                    "start_positions": torch.tensor(s_p).long(),
-                    "end_positions": torch.tensor(e_p).long(),
-                    "answer_offset": i,
-                    "features": features,
-                    "lan": LANG2ISO[features["id"].split("-")[0]],
-                }
+                if yielded:
+                    break
 
 
 class bucc2018Dataset(torch.utils.data.Dataset):
