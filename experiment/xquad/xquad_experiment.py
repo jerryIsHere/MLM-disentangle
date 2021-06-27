@@ -31,7 +31,7 @@ def normalize_ids(ids):
         tokenized_detokenized = "".join(tokenized_detokenized.split())
     if re.search("^[\d\s]+$", tokenized_detokenized):  # is number with brancket
         tokenized_detokenized = "".join(tokenized_detokenized.split())
-    return tokenized_detokenized[1:]
+    return tokenized_detokenized
 
 
 def qa_build_model(experiment_config_dict, mlm_model_path, task):
