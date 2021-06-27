@@ -135,7 +135,7 @@ instnace_ids[ds.__class__.__name__] = set()
 for i, each in enumerate(ds):
     if each["start_positions"] == each["end_positions"]:
         continue
-    instnace_id[ds.__class__.__name__].add(each["features"]["id"])
+    instnace_ids[ds.__class__.__name__].add(each["features"]["id"])
     reply = xtreme_ds.tokenizer.convert_tokens_to_string(
         xtreme_ds.tokenizer.convert_ids_to_tokens(
             each["tokens"][each["start_positions"] : each["end_positions"]]
@@ -175,7 +175,7 @@ instnace_ids[ds.__class__.__name__] = set()
 for i, each in enumerate(ds):
     if each["start_positions"] == each["end_positions"]:
         continue
-    instnace_id[ds.__class__.__name__].add(each["features"]["id"])
+    instnace_ids[ds.__class__.__name__].add(each["features"]["id"])
     reply = xtreme_ds.tokenizer.convert_tokens_to_string(
         xtreme_ds.tokenizer.convert_ids_to_tokens(
             each["tokens"][each["start_positions"] : each["end_positions"]]
@@ -215,7 +215,7 @@ instnace_ids[ds.__class__.__name__] = set()
 for i, each in enumerate(ds):
     if each["start_positions"] == each["end_positions"]:
         continue
-    instnace_id[ds.__class__.__name__].add(each["features"]["id"])
+    instnace_ids[ds.__class__.__name__].add(each["features"]["id"])
     reply = xtreme_ds.tokenizer.convert_tokens_to_string(
         xtreme_ds.tokenizer.convert_ids_to_tokens(
             each["tokens"][each["start_positions"] : each["end_positions"]]
@@ -257,7 +257,7 @@ instnace_ids[ds.__class__.__name__] = set()
 for i, each in enumerate(ds):
     if each["start_positions"] == each["end_positions"]:
         continue
-    instnace_id[ds.__class__.__name__].add(each["features"]["id"])
+    instnace_ids[ds.__class__.__name__].add(each["features"]["id"])
     reply = xtreme_ds.tokenizer.convert_tokens_to_string(
         xtreme_ds.tokenizer.convert_ids_to_tokens(
             each["tokens"][each["start_positions"] : each["end_positions"]]
@@ -299,7 +299,7 @@ instnace_ids[ds.__class__.__name__] = set()
 for i, each in enumerate(ds):
     if each["start_positions"] == each["end_positions"]:
         continue
-    instnace_id[ds.__class__.__name__].add(each["features"]["id"])
+    instnace_ids[ds.__class__.__name__].add(each["features"]["id"])
     reply = xtreme_ds.tokenizer.convert_tokens_to_string(
         xtreme_ds.tokenizer.convert_ids_to_tokens(
             each["tokens"][each["start_positions"] : each["end_positions"]]
@@ -339,7 +339,7 @@ instnace_ids[ds.__class__.__name__] = set()
 for i, each in enumerate(ds):
     if each["start_positions"] == each["end_positions"]:
         continue
-    instnace_id[ds.__class__.__name__].add(each["features"]["id"])
+    instnace_ids[ds.__class__.__name__].add(each["features"]["id"])
     reply = xtreme_ds.tokenizer.convert_tokens_to_string(
         xtreme_ds.tokenizer.convert_ids_to_tokens(
             each["tokens"][each["start_positions"] : each["end_positions"]]
