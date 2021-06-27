@@ -124,6 +124,7 @@ assert i == len(ds) - 1
 
 
 import datasets
+from experiment.xquad.xquad_experiment import normalize_string, normalize_ids
 
 squad_metrics = {}
 instnace_ids = {}
@@ -132,31 +133,20 @@ squad_metrics[ds.__class__.__name__] = datasets.load_metric("squad")
 instnace_ids[ds.__class__.__name__] = set()
 for i, each in enumerate(ds):
     instnace_ids[ds.__class__.__name__].add(each["features"]["id"])
-    reply = xtreme_ds.tokenizer.convert_tokens_to_string(
-        xtreme_ds.tokenizer.convert_ids_to_tokens(
-            each["tokens"][each["start_positions"] : each["end_positions"]]
-        )
+    reply = normalize_ids(
+        each["tokens"][each["start_positions"] : each["end_positions"]]
     )
 
     squad_metrics[ds.__class__.__name__].add(
         prediction={
             "id": each["features"]["id"],
-            "prediction_text": " ".join(
-                xtreme_ds.tokenizer.convert_ids_to_tokens(
-                    xtreme_ds.tokenizer(reply).input_ids[1:-1]
-                )
-            ),
+            "prediction_text": reply,
         },
         reference={
             "id": each["features"]["id"],
             "answers": {
                 "text": [
-                    " ".join(
-                        xtreme_ds.tokenizer.convert_ids_to_tokens(
-                            xtreme_ds.tokenizer(ans).input_ids[1:-1]
-                        )
-                    )
-                    for ans in each["features"]["answers"]["text"]
+                    normalize_string(ans) for ans in each["features"]["answers"]["text"]
                 ],
                 "answer_start": each["features"]["answers"]["answer_start"],
             },
@@ -170,31 +160,20 @@ squad_metrics[ds.__class__.__name__] = datasets.load_metric("squad")
 instnace_ids[ds.__class__.__name__] = set()
 for i, each in enumerate(ds):
     instnace_ids[ds.__class__.__name__].add(each["features"]["id"])
-    reply = xtreme_ds.tokenizer.convert_tokens_to_string(
-        xtreme_ds.tokenizer.convert_ids_to_tokens(
-            each["tokens"][each["start_positions"] : each["end_positions"]]
-        )
+    reply = normalize_ids(
+        each["tokens"][each["start_positions"] : each["end_positions"]]
     )
 
     squad_metrics[ds.__class__.__name__].add(
         prediction={
             "id": each["features"]["id"],
-            "prediction_text": " ".join(
-                xtreme_ds.tokenizer.convert_ids_to_tokens(
-                    xtreme_ds.tokenizer(reply).input_ids[1:-1]
-                )
-            ),
+            "prediction_text": reply,
         },
         reference={
             "id": each["features"]["id"],
             "answers": {
                 "text": [
-                    " ".join(
-                        xtreme_ds.tokenizer.convert_ids_to_tokens(
-                            xtreme_ds.tokenizer(ans).input_ids[1:-1]
-                        )
-                    )
-                    for ans in each["features"]["answers"]["text"]
+                    normalize_string(ans) for ans in each["features"]["answers"]["text"]
                 ],
                 "answer_start": each["features"]["answers"]["answer_start"],
             },
@@ -208,31 +187,20 @@ squad_metrics[ds.__class__.__name__] = datasets.load_metric("squad")
 instnace_ids[ds.__class__.__name__] = set()
 for i, each in enumerate(ds):
     instnace_ids[ds.__class__.__name__].add(each["features"]["id"])
-    reply = xtreme_ds.tokenizer.convert_tokens_to_string(
-        xtreme_ds.tokenizer.convert_ids_to_tokens(
-            each["tokens"][each["start_positions"] : each["end_positions"]]
-        )
+    reply = normalize_ids(
+        each["tokens"][each["start_positions"] : each["end_positions"]]
     )
 
     squad_metrics[ds.__class__.__name__].add(
         prediction={
             "id": each["features"]["id"],
-            "prediction_text": " ".join(
-                xtreme_ds.tokenizer.convert_ids_to_tokens(
-                    xtreme_ds.tokenizer(reply).input_ids[1:-1]
-                )
-            ),
+            "prediction_text": reply,
         },
         reference={
             "id": each["features"]["id"],
             "answers": {
                 "text": [
-                    " ".join(
-                        xtreme_ds.tokenizer.convert_ids_to_tokens(
-                            xtreme_ds.tokenizer(ans).input_ids[1:-1]
-                        )
-                    )
-                    for ans in each["features"]["answers"]["text"]
+                    normalize_string(ans) for ans in each["features"]["answers"]["text"]
                 ],
                 "answer_start": each["features"]["answers"]["answer_start"],
             },
@@ -248,31 +216,20 @@ squad_metrics[ds.__class__.__name__] = datasets.load_metric("squad")
 instnace_ids[ds.__class__.__name__] = set()
 for i, each in enumerate(ds):
     instnace_ids[ds.__class__.__name__].add(each["features"]["id"])
-    reply = xtreme_ds.tokenizer.convert_tokens_to_string(
-        xtreme_ds.tokenizer.convert_ids_to_tokens(
-            each["tokens"][each["start_positions"] : each["end_positions"]]
-        )
+    reply = normalize_ids(
+        each["tokens"][each["start_positions"] : each["end_positions"]]
     )
 
     squad_metrics[ds.__class__.__name__].add(
         prediction={
             "id": each["features"]["id"],
-            "prediction_text": " ".join(
-                xtreme_ds.tokenizer.convert_ids_to_tokens(
-                    xtreme_ds.tokenizer(reply).input_ids[1:-1]
-                )
-            ),
+            "prediction_text": reply,
         },
         reference={
             "id": each["features"]["id"],
             "answers": {
                 "text": [
-                    " ".join(
-                        xtreme_ds.tokenizer.convert_ids_to_tokens(
-                            xtreme_ds.tokenizer(ans).input_ids[1:-1]
-                        )
-                    )
-                    for ans in each["features"]["answers"]["text"]
+                    normalize_string(ans) for ans in each["features"]["answers"]["text"]
                 ],
                 "answer_start": each["features"]["answers"]["answer_start"],
             },
@@ -288,31 +245,20 @@ squad_metrics[ds.__class__.__name__] = datasets.load_metric("squad")
 instnace_ids[ds.__class__.__name__] = set()
 for i, each in enumerate(ds):
     instnace_ids[ds.__class__.__name__].add(each["features"]["id"])
-    reply = xtreme_ds.tokenizer.convert_tokens_to_string(
-        xtreme_ds.tokenizer.convert_ids_to_tokens(
-            each["tokens"][each["start_positions"] : each["end_positions"]]
-        )
+    reply = normalize_ids(
+        each["tokens"][each["start_positions"] : each["end_positions"]]
     )
 
     squad_metrics[ds.__class__.__name__].add(
         prediction={
             "id": each["features"]["id"],
-            "prediction_text": " ".join(
-                xtreme_ds.tokenizer.convert_ids_to_tokens(
-                    xtreme_ds.tokenizer(reply).input_ids[1:-1]
-                )
-            ),
+            "prediction_text": reply,
         },
         reference={
             "id": each["features"]["id"],
             "answers": {
                 "text": [
-                    " ".join(
-                        xtreme_ds.tokenizer.convert_ids_to_tokens(
-                            xtreme_ds.tokenizer(ans).input_ids[1:-1]
-                        )
-                    )
-                    for ans in each["features"]["answers"]["text"]
+                    normalize_string(ans) for ans in each["features"]["answers"]["text"]
                 ],
                 "answer_start": each["features"]["answers"]["answer_start"],
             },
@@ -326,31 +272,20 @@ squad_metrics[ds.__class__.__name__] = datasets.load_metric("squad")
 instnace_ids[ds.__class__.__name__] = set()
 for i, each in enumerate(ds):
     instnace_ids[ds.__class__.__name__].add(each["features"]["id"])
-    reply = xtreme_ds.tokenizer.convert_tokens_to_string(
-        xtreme_ds.tokenizer.convert_ids_to_tokens(
-            each["tokens"][each["start_positions"] : each["end_positions"]]
-        )
+    reply = normalize_ids(
+        each["tokens"][each["start_positions"] : each["end_positions"]]
     )
 
     squad_metrics[ds.__class__.__name__].add(
         prediction={
             "id": each["features"]["id"],
-            "prediction_text": " ".join(
-                xtreme_ds.tokenizer.convert_ids_to_tokens(
-                    xtreme_ds.tokenizer(reply).input_ids[1:-1]
-                )
-            ),
+            "prediction_text": reply,
         },
         reference={
             "id": each["features"]["id"],
             "answers": {
                 "text": [
-                    " ".join(
-                        xtreme_ds.tokenizer.convert_ids_to_tokens(
-                            xtreme_ds.tokenizer(ans).input_ids[1:-1]
-                        )
-                    )
-                    for ans in each["features"]["answers"]["text"]
+                    normalize_string(ans) for ans in each["features"]["answers"]["text"]
                 ],
                 "answer_start": each["features"]["answers"]["answer_start"],
             },
