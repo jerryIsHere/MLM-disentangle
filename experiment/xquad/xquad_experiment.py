@@ -9,8 +9,21 @@ import argparse
 import torch
 import time
 import os
+import re
 
 task = "xquad"
+
+
+def normalize_string(txt):
+    tokenized_detokenized = " ".join(
+        xtreme_ds.tokenizer.convert_ids_to_tokens(
+            xtreme_ds.tokenizer(txt).input_ids[1:-1]
+        )
+    )
+    if re.search("^\([\d\s]+ \)$", tokenized_detokenized):  # is number with brancket
+        tokenized_detokenized = tokenized_detokenized[1:-1]
+        tokenized_detokenized = tokenized_detokenized.split().join("")
+    return tokenized_detokenized
 
 
 def qa_build_model(experiment_config_dict, mlm_model_path, task):
