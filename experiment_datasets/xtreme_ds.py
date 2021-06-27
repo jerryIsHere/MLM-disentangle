@@ -987,7 +987,7 @@ class pawsxTestDataset(torch.utils.data.Dataset):
             id_absolute -= length
         raise StopIteration
 
-
+qa_invalid_char = ['\u200b']
 class xquadTrainDataset(torch.utils.data.Dataset):
     def __init__(self):
         set_name, subset_name, split = TASK["xquad"]["train"]
@@ -1001,6 +1001,9 @@ class xquadTrainDataset(torch.utils.data.Dataset):
             question_encodings = tokenizer(features["question"])
             startposition = np.array(features["answers"]["answer_start"])
             for i, position in enumerate(startposition):
+                if features["context"][position] in qa_invalid_char:
+                    position = position +1
+                    features["answers"]["text"][i] = features["answers"]["text"][i][1:]
                 position = (
                     position
                     if features["context"][
@@ -1137,6 +1140,9 @@ class xquadValidationDataset(torch.utils.data.Dataset):
             question_encodings = tokenizer(features["question"])
             startposition = np.array(features["answers"]["answer_start"])
             for i, position in enumerate(startposition):
+                if features["context"][position] in qa_invalid_char:
+                    position = position +1
+                    features["answers"]["text"][i] = features["answers"]["text"][i][1:]
                 position = (
                     position
                     if features["context"][
@@ -1277,6 +1283,9 @@ class xquadTestDataset(torch.utils.data.Dataset):
                 question_encodings = tokenizer(features["question"])
                 startposition = np.array(features["answers"]["answer_start"])
                 for i, position in enumerate(startposition):
+                    if features["context"][position] in qa_invalid_char:
+                        position = position +1
+                        features["answers"]["text"][i] = features["answers"]["text"][i][1:]
                     position = (
                         position
                         if features["context"][
@@ -1423,6 +1432,9 @@ class mlqaTestDataset(torch.utils.data.Dataset):
                 question_encodings = tokenizer(features["question"])
                 startposition = np.array(features["answers"]["answer_start"])
                 for i, position in enumerate(startposition):
+                    if features["context"][position] in qa_invalid_char:
+                        position = position +1
+                        features["answers"]["text"][i] = features["answers"]["text"][i][1:]
                     position = (
                         position
                         if features["context"][
@@ -1566,6 +1578,9 @@ class tydiqaTrainDataset(torch.utils.data.Dataset):
             question_encodings = tokenizer(features["question"])
             startposition = np.array(features["answers"]["answer_start"])
             for i, position in enumerate(startposition):
+                if features["context"][position] in qa_invalid_char:
+                    position = position +1
+                    features["answers"]["text"][i] = features["answers"]["text"][i][1:]
                 position = (
                     position
                     if features["context"][
@@ -1715,6 +1730,9 @@ class tydiqaTestDataset(torch.utils.data.Dataset):
             question_encodings = tokenizer(features["question"])
             startposition = np.array(features["answers"]["answer_start"])
             for i, position in enumerate(startposition):
+                if features["context"][position] in qa_invalid_char:
+                    position = position +1
+                    features["answers"]["text"][i] = features["answers"]["text"][i][1:]
                 position = (
                     position
                     if features["context"][
