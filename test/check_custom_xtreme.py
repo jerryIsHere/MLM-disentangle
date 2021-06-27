@@ -132,19 +132,28 @@ squad_metrics[ds.__class__.__name__] = datasets.load_metric("squad")
 instnace_ids[ds.__class__.__name__] = set()
 for i, each in enumerate(ds):
     instnace_ids[ds.__class__.__name__].add(each["features"]["id"])
-    reply = xtreme_ds.tokenizer.convert_ids_to_tokens(
-        each["tokens"][each["start_positions"] : each["end_positions"]]
+    reply = xtreme_ds.tokenizer.convert_tokens_to_string(
+        xtreme_ds.tokenizer.convert_ids_to_tokens(
+            each["tokens"][each["start_positions"] : each["end_positions"]]
+        )
     )
 
     squad_metrics[ds.__class__.__name__].add(
-        prediction={"id": each["features"]["id"], "prediction_text": " ".join(reply)},
+        prediction={
+            "id": each["features"]["id"],
+            "prediction_text": " ".join(
+                xtreme_ds.tokenizer.convert_ids_to_tokens(
+                    xtreme_ds.tokenizer(reply).input_ids[1:-1]
+                )
+            ),
+        },
         reference={
             "id": each["features"]["id"],
             "answers": {
                 "text": [
                     " ".join(
                         xtreme_ds.tokenizer.convert_ids_to_tokens(
-                            xtreme_ds.tokenizer(ans).input_ids
+                            xtreme_ds.tokenizer(ans).input_ids[1:-1]
                         )
                     )
                     for ans in each["features"]["answers"]["text"]
@@ -153,27 +162,36 @@ for i, each in enumerate(ds):
             },
         },
     )
-assert (
-    len(instnace_ids[ds.__class__.__name__]) == len(ds.dataset) - 1
+assert len(instnace_ids[ds.__class__.__name__]) == len(
+    ds.dataset
 )  # each question is at least answered once
 ds = xtreme_ds.xquadValidationDataset()
 squad_metrics[ds.__class__.__name__] = datasets.load_metric("squad")
 instnace_ids[ds.__class__.__name__] = set()
 for i, each in enumerate(ds):
     instnace_ids[ds.__class__.__name__].add(each["features"]["id"])
-    reply = xtreme_ds.tokenizer.convert_ids_to_tokens(
-        each["tokens"][each["start_positions"] : each["end_positions"]]
+    reply = xtreme_ds.tokenizer.convert_tokens_to_string(
+        xtreme_ds.tokenizer.convert_ids_to_tokens(
+            each["tokens"][each["start_positions"] : each["end_positions"]]
+        )
     )
 
     squad_metrics[ds.__class__.__name__].add(
-        prediction={"id": each["features"]["id"], "prediction_text": " ".join(reply)},
+        prediction={
+            "id": each["features"]["id"],
+            "prediction_text": " ".join(
+                xtreme_ds.tokenizer.convert_ids_to_tokens(
+                    xtreme_ds.tokenizer(reply).input_ids[1:-1]
+                )
+            ),
+        },
         reference={
             "id": each["features"]["id"],
             "answers": {
                 "text": [
                     " ".join(
                         xtreme_ds.tokenizer.convert_ids_to_tokens(
-                            xtreme_ds.tokenizer(ans).input_ids
+                            xtreme_ds.tokenizer(ans).input_ids[1:-1]
                         )
                     )
                     for ans in each["features"]["answers"]["text"]
@@ -182,27 +200,36 @@ for i, each in enumerate(ds):
             },
         },
     )
-assert (
-    len(instnace_ids[ds.__class__.__name__]) == len(ds.dataset) - 1
+assert len(instnace_ids[ds.__class__.__name__]) == len(
+    ds.dataset
 )  # each question is at least answered once
 ds = xtreme_ds.xquadTestDataset()
 squad_metrics[ds.__class__.__name__] = datasets.load_metric("squad")
 instnace_ids[ds.__class__.__name__] = set()
 for i, each in enumerate(ds):
     instnace_ids[ds.__class__.__name__].add(each["features"]["id"])
-    reply = xtreme_ds.tokenizer.convert_ids_to_tokens(
-        each["tokens"][each["start_positions"] : each["end_positions"]]
+    reply = xtreme_ds.tokenizer.convert_tokens_to_string(
+        xtreme_ds.tokenizer.convert_ids_to_tokens(
+            each["tokens"][each["start_positions"] : each["end_positions"]]
+        )
     )
 
     squad_metrics[ds.__class__.__name__].add(
-        prediction={"id": each["features"]["id"], "prediction_text": " ".join(reply)},
+        prediction={
+            "id": each["features"]["id"],
+            "prediction_text": " ".join(
+                xtreme_ds.tokenizer.convert_ids_to_tokens(
+                    xtreme_ds.tokenizer(reply).input_ids[1:-1]
+                )
+            ),
+        },
         reference={
             "id": each["features"]["id"],
             "answers": {
                 "text": [
                     " ".join(
                         xtreme_ds.tokenizer.convert_ids_to_tokens(
-                            xtreme_ds.tokenizer(ans).input_ids
+                            xtreme_ds.tokenizer(ans).input_ids[1:-1]
                         )
                     )
                     for ans in each["features"]["answers"]["text"]
@@ -211,8 +238,8 @@ for i, each in enumerate(ds):
             },
         },
     )
-assert (
-    len(instnace_ids[ds.__class__.__name__]) == sum(map(len, ds.dataset.values())) - 1
+assert len(instnace_ids[ds.__class__.__name__]) == sum(
+    map(len, ds.dataset.values())
 )  # each question is at least answered once
 
 
@@ -221,19 +248,28 @@ squad_metrics[ds.__class__.__name__] = datasets.load_metric("squad")
 instnace_ids[ds.__class__.__name__] = set()
 for i, each in enumerate(ds):
     instnace_ids[ds.__class__.__name__].add(each["features"]["id"])
-    reply = xtreme_ds.tokenizer.convert_ids_to_tokens(
-        each["tokens"][each["start_positions"] : each["end_positions"]]
+    reply = xtreme_ds.tokenizer.convert_tokens_to_string(
+        xtreme_ds.tokenizer.convert_ids_to_tokens(
+            each["tokens"][each["start_positions"] : each["end_positions"]]
+        )
     )
 
     squad_metrics[ds.__class__.__name__].add(
-        prediction={"id": each["features"]["id"], "prediction_text": " ".join(reply)},
+        prediction={
+            "id": each["features"]["id"],
+            "prediction_text": " ".join(
+                xtreme_ds.tokenizer.convert_ids_to_tokens(
+                    xtreme_ds.tokenizer(reply).input_ids[1:-1]
+                )
+            ),
+        },
         reference={
             "id": each["features"]["id"],
             "answers": {
                 "text": [
                     " ".join(
                         xtreme_ds.tokenizer.convert_ids_to_tokens(
-                            xtreme_ds.tokenizer(ans).input_ids
+                            xtreme_ds.tokenizer(ans).input_ids[1:-1]
                         )
                     )
                     for ans in each["features"]["answers"]["text"]
@@ -242,8 +278,8 @@ for i, each in enumerate(ds):
             },
         },
     )
-assert (
-    len(instnace_ids[ds.__class__.__name__]) == sum(map(len, ds.dataset.values())) - 1
+assert len(instnace_ids[ds.__class__.__name__]) == sum(
+    map(len, ds.dataset.values())
 )  # each question is at least answered once
 
 
@@ -252,19 +288,28 @@ squad_metrics[ds.__class__.__name__] = datasets.load_metric("squad")
 instnace_ids[ds.__class__.__name__] = set()
 for i, each in enumerate(ds):
     instnace_ids[ds.__class__.__name__].add(each["features"]["id"])
-    reply = xtreme_ds.tokenizer.convert_ids_to_tokens(
-        each["tokens"][each["start_positions"] : each["end_positions"]]
+    reply = xtreme_ds.tokenizer.convert_tokens_to_string(
+        xtreme_ds.tokenizer.convert_ids_to_tokens(
+            each["tokens"][each["start_positions"] : each["end_positions"]]
+        )
     )
 
     squad_metrics[ds.__class__.__name__].add(
-        prediction={"id": each["features"]["id"], "prediction_text": " ".join(reply)},
+        prediction={
+            "id": each["features"]["id"],
+            "prediction_text": " ".join(
+                xtreme_ds.tokenizer.convert_ids_to_tokens(
+                    xtreme_ds.tokenizer(reply).input_ids[1:-1]
+                )
+            ),
+        },
         reference={
             "id": each["features"]["id"],
             "answers": {
                 "text": [
                     " ".join(
                         xtreme_ds.tokenizer.convert_ids_to_tokens(
-                            xtreme_ds.tokenizer(ans).input_ids
+                            xtreme_ds.tokenizer(ans).input_ids[1:-1]
                         )
                     )
                     for ans in each["features"]["answers"]["text"]
@@ -273,27 +318,36 @@ for i, each in enumerate(ds):
             },
         },
     )
-assert (
-    len(instnace_ids[ds.__class__.__name__]) == len(ds.dataset) - 1
+assert len(instnace_ids[ds.__class__.__name__]) == len(
+    ds.dataset
 )  # each question is at least answered once
 ds = xtreme_ds.tydiqaTestDataset()
 squad_metrics[ds.__class__.__name__] = datasets.load_metric("squad")
 instnace_ids[ds.__class__.__name__] = set()
 for i, each in enumerate(ds):
     instnace_ids[ds.__class__.__name__].add(each["features"]["id"])
-    reply = xtreme_ds.tokenizer.convert_ids_to_tokens(
-        each["tokens"][each["start_positions"] : each["end_positions"]]
+    reply = xtreme_ds.tokenizer.convert_tokens_to_string(
+        xtreme_ds.tokenizer.convert_ids_to_tokens(
+            each["tokens"][each["start_positions"] : each["end_positions"]]
+        )
     )
 
     squad_metrics[ds.__class__.__name__].add(
-        prediction={"id": each["features"]["id"], "prediction_text": " ".join(reply)},
+        prediction={
+            "id": each["features"]["id"],
+            "prediction_text": " ".join(
+                xtreme_ds.tokenizer.convert_ids_to_tokens(
+                    xtreme_ds.tokenizer(reply).input_ids[1:-1]
+                )
+            ),
+        },
         reference={
             "id": each["features"]["id"],
             "answers": {
                 "text": [
                     " ".join(
                         xtreme_ds.tokenizer.convert_ids_to_tokens(
-                            xtreme_ds.tokenizer(ans).input_ids
+                            xtreme_ds.tokenizer(ans).input_ids[1:-1]
                         )
                     )
                     for ans in each["features"]["answers"]["text"]
@@ -302,8 +356,8 @@ for i, each in enumerate(ds):
             },
         },
     )
-assert (
-    len(instnace_ids[ds.__class__.__name__]) == len(ds.dataset) - 1
+assert len(instnace_ids[ds.__class__.__name__]) == len(
+    ds.dataset
 )  # each question is at least answered once
 
 
@@ -316,3 +370,6 @@ for i, each in enumerate(ds):
     pass
 assert i == len(ds) - 1
 print("check done")
+for dataset_name in squad_metrics:
+    print(dataset_name)
+    print(squad_metrics[dataset_name].compute())

@@ -1204,6 +1204,7 @@ class xquadValidationDataset(torch.utils.data.Dataset):
             block_size = TASK["xquad"]["max seq length"]
             question_size = len(question_encodings.input_ids)
             max_context_size = block_size - question_size
+            yielded = False
             for block_id in range(
                 1 + (len(context_encodings.input_ids) // max_context_size)
             ):
@@ -1347,6 +1348,7 @@ class xquadTestDataset(torch.utils.data.Dataset):
                 block_size = TASK["xquad"]["max seq length"]
                 question_size = len(question_encodings.input_ids)
                 max_context_size = block_size - question_size
+                yielded = False
                 for block_id in range(
                     1 + (len(context_encodings.input_ids) // max_context_size)
                 ):
@@ -1493,6 +1495,7 @@ class mlqaTestDataset(torch.utils.data.Dataset):
                 block_size = TASK["mlqa"]["max seq length"]
                 question_size = len(question_encodings.input_ids)
                 max_context_size = block_size - question_size
+                yielded = False
                 for block_id in range(
                     1 + (len(context_encodings.input_ids) // max_context_size)
                 ):
@@ -1634,6 +1637,7 @@ class tydiqaTrainDataset(torch.utils.data.Dataset):
             block_size = TASK["tydiqa"]["max seq length"]
             question_size = len(question_encodings.input_ids)
             max_context_size = block_size - question_size
+            yielded = False
             for block_id in range(
                 1 + (len(context_encodings.input_ids) // max_context_size)
             ):
@@ -1785,6 +1789,7 @@ class tydiqaTestDataset(torch.utils.data.Dataset):
             block_size = TASK["tydiqa"]["max seq length"]
             question_size = len(question_encodings.input_ids)
             max_context_size = block_size - question_size
+            yielded = False
             for block_id in range(
                 1 + (len(context_encodings.input_ids) // max_context_size)
             ):
