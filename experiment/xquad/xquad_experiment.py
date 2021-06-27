@@ -25,8 +25,8 @@ def normalize_string(txt):
 
 def normalize_ids(ids):
     tokenized_detokenized = " ".join(xtreme_ds.tokenizer.convert_ids_to_tokens(ids))
-    if re.search("^\([\d\s]+ \)$", tokenized_detokenized):  # is number with brancket
-        tokenized_detokenized = tokenized_detokenized[1:-1]
+    if re.search("^\_\([\d\s]+ \)$", tokenized_detokenized):  # is number with brancket
+        tokenized_detokenized = "_" + tokenized_detokenized[2:-1]
         tokenized_detokenized = tokenized_detokenized.split().join("")
     return tokenized_detokenized
 
