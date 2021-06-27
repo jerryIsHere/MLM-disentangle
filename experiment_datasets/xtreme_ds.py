@@ -995,8 +995,7 @@ class xquadTrainDataset(torch.utils.data.Dataset):
     def __iter__(self):
         for features in self.dataset:
             context_encodings = tokenizer(
-                features["context"].split(" "),
-                is_split_into_words=True,
+                features["context"],
             )
             question_encodings = tokenizer(features["question"])
             startposition = np.array(features["answers"]["answer_start"])
@@ -1132,8 +1131,7 @@ class xquadValidationDataset(torch.utils.data.Dataset):
     def __iter__(self):
         for features in self.dataset:
             context_encodings = tokenizer(
-                features["context"].split(" "),
-                is_split_into_words=True,
+                features["context"],
             )
             question_encodings = tokenizer(features["question"])
             startposition = np.array(features["answers"]["answer_start"])
@@ -1273,8 +1271,7 @@ class xquadTestDataset(torch.utils.data.Dataset):
         for lan in self.dataset:
             for features in self.dataset[lan]:
                 context_encodings = tokenizer(
-                    features["context"].split(" "),
-                is_split_into_words=True,
+                    features["context"],
                 )
                 question_encodings = tokenizer(features["question"])
                 startposition = np.array(features["answers"]["answer_start"])
@@ -1418,8 +1415,7 @@ class mlqaTestDataset(torch.utils.data.Dataset):
         for lan in self.dataset:
             for features in self.dataset[lan]:
                 context_encodings = tokenizer(
-                    features["context"].split(" "),
-                is_split_into_words=True,
+                    features["context"],
                 )
                 question_encodings = tokenizer(features["question"])
                 startposition = np.array(features["answers"]["answer_start"])
@@ -1560,8 +1556,7 @@ class tydiqaTrainDataset(torch.utils.data.Dataset):
     def __iter__(self):
         for features in self.dataset:
             context_encodings = tokenizer(
-                features["context"].split(" "),
-                is_split_into_words=True,
+                features["context"],
             )
             question_encodings = tokenizer(features["question"])
             startposition = np.array(features["answers"]["answer_start"])
@@ -1710,8 +1705,7 @@ class tydiqaTestDataset(torch.utils.data.Dataset):
     def __iter__(self):
         for features in self.dataset:
             context_encodings = tokenizer(
-                features["context"].split(" "),
-                is_split_into_words=True,
+                features["context"],
             )
             question_encodings = tokenizer(features["question"])
             startposition = np.array(features["answers"]["answer_start"])
