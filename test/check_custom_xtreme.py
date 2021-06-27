@@ -186,7 +186,7 @@ ds = xtreme_ds.xquadTestDataset()
 squad_metrics[ds.__class__.__name__] = datasets.load_metric("squad")
 instnace_ids[ds.__class__.__name__] = set()
 for i, each in enumerate(ds):
-    instnace_ids[ds.__class__.__name__].add(each['lan'] + each["features"]["id"])
+    instnace_ids[ds.__class__.__name__].add(each["lan"] + each["features"]["id"])
     reply = normalize_ids(
         each["tokens"][each["start_positions"] : each["end_positions"]]
     )
@@ -265,7 +265,11 @@ for i, each in enumerate(ds):
         },
     )
 assert len(instnace_ids[ds.__class__.__name__]) == len(
-    ds.dataset
+    [
+        instance
+        for instance in ds.dataset
+        if xtreme_ds.LANG2ISO[instance["id"].split("-")[0]] == "en"
+    ]
 )  # each question is at least answered once
 ds = xtreme_ds.tydiqaTestDataset()
 squad_metrics[ds.__class__.__name__] = datasets.load_metric("squad")
