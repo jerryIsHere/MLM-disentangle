@@ -152,7 +152,7 @@ TASK["pawsx"]["test"]["zh"] = ("xtreme", "PAWS-X.zh", "test")
 
 TASK["xquad"]["train"] = ("xtreme", "SQuAD", "train")
 TASK["xquad"]["epochs"] = 2  # NUM_EPOCHS
-TASK["xquad"]["max seq length"] = 512  # MAXL
+TASK["xquad"]["max seq length"] = 384  # MAXL
 TASK["xquad"]["learning_rate"] = 3e-5  # LR
 TASK["xquad"]["warmup_steps"] = 500  # warmup_steps 500
 TASK["xquad"]["weight_decay"] = 0.0001  # weight_decay0.0001
@@ -186,7 +186,7 @@ done
 """
 TASK["mlqa"]["train"] = ("xtreme", "SQuAD", "train")
 TASK["mlqa"]["epochs"] = 2  # NUM_EPOCHS
-TASK["mlqa"]["max seq length"] = 512  # MAXL
+TASK["mlqa"]["max seq length"] = 384  # MAXL
 TASK["mlqa"]["learning_rate"] = 3e-5  # LR
 TASK["mlqa"]["warmup_steps"] = 500  # warmup_steps 500
 TASK["mlqa"]["weight_decay"] = 0.0001  # weight_decay0.0001
@@ -205,7 +205,7 @@ TASK["mlqa"]["test"]["hi"] = ("xtreme", "MLQA.hi.hi", "test")
 
 TASK["tydiqa"]["train"] = ("xtreme", "tydiqa", "train")
 TASK["tydiqa"]["epochs"] = 2  # NUM_EPOCHS
-TASK["tydiqa"]["max seq length"] = 512  # MAXL
+TASK["tydiqa"]["max seq length"] = 384  # MAXL
 TASK["tydiqa"]["learning_rate"] = 3e-5  # LR
 TASK["tydiqa"]["warmup_steps"] = 500  # warmup_steps 500
 TASK["tydiqa"]["weight_decay"] = 0.0001  # weight_decay0.0001
@@ -536,33 +536,39 @@ class udposTrainDataset(torch.utils.data.Dataset):
         set_name, subset_name, split = TASK["udpos"]["train"]
         self.dataset = get_dataset(set_name, subset_name)[split]
 
-    def __len__(self):
-        return len(self.dataset)
-
-    def __getitem__(self, id):
-        features = self.dataset[id]
-        txt = features["tokens"]
-        for i, each in enumerate(txt):
-            txt[i] = tokenizer._tokenizer.normalizer.normalize_str(txt[i])
-        train_encodings = tokenizer(
-            txt,
-            is_split_into_words=True,
-            max_length=TASK["udpos"]["max seq length"],
-            truncation=True,
-            padding="max_length",
-            return_offsets_mapping=True,
-        )
-        labels = np.ones(len(train_encodings.input_ids), dtype=int) * -100
-        ids = np.array(train_encodings.input_ids)
-        arr_offset = np.array(train_encodings.offset_mapping)
-        label_index = (arr_offset[:, 0] == 0) & (arr_offset[:, 1] != 0) & (ids[:] != 6)
-        labels[label_index] = self.dataset[id]["pos_tags"][
-            : np.count_nonzero(label_index)
-        ]
-        return {
-            "tokens": torch.from_numpy(ids).long(),
-            "tags": torch.from_numpy(labels).long(),
-        }
+    def __iter__(self):
+        for features in self.dataset:
+            txt = features["tokens"]
+            for i, each in enumerate(txt):
+                txt[i] = tokenizer._tokenizer.normalizer.normalize_str(txt[i])
+            train_encodings = tokenizer(
+                txt,
+                is_split_into_words=True,
+                return_offsets_mapping=True,
+            )
+            labels = np.ones(len(train_encodings.input_ids), dtype=int) * -100
+            ids = np.array(train_encodings.input_ids)
+            arr_offset = np.array(train_encodings.offset_mapping)
+            label_index = (
+                (arr_offset[:, 0] == 0) & (arr_offset[:, 1] != 0) & (ids[:] != 6)
+            )
+            labels[label_index] = self.dataset[id]["pos_tags"][
+                : np.count_nonzero(label_index)
+            ]
+            block_size = TASK["udpos"]["max seq length"]
+            for block_id in range(1 + (len(ids) // block_size)):
+                ids_block = np.ones(block_size, dtype=int) * tokenizer.pad_token_id
+                chosen_ids = ids[block_id * block_size : (block_id + 1) * block_size]
+                ids_block[: len(chosen_ids)] = chosen_ids
+                labels_block = np.ones(block_size, dtype=int) * -100
+                chosen_label = labels[
+                    block_id * block_size : (block_id + 1) * block_size
+                ]
+                labels_block[: len(chosen_label)] = chosen_label
+                yield {
+                    "tokens": torch.from_numpy(ids_block).long(),
+                    "tags": torch.from_numpy(labels_block).long(),
+                }
 
 
 class udposValidationDataset(torch.utils.data.Dataset):
@@ -570,33 +576,39 @@ class udposValidationDataset(torch.utils.data.Dataset):
         set_name, subset_name, split = TASK["udpos"]["validation"]
         self.dataset = get_dataset(set_name, subset_name)[split]
 
-    def __len__(self):
-        return len(self.dataset)
-
-    def __getitem__(self, id):
-        features = self.dataset[id]
-        txt = features["tokens"]
-        for i, each in enumerate(txt):
-            txt[i] = tokenizer._tokenizer.normalizer.normalize_str(txt[i])
-        train_encodings = tokenizer(
-            txt,
-            is_split_into_words=True,
-            max_length=TASK["udpos"]["max seq length"],
-            truncation=True,
-            padding="max_length",
-            return_offsets_mapping=True,
-        )
-        labels = np.ones(len(train_encodings.input_ids), dtype=int) * -100
-        ids = np.array(train_encodings.input_ids)
-        arr_offset = np.array(train_encodings.offset_mapping)
-        label_index = (arr_offset[:, 0] == 0) & (arr_offset[:, 1] != 0) & (ids[:] != 6)
-        labels[label_index] = self.dataset[id]["pos_tags"][
-            : np.count_nonzero(label_index)
-        ]
-        return {
-            "tokens": torch.from_numpy(ids).long(),
-            "tags": torch.from_numpy(labels).long(),
-        }
+    def __iter__(self):
+        for features in self.dataset:
+            txt = features["tokens"]
+            for i, each in enumerate(txt):
+                txt[i] = tokenizer._tokenizer.normalizer.normalize_str(txt[i])
+            train_encodings = tokenizer(
+                txt,
+                is_split_into_words=True,
+                return_offsets_mapping=True,
+            )
+            labels = np.ones(len(train_encodings.input_ids), dtype=int) * -100
+            ids = np.array(train_encodings.input_ids)
+            arr_offset = np.array(train_encodings.offset_mapping)
+            label_index = (
+                (arr_offset[:, 0] == 0) & (arr_offset[:, 1] != 0) & (ids[:] != 6)
+            )
+            labels[label_index] = self.dataset[id]["pos_tags"][
+                : np.count_nonzero(label_index)
+            ]
+            block_size = TASK["udpos"]["max seq length"]
+            for block_id in range(1 + (len(ids) // block_size)):
+                ids_block = np.ones(block_size, dtype=int) * tokenizer.pad_token_id
+                chosen_ids = ids[block_id * block_size : (block_id + 1) * block_size]
+                ids_block[: len(chosen_ids)] = chosen_ids
+                labels_block = np.ones(block_size, dtype=int) * -100
+                chosen_label = labels[
+                    block_id * block_size : (block_id + 1) * block_size
+                ]
+                labels_block[: len(chosen_label)] = chosen_label
+                yield {
+                    "tokens": torch.from_numpy(ids_block).long(),
+                    "tags": torch.from_numpy(labels_block).long(),
+                }
 
 
 class udposTestDataset(torch.utils.data.Dataset):
@@ -606,24 +618,15 @@ class udposTestDataset(torch.utils.data.Dataset):
             set_name, subset_name, split = TASK["udpos"]["test"][lan]
             self.dataset[lan] = get_dataset(set_name, subset_name)[split]
 
-    def __len__(self):
-        return sum(map(len, self.dataset.values()))
-
-    def __getitem__(self, id_absolute):
+    def __iter__(self):
         for lan in self.dataset:
-            length = len(self.dataset[lan])
-            if id_absolute < length:
-                id = id_absolute
-                features = self.dataset[lan][id]
+            for features in self.dataset[lan]:
                 txt = features["tokens"]
                 for i, each in enumerate(txt):
                     txt[i] = tokenizer._tokenizer.normalizer.normalize_str(txt[i])
                 train_encodings = tokenizer(
                     txt,
                     is_split_into_words=True,
-                    max_length=None,
-                    truncation=True,
-                    padding="max_length",
                     return_offsets_mapping=True,
                 )
                 labels = np.ones(len(train_encodings.input_ids), dtype=int) * -100
@@ -632,16 +635,26 @@ class udposTestDataset(torch.utils.data.Dataset):
                 label_index = (
                     (arr_offset[:, 0] == 0) & (arr_offset[:, 1] != 0) & (ids[:] != 6)
                 )
-                labels[label_index] = self.dataset[lan][id]["pos_tags"][
+                labels[label_index] = self.dataset[id]["pos_tags"][
                     : np.count_nonzero(label_index)
                 ]
-                return {
-                    "tokens": torch.from_numpy(ids).long(),
-                    "tags": torch.from_numpy(labels).long(),
-                    "lan": lan,
-                }
-            id_absolute -= length
-        raise StopIteration
+                block_size = TASK["udpos"]["max seq length"]
+                for block_id in range(1 + (len(ids) // block_size)):
+                    ids_block = np.ones(block_size, dtype=int) * tokenizer.pad_token_id
+                    chosen_ids = ids[
+                        block_id * block_size : (block_id + 1) * block_size
+                    ]
+                    ids_block[: len(chosen_ids)] = chosen_ids
+                    labels_block = np.ones(block_size, dtype=int) * -100
+                    chosen_label = labels[
+                        block_id * block_size : (block_id + 1) * block_size
+                    ]
+                    labels_block[: len(chosen_label)] = chosen_label
+                    yield {
+                        "tokens": torch.from_numpy(ids_block).long(),
+                        "tags": torch.from_numpy(labels_block).long(),
+                        "lan": lan,
+                    }
 
 
 class panxTrainDataset(torch.utils.data.Dataset):
@@ -649,33 +662,39 @@ class panxTrainDataset(torch.utils.data.Dataset):
         set_name, subset_name, split = TASK["panx"]["train"]
         self.dataset = get_dataset(set_name, subset_name)[split]
 
-    def __len__(self):
-        return len(self.dataset)
-
-    def __getitem__(self, id):
-        features = self.dataset[id]
-        txt = features["tokens"]
-        for i, each in enumerate(txt):
-            txt[i] = tokenizer._tokenizer.normalizer.normalize_str(txt[i])
-        train_encodings = tokenizer(
-            txt,
-            is_split_into_words=True,
-            max_length=TASK["panx"]["max seq length"],
-            truncation=True,
-            padding="max_length",
-            return_offsets_mapping=True,
-        )
-        labels = np.ones(len(train_encodings.input_ids), dtype=int) * -100
-        ids = np.array(train_encodings.input_ids)
-        arr_offset = np.array(train_encodings.offset_mapping)
-        label_index = (arr_offset[:, 0] == 0) & (arr_offset[:, 1] != 0) & (ids[:] != 6)
-        labels[label_index] = self.dataset[id]["ner_tags"][
-            : np.count_nonzero(label_index)
-        ]
-        return {
-            "tokens": torch.from_numpy(ids).long(),
-            "tags": torch.from_numpy(labels).long(),
-        }
+    def __iter__(self):
+        for features in self.dataset:
+            txt = features["tokens"]
+            for i, each in enumerate(txt):
+                txt[i] = tokenizer._tokenizer.normalizer.normalize_str(txt[i])
+            train_encodings = tokenizer(
+                txt,
+                is_split_into_words=True,
+                return_offsets_mapping=True,
+            )
+            labels = np.ones(len(train_encodings.input_ids), dtype=int) * -100
+            ids = np.array(train_encodings.input_ids)
+            arr_offset = np.array(train_encodings.offset_mapping)
+            label_index = (
+                (arr_offset[:, 0] == 0) & (arr_offset[:, 1] != 0) & (ids[:] != 6)
+            )
+            labels[label_index] = self.dataset[id]["ner_tags"][
+                : np.count_nonzero(label_index)
+            ]
+            block_size = TASK["panx"]["max seq length"]
+            for block_id in range(1 + (len(ids) // block_size)):
+                ids_block = np.ones(block_size, dtype=int) * tokenizer.pad_token_id
+                chosen_ids = ids[block_id * block_size : (block_id + 1) * block_size]
+                ids_block[: len(chosen_ids)] = chosen_ids
+                labels_block = np.ones(block_size, dtype=int) * -100
+                chosen_label = labels[
+                    block_id * block_size : (block_id + 1) * block_size
+                ]
+                labels_block[: len(chosen_label)] = chosen_label
+                yield {
+                    "tokens": torch.from_numpy(ids_block).long(),
+                    "tags": torch.from_numpy(labels_block).long(),
+                }
 
 
 class panxValidationDataset(torch.utils.data.Dataset):
@@ -683,33 +702,39 @@ class panxValidationDataset(torch.utils.data.Dataset):
         set_name, subset_name, split = TASK["panx"]["validation"]
         self.dataset = get_dataset(set_name, subset_name)[split]
 
-    def __len__(self):
-        return len(self.dataset)
-
-    def __getitem__(self, id):
-        features = self.dataset[id]
-        txt = features["tokens"]
-        for i, each in enumerate(txt):
-            txt[i] = tokenizer._tokenizer.normalizer.normalize_str(txt[i])
-        train_encodings = tokenizer(
-            txt,
-            is_split_into_words=True,
-            max_length=TASK["panx"]["max seq length"],
-            truncation=True,
-            padding="max_length",
-            return_offsets_mapping=True,
-        )
-        labels = np.ones(len(train_encodings.input_ids), dtype=int) * -100
-        ids = np.array(train_encodings.input_ids)
-        arr_offset = np.array(train_encodings.offset_mapping)
-        label_index = (arr_offset[:, 0] == 0) & (arr_offset[:, 1] != 0) & (ids[:] != 6)
-        labels[label_index] = self.dataset[id]["ner_tags"][
-            : np.count_nonzero(label_index)
-        ]
-        return {
-            "tokens": torch.from_numpy(ids).long(),
-            "tags": torch.from_numpy(labels).long(),
-        }
+    def __iter__(self):
+        for features in self.dataset:
+            txt = features["tokens"]
+            for i, each in enumerate(txt):
+                txt[i] = tokenizer._tokenizer.normalizer.normalize_str(txt[i])
+            train_encodings = tokenizer(
+                txt,
+                is_split_into_words=True,
+                return_offsets_mapping=True,
+            )
+            labels = np.ones(len(train_encodings.input_ids), dtype=int) * -100
+            ids = np.array(train_encodings.input_ids)
+            arr_offset = np.array(train_encodings.offset_mapping)
+            label_index = (
+                (arr_offset[:, 0] == 0) & (arr_offset[:, 1] != 0) & (ids[:] != 6)
+            )
+            labels[label_index] = self.dataset[id]["ner_tags"][
+                : np.count_nonzero(label_index)
+            ]
+            block_size = TASK["panx"]["max seq length"]
+            for block_id in range(1 + (len(ids) // block_size)):
+                ids_block = np.ones(block_size, dtype=int) * tokenizer.pad_token_id
+                chosen_ids = ids[block_id * block_size : (block_id + 1) * block_size]
+                ids_block[: len(chosen_ids)] = chosen_ids
+                labels_block = np.ones(block_size, dtype=int) * -100
+                chosen_label = labels[
+                    block_id * block_size : (block_id + 1) * block_size
+                ]
+                labels_block[: len(chosen_label)] = chosen_label
+                yield {
+                    "tokens": torch.from_numpy(ids_block).long(),
+                    "tags": torch.from_numpy(labels_block).long(),
+                }
 
 
 class panxTestDataset(torch.utils.data.Dataset):
@@ -719,24 +744,15 @@ class panxTestDataset(torch.utils.data.Dataset):
             set_name, subset_name, split = TASK["panx"]["test"][lan]
             self.dataset[lan] = get_dataset(set_name, subset_name)[split]
 
-    def __len__(self):
-        return sum(map(len, self.dataset.values()))
-
-    def __getitem__(self, id_absolute):
+    def __iter__(self):
         for lan in self.dataset:
-            length = len(self.dataset[lan])
-            if id_absolute < length:
-                id = id_absolute
-                features = self.dataset[lan][id]
+            for features in self.dataset[lan]:
                 txt = features["tokens"]
                 for i, each in enumerate(txt):
                     txt[i] = tokenizer._tokenizer.normalizer.normalize_str(txt[i])
                 train_encodings = tokenizer(
                     txt,
                     is_split_into_words=True,
-                    max_length=None,
-                    truncation=True,
-                    padding="max_length",
                     return_offsets_mapping=True,
                 )
                 labels = np.ones(len(train_encodings.input_ids), dtype=int) * -100
@@ -745,16 +761,26 @@ class panxTestDataset(torch.utils.data.Dataset):
                 label_index = (
                     (arr_offset[:, 0] == 0) & (arr_offset[:, 1] != 0) & (ids[:] != 6)
                 )
-                labels[label_index] = self.dataset[lan][id]["ner_tags"][
+                labels[label_index] = self.dataset[id]["ner_tags"][
                     : np.count_nonzero(label_index)
                 ]
-                return {
-                    "tokens": torch.from_numpy(ids).long(),
-                    "tags": torch.from_numpy(labels).long(),
-                    "lan": lan,
-                }
-            id_absolute -= length
-        raise StopIteration
+                block_size = TASK["panx"]["max seq length"]
+                for block_id in range(1 + (len(ids) // block_size)):
+                    ids_block = np.ones(block_size, dtype=int) * tokenizer.pad_token_id
+                    chosen_ids = ids[
+                        block_id * block_size : (block_id + 1) * block_size
+                    ]
+                    ids_block[: len(chosen_ids)] = chosen_ids
+                    labels_block = np.ones(block_size, dtype=int) * -100
+                    chosen_label = labels[
+                        block_id * block_size : (block_id + 1) * block_size
+                    ]
+                    labels_block[: len(chosen_label)] = chosen_label
+                    yield {
+                        "tokens": torch.from_numpy(ids_block).long(),
+                        "tags": torch.from_numpy(labels_block).long(),
+                        "lan": lan,
+                    }
 
 
 class xnliTrainDataset(torch.utils.data.Dataset):
