@@ -5,13 +5,23 @@ ds = xtreme_ds.udposTrainDataset()
 for i, each in enumerate(ds):
     tags = each["tags"].numpy()
     tags = tags[tags != -100]
-    assert (tags == np.array(ds.dataset[i]["pos_tags"][0 : len(tags)])).all()
+    assert (
+        tags
+        == np.array(
+            ds.dataset[i]["pos_tags"][each["offset"] : each["offset"] + len(tags)]
+        )
+    ).all()
 assert i >= len(ds) - 1
 ds = xtreme_ds.udposValidationDataset()
 for i, each in enumerate(ds):
     tags = each["tags"].numpy()
     tags = tags[tags != -100]
-    assert (tags == np.array(ds.dataset[i]["pos_tags"][0 : len(tags)])).all()
+    assert (
+        tags
+        == np.array(
+            ds.dataset[i]["pos_tags"][each["offset"] : each["offset"] + len(tags)]
+        )
+    ).all()
 assert i >= len(ds) - 1
 ds = xtreme_ds.udposTestDataset()
 for i, each in enumerate(ds):
@@ -106,6 +116,7 @@ assert i == len(ds) - 1
 
 
 import datasets
+
 metrics = datasets.load_metric("squad")
 ds = xtreme_ds.xquadTrainDataset()
 for i, each in enumerate(ds):
@@ -120,9 +131,9 @@ for i, each in enumerate(ds):
             reference={
                 "id": each["id"],
                 "answers": {
-                    "text": [" ".join(
-                        xtreme_ds.normalize_string(each["answers"]["text"][j])
-                    )],
+                    "text": [
+                        " ".join(xtreme_ds.normalize_string(each["answers"]["text"][j]))
+                    ],
                     "answer_start": [each["answers"]["answer_start"][j]],
                 },
             },
@@ -143,9 +154,9 @@ for i, each in enumerate(ds):
             reference={
                 "id": each["id"],
                 "answers": {
-                    "text": [" ".join(
-                        xtreme_ds.normalize_string(each["answers"]["text"][j])
-                    )],
+                    "text": [
+                        " ".join(xtreme_ds.normalize_string(each["answers"]["text"][j]))
+                    ],
                     "answer_start": [each["answers"]["answer_start"][j]],
                 },
             },
@@ -172,9 +183,9 @@ for i, each in enumerate(ds):
             reference={
                 "id": each["id"],
                 "answers": {
-                    "text": [" ".join(
-                        xtreme_ds.normalize_string(each["answers"]["text"][j])
-                    )],
+                    "text": [
+                        " ".join(xtreme_ds.normalize_string(each["answers"]["text"][j]))
+                    ],
                     "answer_start": [each["answers"]["answer_start"][j]],
                 },
             },
@@ -203,9 +214,9 @@ for i, each in enumerate(ds):
             reference={
                 "id": each["id"],
                 "answers": {
-                    "text": [" ".join(
-                        xtreme_ds.normalize_string(each["answers"]["text"][j])
-                    )],
+                    "text": [
+                        " ".join(xtreme_ds.normalize_string(each["answers"]["text"][j]))
+                    ],
                     "answer_start": [each["answers"]["answer_start"][j]],
                 },
             },
@@ -228,9 +239,9 @@ for i, each in enumerate(ds):
             reference={
                 "id": each["id"],
                 "answers": {
-                    "text": [" ".join(
-                        xtreme_ds.normalize_string(each["answers"]["text"][j])
-                    )],
+                    "text": [
+                        " ".join(xtreme_ds.normalize_string(each["answers"]["text"][j]))
+                    ],
                     "answer_start": [each["answers"]["answer_start"][j]],
                 },
             },
@@ -251,9 +262,9 @@ for i, each in enumerate(ds):
             reference={
                 "id": each["id"],
                 "answers": {
-                    "text": [" ".join(
-                        xtreme_ds.normalize_string(each["answers"]["text"][j])
-                    )],
+                    "text": [
+                        " ".join(xtreme_ds.normalize_string(each["answers"]["text"][j]))
+                    ],
                     "answer_start": [each["answers"]["answer_start"][j]],
                 },
             },

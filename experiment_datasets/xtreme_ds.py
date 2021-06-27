@@ -566,6 +566,7 @@ class udposTrainDataset(torch.utils.data.Dataset):
                 ]
                 labels_block[: len(chosen_label)] = chosen_label
                 yield {
+                    "feature": feature,
                     "offset": len(
                         labels[: block_id * block_size][
                             labels[: block_id * block_size] != -100
@@ -611,6 +612,7 @@ class udposValidationDataset(torch.utils.data.Dataset):
                 ]
                 labels_block[: len(chosen_label)] = chosen_label
                 yield {
+                    "feature": feature,
                     "offset": len(
                         labels[: block_id * block_size][
                             labels[: block_id * block_size] != -100
@@ -661,7 +663,8 @@ class udposTestDataset(torch.utils.data.Dataset):
                     ]
                     labels_block[: len(chosen_label)] = chosen_label
                     yield {
-                        "offset": len(
+                        "feature": feature,
+                    "offset": len(
                             labels[: block_id * block_size][
                                 labels[: block_id * block_size] != -100
                             ]
@@ -707,6 +710,7 @@ class panxTrainDataset(torch.utils.data.Dataset):
                 ]
                 labels_block[: len(chosen_label)] = chosen_label
                 yield {
+                    "feature": feature,
                     "offset": len(
                         labels[: block_id * block_size][
                             labels[: block_id * block_size] != -100
@@ -752,6 +756,7 @@ class panxValidationDataset(torch.utils.data.Dataset):
                 ]
                 labels_block[: len(chosen_label)] = chosen_label
                 yield {
+                    "feature": feature,
                     "offset": len(
                         labels[: block_id * block_size][
                             labels[: block_id * block_size] != -100
@@ -802,7 +807,8 @@ class panxTestDataset(torch.utils.data.Dataset):
                     ]
                     labels_block[: len(chosen_label)] = chosen_label
                     yield {
-                        "offset": len(
+                        "feature": feature,
+                    "offset": len(
                             labels[: block_id * block_size][
                                 labels[: block_id * block_size] != -100
                             ]
