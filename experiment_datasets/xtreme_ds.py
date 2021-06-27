@@ -552,7 +552,7 @@ class udposTrainDataset(torch.utils.data.Dataset):
             label_index = (
                 (arr_offset[:, 0] == 0) & (arr_offset[:, 1] != 0) & (ids[:] != 6)
             )
-            labels[label_index] = self.dataset[id]["pos_tags"][
+            labels[label_index] = features["pos_tags"][
                 : np.count_nonzero(label_index)
             ]
             block_size = TASK["udpos"]["max seq length"]
@@ -597,7 +597,7 @@ class udposValidationDataset(torch.utils.data.Dataset):
             label_index = (
                 (arr_offset[:, 0] == 0) & (arr_offset[:, 1] != 0) & (ids[:] != 6)
             )
-            labels[label_index] = self.dataset[id]["pos_tags"][
+            labels[label_index] = features["pos_tags"][
                 : np.count_nonzero(label_index)
             ]
             block_size = TASK["udpos"]["max seq length"]
@@ -645,7 +645,7 @@ class udposTestDataset(torch.utils.data.Dataset):
                 label_index = (
                     (arr_offset[:, 0] == 0) & (arr_offset[:, 1] != 0) & (ids[:] != 6)
                 )
-                labels[label_index] = self.dataset[id]["pos_tags"][
+                labels[label_index] = features["pos_tags"][
                     : np.count_nonzero(label_index)
                 ]
                 block_size = TASK["udpos"]["max seq length"]
@@ -693,7 +693,7 @@ class panxTrainDataset(torch.utils.data.Dataset):
             label_index = (
                 (arr_offset[:, 0] == 0) & (arr_offset[:, 1] != 0) & (ids[:] != 6)
             )
-            labels[label_index] = self.dataset[id]["ner_tags"][
+            labels[label_index] = features["ner_tags"][
                 : np.count_nonzero(label_index)
             ]
             block_size = TASK["panx"]["max seq length"]
@@ -738,7 +738,7 @@ class panxValidationDataset(torch.utils.data.Dataset):
             label_index = (
                 (arr_offset[:, 0] == 0) & (arr_offset[:, 1] != 0) & (ids[:] != 6)
             )
-            labels[label_index] = self.dataset[id]["ner_tags"][
+            labels[label_index] = features["ner_tags"][
                 : np.count_nonzero(label_index)
             ]
             block_size = TASK["panx"]["max seq length"]
@@ -786,7 +786,7 @@ class panxTestDataset(torch.utils.data.Dataset):
                 label_index = (
                     (arr_offset[:, 0] == 0) & (arr_offset[:, 1] != 0) & (ids[:] != 6)
                 )
-                labels[label_index] = self.dataset[id]["ner_tags"][
+                labels[label_index] = features["ner_tags"][
                     : np.count_nonzero(label_index)
                 ]
                 block_size = TASK["panx"]["max seq length"]
