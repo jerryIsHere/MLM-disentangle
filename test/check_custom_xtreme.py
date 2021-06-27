@@ -6,13 +6,13 @@ for i, each in enumerate(ds):
     tags = each["tags"].numpy()
     tags = tags[tags != -100]
     assert (tags == np.array(ds.dataset[i]["pos_tags"][0 : len(tags)])).all()
-assert i == len(ds) - 1
+assert i >= len(ds) - 1
 ds = xtreme_ds.udposValidationDataset()
 for i, each in enumerate(ds):
     tags = each["tags"].numpy()
     tags = tags[tags != -100]
     assert (tags == np.array(ds.dataset[i]["pos_tags"][0 : len(tags)])).all()
-assert i == len(ds) - 1
+assert i >= len(ds) - 1
 ds = xtreme_ds.udposTestDataset()
 for i, each in enumerate(ds):
     id = i
@@ -24,7 +24,7 @@ for i, each in enumerate(ds):
     tags = each["tags"].numpy()
     tags = tags[tags != -100]
     assert (tags == np.array(ds.dataset[lan][id]["pos_tags"][0 : len(tags)])).all()
-assert i == len(ds) - 1
+assert i >= len(ds) - 1
 
 
 ds = xtreme_ds.panxTrainDataset()
@@ -32,13 +32,13 @@ for i, each in enumerate(ds):
     tags = each["tags"].numpy()
     tags = tags[tags != -100]
     assert (tags == np.array(ds.dataset[i]["ner_tags"][0 : len(tags)])).all()
-assert i == len(ds) - 1
+assert i >= len(ds) - 1
 ds = xtreme_ds.panxValidationDataset()
 for i, each in enumerate(ds):
     tags = each["tags"].numpy()
     tags = tags[tags != -100]
     assert (tags == np.array(ds.dataset[i]["ner_tags"][0 : len(tags)])).all()
-assert i == len(ds) - 1
+assert i >= len(ds) - 1
 ds = xtreme_ds.panxTestDataset()
 for i, each in enumerate(ds):
     id = i
@@ -50,7 +50,7 @@ for i, each in enumerate(ds):
     tags = each["tags"].numpy()
     tags = tags[tags != -100]
     assert (tags == np.array(ds.dataset[lan][id]["ner_tags"][0 : len(tags)])).all()
-assert i == len(ds) - 1
+assert i >= len(ds) - 1
 
 
 ds = xtreme_ds.xnliTrainDataset()
@@ -115,16 +115,18 @@ for i, each in enumerate(ds):
                 each["tokens"][each["start_positions"][j] : each["end_positions"][j]]
             )
         )
-        metrics.add(prediction={"id": each["id"], "prediction_text": reply},
-                    reference={
-                        "id": each["id"],
-                        "answers": {
-                            "text": xtreme_ds.normalize_string(
-                                each["answers"]["text"]
-                            ),
-                            "answer_start": each["answers"]["answer_start"],
-                        },
-                    },)
+        metrics.add(
+            prediction={"id": each["id"], "prediction_text": " ".join(reply)},
+            reference={
+                "id": each["id"],
+                "answers": {
+                    "text": [" ".join(
+                        xtreme_ds.normalize_string(each["answers"]["text"][j])
+                    )],
+                    "answer_start": [each["answers"]["answer_start"][j]],
+                },
+            },
+        )
 print(metrics.compute())
 assert i == len(ds) - 1
 ds = xtreme_ds.xquadValidationDataset()
@@ -136,16 +138,18 @@ for i, each in enumerate(ds):
             )
         )
         answer = xtreme_ds.normalize_string(each["answers"]["text"][j])
-        metrics.add(prediction={"id": each["id"], "prediction_text": reply},
-                    reference={
-                        "id": each["id"],
-                        "answers": {
-                            "text": xtreme_ds.normalize_string(
-                                each["answers"]["text"]
-                            ),
-                            "answer_start": each["answers"]["answer_start"],
-                        },
-                    },)
+        metrics.add(
+            prediction={"id": each["id"], "prediction_text": " ".join(reply)},
+            reference={
+                "id": each["id"],
+                "answers": {
+                    "text": [" ".join(
+                        xtreme_ds.normalize_string(each["answers"]["text"][j])
+                    )],
+                    "answer_start": [each["answers"]["answer_start"][j]],
+                },
+            },
+        )
 print(metrics.compute())
 assert i == len(ds) - 1
 ds = xtreme_ds.xquadTestDataset()
@@ -163,16 +167,18 @@ for i, each in enumerate(ds):
             )
         )
         answer = xtreme_ds.normalize_string(each["answers"]["text"][j])
-        metrics.add(prediction={"id": each["id"], "prediction_text": reply},
-                    reference={
-                        "id": each["id"],
-                        "answers": {
-                            "text": xtreme_ds.normalize_string(
-                                each["answers"]["text"]
-                            ),
-                            "answer_start": each["answers"]["answer_start"],
-                        },
-                    },)
+        metrics.add(
+            prediction={"id": each["id"], "prediction_text": " ".join(reply)},
+            reference={
+                "id": each["id"],
+                "answers": {
+                    "text": [" ".join(
+                        xtreme_ds.normalize_string(each["answers"]["text"][j])
+                    )],
+                    "answer_start": [each["answers"]["answer_start"][j]],
+                },
+            },
+        )
 print(metrics.compute())
 assert i == len(ds) - 1
 
@@ -192,16 +198,18 @@ for i, each in enumerate(ds):
             )
         )
         answer = xtreme_ds.normalize_string(each["answers"]["text"][j])
-        metrics.add(prediction={"id": each["id"], "prediction_text": reply},
-                    reference={
-                        "id": each["id"],
-                        "answers": {
-                            "text": xtreme_ds.normalize_string(
-                                each["answers"]["text"]
-                            ),
-                            "answer_start": each["answers"]["answer_start"],
-                        },
-                    },)
+        metrics.add(
+            prediction={"id": each["id"], "prediction_text": " ".join(reply)},
+            reference={
+                "id": each["id"],
+                "answers": {
+                    "text": [" ".join(
+                        xtreme_ds.normalize_string(each["answers"]["text"][j])
+                    )],
+                    "answer_start": [each["answers"]["answer_start"][j]],
+                },
+            },
+        )
 print(metrics.compute())
 assert i == len(ds) - 1
 
@@ -215,16 +223,18 @@ for i, each in enumerate(ds):
             )
         )
         answer = xtreme_ds.normalize_string(each["answers"]["text"][j])
-        metrics.add(prediction={"id": each["id"], "prediction_text": reply},
-                    reference={
-                        "id": each["id"],
-                        "answers": {
-                            "text": xtreme_ds.normalize_string(
-                                each["answers"]["text"]
-                            ),
-                            "answer_start": each["answers"]["answer_start"],
-                        },
-                    },)
+        metrics.add(
+            prediction={"id": each["id"], "prediction_text": " ".join(reply)},
+            reference={
+                "id": each["id"],
+                "answers": {
+                    "text": [" ".join(
+                        xtreme_ds.normalize_string(each["answers"]["text"][j])
+                    )],
+                    "answer_start": [each["answers"]["answer_start"][j]],
+                },
+            },
+        )
 print(metrics.compute())
 assert i == len(ds) - 1
 ds = xtreme_ds.tydiqaTestDataset()
@@ -236,16 +246,18 @@ for i, each in enumerate(ds):
             )
         )
         answer = xtreme_ds.normalize_string(each["answers"]["text"][j])
-        metrics.add(prediction={"id": each["id"], "prediction_text": reply},
-                    reference={
-                        "id": each["id"],
-                        "answers": {
-                            "text": xtreme_ds.normalize_string(
-                                each["answers"]["text"]
-                            ),
-                            "answer_start": each["answers"]["answer_start"],
-                        },
-                    },)
+        metrics.add(
+            prediction={"id": each["id"], "prediction_text": " ".join(reply)},
+            reference={
+                "id": each["id"],
+                "answers": {
+                    "text": [" ".join(
+                        xtreme_ds.normalize_string(each["answers"]["text"][j])
+                    )],
+                    "answer_start": [each["answers"]["answer_start"][j]],
+                },
+            },
+        )
 print(metrics.compute())
 assert i == len(ds) - 1
 
