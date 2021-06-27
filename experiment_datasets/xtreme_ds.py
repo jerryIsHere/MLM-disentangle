@@ -1001,7 +1001,7 @@ class xquadTrainDataset(torch.utils.data.Dataset):
         set_name, subset_name, split = TASK["xquad"]["train"]
         self.dataset = get_dataset(set_name, subset_name)[split]
 
-    def __iter__(self, id):
+    def __iter__(self):
         for features in self.dataset:
             context_encodings = tokenizer(
                 features["context"],
@@ -1106,7 +1106,7 @@ class xquadValidationDataset(torch.utils.data.Dataset):
         set_name, subset_name, split = TASK["xquad"]["validation"]
         self.dataset = get_dataset(set_name, subset_name)[split]
 
-    def __iter__(self, id):
+    def __iter__(self):
         for features in self.dataset:
             context_encodings = tokenizer(
                 features["context"],
@@ -1213,7 +1213,7 @@ class xquadTestDataset(torch.utils.data.Dataset):
             set_name, subset_name, split = TASK["xquad"]["test"][lan]
             self.dataset[lan] = get_dataset(set_name, subset_name)[split]
 
-    def __iter__(self, id):
+    def __iter__(self):
         for lan in self.dataset:
             for features in self.dataset[lan]:
                 context_encodings = tokenizer(
@@ -1326,7 +1326,7 @@ class mlqaTestDataset(torch.utils.data.Dataset):
             set_name, subset_name, split = TASK["mlqa"]["test"][lan]
             self.dataset[lan] = get_dataset(set_name, subset_name)[split]
 
-    def __iter__(self, id):
+    def __iter__(self):
         for lan in self.dataset:
             for features in self.dataset[lan]:
                 context_encodings = tokenizer(
@@ -1437,7 +1437,7 @@ class tydiqaTrainDataset(torch.utils.data.Dataset):
         set_name, subset_name, split = TASK["tydiqa"]["train"]
         self.dataset = get_dataset(set_name, subset_name)[split]
 
-    def __iter__(self, id):
+    def __iter__(self):
         for features in self.dataset:
             context_encodings = tokenizer(
                 features["context"],
@@ -1555,7 +1555,7 @@ class tydiqaTestDataset(torch.utils.data.Dataset):
         set_name, subset_name, split = TASK["tydiqa"]["test"]
         self.dataset = get_dataset(set_name, subset_name)[split]
 
-    def __iter__(self, id):
+    def __iter__(self):
         for features in self.dataset:
             context_encodings = tokenizer(
                 features["context"],
