@@ -566,6 +566,11 @@ class udposTrainDataset(torch.utils.data.Dataset):
                 ]
                 labels_block[: len(chosen_label)] = chosen_label
                 yield {
+                    "offset": len(
+                        labels[: block_id * block_size][
+                            labels[: block_id * block_size] != -100
+                        ]
+                    ),
                     "tokens": torch.from_numpy(ids_block).long(),
                     "tags": torch.from_numpy(labels_block).long(),
                 }
@@ -606,6 +611,11 @@ class udposValidationDataset(torch.utils.data.Dataset):
                 ]
                 labels_block[: len(chosen_label)] = chosen_label
                 yield {
+                    "offset": len(
+                        labels[: block_id * block_size][
+                            labels[: block_id * block_size] != -100
+                        ]
+                    ),
                     "tokens": torch.from_numpy(ids_block).long(),
                     "tags": torch.from_numpy(labels_block).long(),
                 }
@@ -651,6 +661,11 @@ class udposTestDataset(torch.utils.data.Dataset):
                     ]
                     labels_block[: len(chosen_label)] = chosen_label
                     yield {
+                        "offset": len(
+                            labels[: block_id * block_size][
+                                labels[: block_id * block_size] != -100
+                            ]
+                        ),
                         "tokens": torch.from_numpy(ids_block).long(),
                         "tags": torch.from_numpy(labels_block).long(),
                         "lan": lan,
@@ -692,6 +707,11 @@ class panxTrainDataset(torch.utils.data.Dataset):
                 ]
                 labels_block[: len(chosen_label)] = chosen_label
                 yield {
+                    "offset": len(
+                        labels[: block_id * block_size][
+                            labels[: block_id * block_size] != -100
+                        ]
+                    ),
                     "tokens": torch.from_numpy(ids_block).long(),
                     "tags": torch.from_numpy(labels_block).long(),
                 }
@@ -732,6 +752,11 @@ class panxValidationDataset(torch.utils.data.Dataset):
                 ]
                 labels_block[: len(chosen_label)] = chosen_label
                 yield {
+                    "offset": len(
+                        labels[: block_id * block_size][
+                            labels[: block_id * block_size] != -100
+                        ]
+                    ),
                     "tokens": torch.from_numpy(ids_block).long(),
                     "tags": torch.from_numpy(labels_block).long(),
                 }
@@ -777,6 +802,11 @@ class panxTestDataset(torch.utils.data.Dataset):
                     ]
                     labels_block[: len(chosen_label)] = chosen_label
                     yield {
+                        "offset": len(
+                            labels[: block_id * block_size][
+                                labels[: block_id * block_size] != -100
+                            ]
+                        ),
                         "tokens": torch.from_numpy(ids_block).long(),
                         "tags": torch.from_numpy(labels_block).long(),
                         "lan": lan,
