@@ -1596,7 +1596,7 @@ class tydiqaTrainDataset(torch.utils.data.Dataset):
 
     def __iter__(self):
         for features in self.dataset:
-            if "lan": LANG2ISO[features["id"].split("-")[0]] != 'en':
+            if LANG2ISO[features["id"].split("-")[0]] != 'en':
                 break
             context_encodings = tokenizer(
                 features["context"],
