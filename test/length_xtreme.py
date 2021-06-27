@@ -28,12 +28,12 @@ for i, each in enumerate(ds):
 ds = xtreme_ds.udposTestDataset()
 sequence_length[ds.__class__.__name__] = 0
 for i, each in enumerate(ds):
-    id = i
+    instnace_id= i
     for lan in ds.dataset:
         length = len(ds.dataset[lan])
-        if id < length:
+        if instnace_id< length:
             break
-        id -= length
+        instnace_id-= length
     l = len(
         xtreme_ds.tokenizer(
             ds.dataset[lan][id]["tokens"],
@@ -72,12 +72,12 @@ for i, each in enumerate(ds):
 ds = xtreme_ds.panxTestDataset()
 sequence_length[ds.__class__.__name__] = 0
 for i, each in enumerate(ds):
-    id = i
+    instnace_id= i
     for lan in ds.dataset:
         length = len(ds.dataset[lan])
-        if id < length:
+        if instnace_id< length:
             break
-        id -= length
+        instnace_id-= length
     l = len(
         xtreme_ds.tokenizer(
             ds.dataset[lan][id]["tokens"],
@@ -104,12 +104,12 @@ for i, each in enumerate(ds):
 ds = xtreme_ds.xnliValidationDataset()
 sequence_length[ds.__class__.__name__] = 0
 for i, each in enumerate(ds):
-    id = i
+    instnace_id= i
     for split in ds.dataset:
         length = len(ds.dataset[split])
-        if id < length:
+        if instnace_id< length:
             break
-        id -= length
+        instnace_id-= length
     l = len(
         xtreme_ds.tokenizer(
             ds.dataset[split][id]["premise"],
@@ -160,12 +160,12 @@ for i, each in enumerate(ds):
 ds = xtreme_ds.pawsxTestDataset()
 sequence_length[ds.__class__.__name__] = 0
 for i, each in enumerate(ds):
-    id = i
+    instnace_id= i
     for lan in ds.dataset:
         length = len(ds.dataset[lan])
-        if id < length:
+        if instnace_id< length:
             break
-        id -= length
+        instnace_id-= length
     l = len(
         xtreme_ds.tokenizer(
             ds.dataset[lan][id]["sentence1"],
@@ -204,12 +204,12 @@ for i, each in enumerate(ds):
 ds = xtreme_ds.xquadTestDataset()
 sequence_length[ds.__class__.__name__] = 0
 for i, each in enumerate(ds):
-    id = i
+    instnace_id= i
     for lan in ds.dataset:
         length = len(ds.dataset[lan])
-        if id < length:
+        if instnace_id< length:
             break
-        id -= length
+        instnace_id-= length
     l = len(
         xtreme_ds.tokenizer(
             ds.dataset[lan][id]["context"],
@@ -224,12 +224,12 @@ for i, each in enumerate(ds):
 ds = xtreme_ds.mlqaTestDataset()
 sequence_length[ds.__class__.__name__] = 0
 for i, each in enumerate(ds):
-    id = i
+    instnace_id= i
     for lan in ds.dataset:
         length = len(ds.dataset[lan])
-        if id < length:
+        if instnace_id< length:
             break
-        id -= length
+        instnace_id-= length
     l = len(
         xtreme_ds.tokenizer(
             ds.dataset[lan][id]["context"],

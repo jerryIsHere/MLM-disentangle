@@ -552,9 +552,7 @@ class udposTrainDataset(torch.utils.data.Dataset):
             label_index = (
                 (arr_offset[:, 0] == 0) & (arr_offset[:, 1] != 0) & (ids[:] != 6)
             )
-            labels[label_index] = features["pos_tags"][
-                : np.count_nonzero(label_index)
-            ]
+            labels[label_index] = features["pos_tags"][: np.count_nonzero(label_index)]
             block_size = TASK["udpos"]["max seq length"]
             for block_id in range(1 + (len(ids) // block_size)):
                 ids_block = np.ones(block_size, dtype=int) * tokenizer.pad_token_id
@@ -598,9 +596,7 @@ class udposValidationDataset(torch.utils.data.Dataset):
             label_index = (
                 (arr_offset[:, 0] == 0) & (arr_offset[:, 1] != 0) & (ids[:] != 6)
             )
-            labels[label_index] = features["pos_tags"][
-                : np.count_nonzero(label_index)
-            ]
+            labels[label_index] = features["pos_tags"][: np.count_nonzero(label_index)]
             block_size = TASK["udpos"]["max seq length"]
             for block_id in range(1 + (len(ids) // block_size)):
                 ids_block = np.ones(block_size, dtype=int) * tokenizer.pad_token_id
@@ -664,7 +660,7 @@ class udposTestDataset(torch.utils.data.Dataset):
                     labels_block[: len(chosen_label)] = chosen_label
                     yield {
                         "features": features,
-                    "offset": len(
+                        "offset": len(
                             labels[: block_id * block_size][
                                 labels[: block_id * block_size] != -100
                             ]
@@ -696,9 +692,7 @@ class panxTrainDataset(torch.utils.data.Dataset):
             label_index = (
                 (arr_offset[:, 0] == 0) & (arr_offset[:, 1] != 0) & (ids[:] != 6)
             )
-            labels[label_index] = features["ner_tags"][
-                : np.count_nonzero(label_index)
-            ]
+            labels[label_index] = features["ner_tags"][: np.count_nonzero(label_index)]
             block_size = TASK["panx"]["max seq length"]
             for block_id in range(1 + (len(ids) // block_size)):
                 ids_block = np.ones(block_size, dtype=int) * tokenizer.pad_token_id
@@ -742,9 +736,7 @@ class panxValidationDataset(torch.utils.data.Dataset):
             label_index = (
                 (arr_offset[:, 0] == 0) & (arr_offset[:, 1] != 0) & (ids[:] != 6)
             )
-            labels[label_index] = features["ner_tags"][
-                : np.count_nonzero(label_index)
-            ]
+            labels[label_index] = features["ner_tags"][: np.count_nonzero(label_index)]
             block_size = TASK["panx"]["max seq length"]
             for block_id in range(1 + (len(ids) // block_size)):
                 ids_block = np.ones(block_size, dtype=int) * tokenizer.pad_token_id
@@ -808,7 +800,7 @@ class panxTestDataset(torch.utils.data.Dataset):
                     labels_block[: len(chosen_label)] = chosen_label
                     yield {
                         "features": features,
-                    "offset": len(
+                        "offset": len(
                             labels[: block_id * block_size][
                                 labels[: block_id * block_size] != -100
                             ]
@@ -860,7 +852,7 @@ class xnliValidationDataset(torch.utils.data.Dataset):
         for split in self.dataset:
             length = len(self.dataset[split])
             if id_absolute < length:
-                id = id_absolute
+                instnace_id = id_absolute
                 features = self.dataset[split][id]
                 train_encodings = tokenizer(
                     features["premise"],
@@ -976,7 +968,7 @@ class pawsxTestDataset(torch.utils.data.Dataset):
         for lan in self.dataset:
             length = len(self.dataset[lan])
             if id_absolute < length:
-                id = id_absolute
+                instnace_id = id_absolute
                 features = self.dataset[lan][id]
                 train_encodings = tokenizer(
                     features["sentence1"],
@@ -1009,73 +1001,104 @@ class xquadTrainDataset(torch.utils.data.Dataset):
         set_name, subset_name, split = TASK["xquad"]["train"]
         self.dataset = get_dataset(set_name, subset_name)[split]
 
-    def __len__(self):
-        return len(self.dataset)
-
-    def __getitem__(self, id):
-        features = self.dataset[id]
-        train_encodings = tokenizer(
-            features["context"],
-            features["question"],
-            max_length=TASK["xquad"]["max seq length"],
-            truncation=True,
-            padding="max_length",
-        )
-        startposition = np.array(features["answers"]["answer_start"])
-        for i, position in enumerate(startposition):
-            position = (
-                position
-                if features["context"][
-                    position : position + len(features["answers"]["text"][i])
-                ]
-                == features["answers"]["text"][i]
-                else position - 1
-                if features["context"][
-                    position - 1 : position + len(features["answers"]["text"][i]) - 1
-                ]
-                == features["answers"]["text"][i]
-                else position - 2
+    def __iter__(self, id):
+        for features in self.dataset:
+            context_encodings = tokenizer(
+                features["context"],
             )
-            startposition[i] = (
-                train_encodings.char_to_token(position)
-                if train_encodings.char_to_token(position) is not None
-                else TASK["xquad"]["max seq length"] - 1
-            )
-        my_answer = {}
-        for i, answer_txt in enumerate(features["answers"]["text"]):
-            my_answer[i] = tokenizer.convert_tokens_to_string(
-                tokenizer.convert_ids_to_tokens(
-                    tokenizer(features["answers"]["text"][i]).input_ids[1:-1]
+            question_encodings = tokenizer(features["question"])
+            startposition = np.array(features["answers"]["answer_start"])
+            for i, position in enumerate(startposition):
+                position = (
+                    position
+                    if features["context"][
+                        position : position + len(features["answers"]["text"][i])
+                    ]
+                    == features["answers"]["text"][i]
+                    else position - 1
+                    if features["context"][
+                        position
+                        - 1 : position
+                        + len(features["answers"]["text"][i])
+                        - 1
+                    ]
+                    == features["answers"]["text"][i]
+                    else position - 2
+                    if features["context"][
+                        position
+                        - 2 : position
+                        + len(features["answers"]["text"][i])
+                        - 2
+                    ]
+                    == features["answers"]["text"][i]
+                    else position
                 )
-            )
-        endposition = np.copy(startposition + 1)
-        for i, position in enumerate(endposition):
-            while my_answer[i] not in tokenizer.convert_tokens_to_string(
-                tokenizer.convert_ids_to_tokens(
-                    train_encodings.input_ids[startposition[i] : endposition[i]]
+                startposition[i] = context_encodings.char_to_token(position)
+            my_answer = {}
+            for i, answer_txt in enumerate(features["answers"]["text"]):
+                my_answer[i] = tokenizer.convert_tokens_to_string(
+                    tokenizer.convert_ids_to_tokens(
+                        tokenizer(features["answers"]["text"][i]).input_ids[1:-1]
+                    )
                 )
-            ):
-                if endposition[i] > TASK["xquad"]["max seq length"] - 1:
-                    endposition[i] = TASK["xquad"]["max seq length"] - 1
-                    break
-                if (
-                    train_encodings.input_ids[endposition[i] + 1]
-                    == tokenizer.eos_token_id
+            endposition = np.copy(startposition + 1)
+            for i, position in enumerate(endposition):
+                while my_answer[i] not in tokenizer.convert_tokens_to_string(
+                    tokenizer.convert_ids_to_tokens(
+                        context_encodings.input_ids[startposition[i] : endposition[i]]
+                    )
                 ):
+                    if endposition[i] > TASK["xquad"]["max seq length"] - 1:
+                        endposition[i] = TASK["xquad"]["max seq length"] - 1
+                        break
                     if (
-                        train_encodings.input_ids[endposition[i]]
-                        != tokenizer.eos_token_id
+                        context_encodings.input_ids[endposition[i] + 1]
+                        == tokenizer.eos_token_id
                     ):
-                        endposition[i] += 1
-                    break
-                endposition[i] += 1
-        return {
-            "tokens": torch.LongTensor(train_encodings.input_ids),
-            "start_positions": torch.tensor(startposition).long(),
-            "end_positions": torch.tensor(endposition).long(),
-            "id": features["id"],
-            "answers": features["answers"],
-        }
+                        if (
+                            context_encodings.input_ids[endposition[i]]
+                            != tokenizer.eos_token_id
+                        ):
+                            endposition[i] += 1
+                        break
+                    endposition[i] += 1
+            block_size = TASK["xquad"]["max seq length"]
+            question_size = len(question_encodings.input_ids)
+            max_context_size = block_size - question_size
+            for block_id in range(
+                1 + (len(context_encodings.input_ids) // max_context_size)
+            ):
+                context_size = min(
+                    max_context_size,
+                    len(context_encodings.input_ids) - block_id * max_context_size,
+                )
+                context_question_size = context_size + question_size
+                ids_block = np.ones(block_size, dtype=int) * tokenizer.pad_token_id
+                context_start = block_id * max_context_size
+                context_end = block_id * max_context_size + context_size
+                chosen_context = context_encodings.input_ids[context_start:context_end]
+                ids_block[:context_question_size] = np.hstack(
+                    (chosen_context, question_encodings.input_ids)
+                )
+                s_p = max_context_size
+                e_p = max_context_size
+                for i, s_potition in enumerate(startposition):
+                    if (
+                        context_start <= startposition[i]
+                        and startposition[i] < context_end
+                        and context_start <= endposition[i]
+                        and endposition[i] < context_end
+                    ):
+                        s_p = startposition[i]
+                        e_p = endposition[i]
+                        break
+                yield {
+                    "tokens": torch.from_numpy(ids_block).long(),
+                    "start_positions": torch.tensor(s_p).long(),
+                    "end_positions": torch.tensor(e_p).long(),
+                    "answer_offset": i,
+                    "features": features,
+                }
 
 
 class xquadValidationDataset(torch.utils.data.Dataset):
@@ -1083,73 +1106,104 @@ class xquadValidationDataset(torch.utils.data.Dataset):
         set_name, subset_name, split = TASK["xquad"]["validation"]
         self.dataset = get_dataset(set_name, subset_name)[split]
 
-    def __len__(self):
-        return len(self.dataset)
-
-    def __getitem__(self, id):
-        features = self.dataset[id]
-        train_encodings = tokenizer(
-            features["context"],
-            features["question"],
-            max_length=TASK["xquad"]["max seq length"],
-            truncation=True,
-            padding="max_length",
-        )
-        startposition = np.array(features["answers"]["answer_start"])
-        for i, position in enumerate(startposition):
-            position = (
-                position
-                if features["context"][
-                    position : position + len(features["answers"]["text"][i])
-                ]
-                == features["answers"]["text"][i]
-                else position - 1
-                if features["context"][
-                    position - 1 : position + len(features["answers"]["text"][i]) - 1
-                ]
-                == features["answers"]["text"][i]
-                else position - 2
+    def __iter__(self, id):
+        for features in self.dataset:
+            context_encodings = tokenizer(
+                features["context"],
             )
-            startposition[i] = (
-                train_encodings.char_to_token(position)
-                if train_encodings.char_to_token(position) is not None
-                else TASK["xquad"]["max seq length"] - 1
-            )
-        my_answer = {}
-        for i, answer_txt in enumerate(features["answers"]["text"]):
-            my_answer[i] = tokenizer.convert_tokens_to_string(
-                tokenizer.convert_ids_to_tokens(
-                    tokenizer(features["answers"]["text"][i]).input_ids[1:-1]
+            question_encodings = tokenizer(features["question"])
+            startposition = np.array(features["answers"]["answer_start"])
+            for i, position in enumerate(startposition):
+                position = (
+                    position
+                    if features["context"][
+                        position : position + len(features["answers"]["text"][i])
+                    ]
+                    == features["answers"]["text"][i]
+                    else position - 1
+                    if features["context"][
+                        position
+                        - 1 : position
+                        + len(features["answers"]["text"][i])
+                        - 1
+                    ]
+                    == features["answers"]["text"][i]
+                    else position - 2
+                    if features["context"][
+                        position
+                        - 2 : position
+                        + len(features["answers"]["text"][i])
+                        - 2
+                    ]
+                    == features["answers"]["text"][i]
+                    else position
                 )
-            )
-        endposition = np.copy(startposition + 1)
-        for i, position in enumerate(endposition):
-            while my_answer[i] not in tokenizer.convert_tokens_to_string(
-                tokenizer.convert_ids_to_tokens(
-                    train_encodings.input_ids[startposition[i] : endposition[i]]
+                startposition[i] = context_encodings.char_to_token(position)
+            my_answer = {}
+            for i, answer_txt in enumerate(features["answers"]["text"]):
+                my_answer[i] = tokenizer.convert_tokens_to_string(
+                    tokenizer.convert_ids_to_tokens(
+                        tokenizer(features["answers"]["text"][i]).input_ids[1:-1]
+                    )
                 )
-            ):
-                if endposition[i] > TASK["xquad"]["max seq length"] - 1:
-                    endposition[i] = TASK["xquad"]["max seq length"] - 1
-                    break
-                if (
-                    train_encodings.input_ids[endposition[i] + 1]
-                    == tokenizer.eos_token_id
+            endposition = np.copy(startposition + 1)
+            for i, position in enumerate(endposition):
+                while my_answer[i] not in tokenizer.convert_tokens_to_string(
+                    tokenizer.convert_ids_to_tokens(
+                        context_encodings.input_ids[startposition[i] : endposition[i]]
+                    )
                 ):
+                    if endposition[i] > TASK["xquad"]["max seq length"] - 1:
+                        endposition[i] = TASK["xquad"]["max seq length"] - 1
+                        break
                     if (
-                        train_encodings.input_ids[endposition[i]]
-                        != tokenizer.eos_token_id
+                        context_encodings.input_ids[endposition[i] + 1]
+                        == tokenizer.eos_token_id
                     ):
-                        endposition[i] += 1
-                    break
-                endposition[i] += 1
-        return {
-            "tokens": torch.LongTensor(train_encodings.input_ids),
-            "start_positions": torch.tensor(startposition).long(),
-            "end_positions": torch.tensor(endposition).long(),
-            "id": features["id"],
-            "answers": features["answers"],
-        }
+                        if (
+                            context_encodings.input_ids[endposition[i]]
+                            != tokenizer.eos_token_id
+                        ):
+                            endposition[i] += 1
+                        break
+                    endposition[i] += 1
+            block_size = TASK["xquad"]["max seq length"]
+            question_size = len(question_encodings.input_ids)
+            max_context_size = block_size - question_size
+            for block_id in range(
+                1 + (len(context_encodings.input_ids) // max_context_size)
+            ):
+                context_size = min(
+                    max_context_size,
+                    len(context_encodings.input_ids) - block_id * max_context_size,
+                )
+                context_question_size = context_size + question_size
+                ids_block = np.ones(block_size, dtype=int) * tokenizer.pad_token_id
+                context_start = block_id * max_context_size
+                context_end = block_id * max_context_size + context_size
+                chosen_context = context_encodings.input_ids[context_start:context_end]
+                ids_block[:context_question_size] = np.hstack(
+                    (chosen_context, question_encodings.input_ids)
+                )
+                s_p = max_context_size
+                e_p = max_context_size
+                for i, s_potition in enumerate(startposition):
+                    if (
+                        context_start <= startposition[i]
+                        and startposition[i] < context_end
+                        and context_start <= endposition[i]
+                        and endposition[i] < context_end
+                    ):
+                        s_p = startposition[i]
+                        e_p = endposition[i]
+                        break
+                yield {
+                    "tokens": torch.from_numpy(ids_block).long(),
+                    "start_positions": torch.tensor(s_p).long(),
+                    "end_positions": torch.tensor(e_p).long(),
+                    "answer_offset": i,
+                    "features": features,
+                }
 
 
 class xquadTestDataset(torch.utils.data.Dataset):
@@ -1159,22 +1213,13 @@ class xquadTestDataset(torch.utils.data.Dataset):
             set_name, subset_name, split = TASK["xquad"]["test"][lan]
             self.dataset[lan] = get_dataset(set_name, subset_name)[split]
 
-    def __len__(self):
-        return sum(map(len, self.dataset.values()))
-
-    def __getitem__(self, id_absolute):
+    def __iter__(self, id):
         for lan in self.dataset:
-            length = len(self.dataset[lan])
-            if id_absolute < length:
-                id = id_absolute
-                features = self.dataset[lan][id]
-                train_encodings = tokenizer(
+            for features in self.dataset[lan]:
+                context_encodings = tokenizer(
                     features["context"],
-                    features["question"],
-                    max_length=TASK["xquad"]["max seq length"],
-                    truncation=True,
-                    padding="max_length",
                 )
+                question_encodings = tokenizer(features["question"])
                 startposition = np.array(features["answers"]["answer_start"])
                 for i, position in enumerate(startposition):
                     position = (
@@ -1192,12 +1237,16 @@ class xquadTestDataset(torch.utils.data.Dataset):
                         ]
                         == features["answers"]["text"][i]
                         else position - 2
+                        if features["context"][
+                            position
+                            - 2 : position
+                            + len(features["answers"]["text"][i])
+                            - 2
+                        ]
+                        == features["answers"]["text"][i]
+                        else position
                     )
-                    startposition[i] = (
-                        train_encodings.char_to_token(position)
-                        if train_encodings.char_to_token(position) is not None
-                        else TASK["xquad"]["max seq length"] - 1
-                    )
+                    startposition[i] = context_encodings.char_to_token(position)
                 my_answer = {}
                 for i, answer_txt in enumerate(features["answers"]["text"]):
                     my_answer[i] = tokenizer.convert_tokens_to_string(
@@ -1209,33 +1258,65 @@ class xquadTestDataset(torch.utils.data.Dataset):
                 for i, position in enumerate(endposition):
                     while my_answer[i] not in tokenizer.convert_tokens_to_string(
                         tokenizer.convert_ids_to_tokens(
-                            train_encodings.input_ids[startposition[i] : endposition[i]]
+                            context_encodings.input_ids[
+                                startposition[i] : endposition[i]
+                            ]
                         )
                     ):
                         if endposition[i] > TASK["xquad"]["max seq length"] - 1:
                             endposition[i] = TASK["xquad"]["max seq length"] - 1
                             break
                         if (
-                            train_encodings.input_ids[endposition[i] + 1]
+                            context_encodings.input_ids[endposition[i] + 1]
                             == tokenizer.eos_token_id
                         ):
                             if (
-                                train_encodings.input_ids[endposition[i]]
+                                context_encodings.input_ids[endposition[i]]
                                 != tokenizer.eos_token_id
                             ):
                                 endposition[i] += 1
                             break
                         endposition[i] += 1
-                return {
-                    "tokens": torch.LongTensor(train_encodings.input_ids),
-                    "start_positions": torch.tensor(startposition).long(),
-                    "end_positions": torch.tensor(endposition).long(),
-                    "id": features["id"],
-                    "answers": features["answers"],
-                    "lan": lan,
-                }
-            id_absolute -= length
-        raise StopIteration
+                block_size = TASK["xquad"]["max seq length"]
+                question_size = len(question_encodings.input_ids)
+                max_context_size = block_size - question_size
+                for block_id in range(
+                    1 + (len(context_encodings.input_ids) // max_context_size)
+                ):
+                    context_size = min(
+                        max_context_size,
+                        len(context_encodings.input_ids) - block_id * max_context_size,
+                    )
+                    context_question_size = context_size + question_size
+                    ids_block = np.ones(block_size, dtype=int) * tokenizer.pad_token_id
+                    context_start = block_id * max_context_size
+                    context_end = block_id * max_context_size + context_size
+                    chosen_context = context_encodings.input_ids[
+                        context_start:context_end
+                    ]
+                    ids_block[:context_question_size] = np.hstack(
+                        (chosen_context, question_encodings.input_ids)
+                    )
+                    s_p = max_context_size
+                    e_p = max_context_size
+                    for i, s_potition in enumerate(startposition):
+                        if (
+                            context_start <= startposition[i]
+                            and startposition[i] < context_end
+                            and context_start <= endposition[i]
+                            and endposition[i] < context_end
+                        ):
+                            s_p = startposition[i]
+                            e_p = endposition[i]
+                            break
+                    yield {
+                        "tokens": torch.from_numpy(ids_block).long(),
+                        "start_positions": torch.tensor(s_p).long(),
+                        "end_positions": torch.tensor(e_p).long(),
+                        "answer_offset": i,
+                        "features": features,
+                        "lan": lan,
+                    }
 
 
 class mlqaTestDataset(torch.utils.data.Dataset):
@@ -1245,22 +1326,13 @@ class mlqaTestDataset(torch.utils.data.Dataset):
             set_name, subset_name, split = TASK["mlqa"]["test"][lan]
             self.dataset[lan] = get_dataset(set_name, subset_name)[split]
 
-    def __len__(self):
-        return sum(map(len, self.dataset.values()))
-
-    def __getitem__(self, id_absolute):
+    def __iter__(self, id):
         for lan in self.dataset:
-            length = len(self.dataset[lan])
-            if id_absolute < length:
-                id = id_absolute
-                features = self.dataset[lan][id]
-                train_encodings = tokenizer(
+            for features in self.dataset[lan]:
+                context_encodings = tokenizer(
                     features["context"],
-                    features["question"],
-                    max_length=TASK["mlqa"]["max seq length"],
-                    truncation=True,
-                    padding="max_length",
                 )
+                question_encodings = tokenizer(features["question"])
                 startposition = np.array(features["answers"]["answer_start"])
                 for i, position in enumerate(startposition):
                     position = (
@@ -1278,12 +1350,16 @@ class mlqaTestDataset(torch.utils.data.Dataset):
                         ]
                         == features["answers"]["text"][i]
                         else position - 2
+                        if features["context"][
+                            position
+                            - 2 : position
+                            + len(features["answers"]["text"][i])
+                            - 2
+                        ]
+                        == features["answers"]["text"][i]
+                        else position
                     )
-                    startposition[i] = (
-                        train_encodings.char_to_token(position)
-                        if train_encodings.char_to_token(position) is not None
-                        else TASK["mlqa"]["max seq length"] - 1
-                    )
+                    startposition[i] = context_encodings.char_to_token(position)
                 my_answer = {}
                 for i, answer_txt in enumerate(features["answers"]["text"]):
                     my_answer[i] = tokenizer.convert_tokens_to_string(
@@ -1295,33 +1371,65 @@ class mlqaTestDataset(torch.utils.data.Dataset):
                 for i, position in enumerate(endposition):
                     while my_answer[i] not in tokenizer.convert_tokens_to_string(
                         tokenizer.convert_ids_to_tokens(
-                            train_encodings.input_ids[startposition[i] : endposition[i]]
+                            context_encodings.input_ids[
+                                startposition[i] : endposition[i]
+                            ]
                         )
                     ):
-                        if endposition[i] > TASK["xquad"]["max seq length"] - 1:
-                            endposition[i] = TASK["xquad"]["max seq length"] - 1
+                        if endposition[i] > TASK["mlqa"]["max seq length"] - 1:
+                            endposition[i] = TASK["mlqa"]["max seq length"] - 1
                             break
                         if (
-                            train_encodings.input_ids[endposition[i] + 1]
+                            context_encodings.input_ids[endposition[i] + 1]
                             == tokenizer.eos_token_id
                         ):
                             if (
-                                train_encodings.input_ids[endposition[i]]
+                                context_encodings.input_ids[endposition[i]]
                                 != tokenizer.eos_token_id
                             ):
                                 endposition[i] += 1
                             break
                         endposition[i] += 1
-                return {
-                    "tokens": torch.LongTensor(train_encodings.input_ids),
-                    "start_positions": torch.tensor(startposition).long(),
-                    "end_positions": torch.tensor(endposition).long(),
-                    "id": features["id"],
-                    "answers": features["answers"],
-                    "lan": lan,
-                }
-            id_absolute -= length
-        raise StopIteration
+                block_size = TASK["mlqa"]["max seq length"]
+                question_size = len(question_encodings.input_ids)
+                max_context_size = block_size - question_size
+                for block_id in range(
+                    1 + (len(context_encodings.input_ids) // max_context_size)
+                ):
+                    context_size = min(
+                        max_context_size,
+                        len(context_encodings.input_ids) - block_id * max_context_size,
+                    )
+                    context_question_size = context_size + question_size
+                    ids_block = np.ones(block_size, dtype=int) * tokenizer.pad_token_id
+                    context_start = block_id * max_context_size
+                    context_end = block_id * max_context_size + context_size
+                    chosen_context = context_encodings.input_ids[
+                        context_start:context_end
+                    ]
+                    ids_block[:context_question_size] = np.hstack(
+                        (chosen_context, question_encodings.input_ids)
+                    )
+                    s_p = max_context_size
+                    e_p = max_context_size
+                    for i, s_potition in enumerate(startposition):
+                        if (
+                            context_start <= startposition[i]
+                            and startposition[i] < context_end
+                            and context_start <= endposition[i]
+                            and endposition[i] < context_end
+                        ):
+                            s_p = startposition[i]
+                            e_p = endposition[i]
+                            break
+                    yield {
+                        "tokens": torch.from_numpy(ids_block).long(),
+                        "start_positions": torch.tensor(s_p).long(),
+                        "end_positions": torch.tensor(e_p).long(),
+                        "answer_offset": i,
+                        "features": features,
+                        "lan": lan,
+                    }
 
 
 class tydiqaTrainDataset(torch.utils.data.Dataset):
@@ -1329,73 +1437,104 @@ class tydiqaTrainDataset(torch.utils.data.Dataset):
         set_name, subset_name, split = TASK["tydiqa"]["train"]
         self.dataset = get_dataset(set_name, subset_name)[split]
 
-    def __len__(self):
-        return len(self.dataset)
-
-    def __getitem__(self, id):
-        features = self.dataset[id]
-        train_encodings = tokenizer(
-            features["context"],
-            features["question"],
-            max_length=TASK["tydiqa"]["max seq length"],
-            truncation=True,
-            padding="max_length",
-        )
-        startposition = np.array(features["answers"]["answer_start"])
-        for i, position in enumerate(startposition):
-            position = (
-                position
-                if features["context"][
-                    position : position + len(features["answers"]["text"][i])
-                ]
-                == features["answers"]["text"][i]
-                else position - 1
-                if features["context"][
-                    position - 1 : position + len(features["answers"]["text"][i]) - 1
-                ]
-                == features["answers"]["text"][i]
-                else position - 2
+    def __iter__(self, id):
+        for features in self.dataset:
+            context_encodings = tokenizer(
+                features["context"],
             )
-            startposition[i] = (
-                train_encodings.char_to_token(position)
-                if train_encodings.char_to_token(position) is not None
-                else TASK["tydiqa"]["max seq length"] - 1
-            )
-        my_answer = {}
-        for i, answer_txt in enumerate(features["answers"]["text"]):
-            my_answer[i] = tokenizer.convert_tokens_to_string(
-                tokenizer.convert_ids_to_tokens(
-                    tokenizer(features["answers"]["text"][i]).input_ids[1:-1]
+            question_encodings = tokenizer(features["question"])
+            startposition = np.array(features["answers"]["answer_start"])
+            for i, position in enumerate(startposition):
+                position = (
+                    position
+                    if features["context"][
+                        position : position + len(features["answers"]["text"][i])
+                    ]
+                    == features["answers"]["text"][i]
+                    else position - 1
+                    if features["context"][
+                        position
+                        - 1 : position
+                        + len(features["answers"]["text"][i])
+                        - 1
+                    ]
+                    == features["answers"]["text"][i]
+                    else position - 2
+                    if features["context"][
+                        position
+                        - 2 : position
+                        + len(features["answers"]["text"][i])
+                        - 2
+                    ]
+                    == features["answers"]["text"][i]
+                    else position
                 )
-            )
-        endposition = np.copy(startposition + 1)
-        for i, position in enumerate(endposition):
-            while my_answer[i] not in tokenizer.convert_tokens_to_string(
-                tokenizer.convert_ids_to_tokens(
-                    train_encodings.input_ids[startposition[i] : endposition[i]]
+                startposition[i] = context_encodings.char_to_token(position)
+            my_answer = {}
+            for i, answer_txt in enumerate(features["answers"]["text"]):
+                my_answer[i] = tokenizer.convert_tokens_to_string(
+                    tokenizer.convert_ids_to_tokens(
+                        tokenizer(features["answers"]["text"][i]).input_ids[1:-1]
+                    )
                 )
-            ):
-                if endposition[i] > TASK["xquad"]["max seq length"] - 1:
-                    endposition[i] = TASK["xquad"]["max seq length"] - 1
-                    break
-                if (
-                    train_encodings.input_ids[endposition[i] + 1]
-                    == tokenizer.eos_token_id
+            endposition = np.copy(startposition + 1)
+            for i, position in enumerate(endposition):
+                while my_answer[i] not in tokenizer.convert_tokens_to_string(
+                    tokenizer.convert_ids_to_tokens(
+                        context_encodings.input_ids[startposition[i] : endposition[i]]
+                    )
                 ):
+                    if endposition[i] > TASK["tydiqa"]["max seq length"] - 1:
+                        endposition[i] = TASK["tydiqa"]["max seq length"] - 1
+                        break
                     if (
-                        train_encodings.input_ids[endposition[i]]
-                        != tokenizer.eos_token_id
+                        context_encodings.input_ids[endposition[i] + 1]
+                        == tokenizer.eos_token_id
                     ):
-                        endposition[i] += 1
-                    break
-                endposition[i] += 1
-        return {
-            "tokens": torch.LongTensor(train_encodings.input_ids),
-            "start_positions": torch.tensor(startposition).long(),
-            "end_positions": torch.tensor(endposition).long(),
-            "id": features["id"],
-            "answers": features["answers"],
-        }
+                        if (
+                            context_encodings.input_ids[endposition[i]]
+                            != tokenizer.eos_token_id
+                        ):
+                            endposition[i] += 1
+                        break
+                    endposition[i] += 1
+            block_size = TASK["tydiqa"]["max seq length"]
+            question_size = len(question_encodings.input_ids)
+            max_context_size = block_size - question_size
+            for block_id in range(
+                1 + (len(context_encodings.input_ids) // max_context_size)
+            ):
+                context_size = min(
+                    max_context_size,
+                    len(context_encodings.input_ids) - block_id * max_context_size,
+                )
+                context_question_size = context_size + question_size
+                ids_block = np.ones(block_size, dtype=int) * tokenizer.pad_token_id
+                context_start = block_id * max_context_size
+                context_end = block_id * max_context_size + context_size
+                chosen_context = context_encodings.input_ids[context_start:context_end]
+                ids_block[:context_question_size] = np.hstack(
+                    (chosen_context, question_encodings.input_ids)
+                )
+                s_p = max_context_size
+                e_p = max_context_size
+                for i, s_potition in enumerate(startposition):
+                    if (
+                        context_start <= startposition[i]
+                        and startposition[i] < context_end
+                        and context_start <= endposition[i]
+                        and endposition[i] < context_end
+                    ):
+                        s_p = startposition[i]
+                        e_p = endposition[i]
+                        break
+                yield {
+                    "tokens": torch.from_numpy(ids_block).long(),
+                    "start_positions": torch.tensor(s_p).long(),
+                    "end_positions": torch.tensor(e_p).long(),
+                    "answer_offset": i,
+                    "features": features,
+                }
 
 
 LANG2ISO = {
@@ -1416,74 +1555,105 @@ class tydiqaTestDataset(torch.utils.data.Dataset):
         set_name, subset_name, split = TASK["tydiqa"]["test"]
         self.dataset = get_dataset(set_name, subset_name)[split]
 
-    def __len__(self):
-        return len(self.dataset)
-
-    def __getitem__(self, id):
-        features = self.dataset[id]
-        train_encodings = tokenizer(
-            features["context"],
-            features["question"],
-            max_length=TASK["tydiqa"]["max seq length"],
-            truncation=True,
-            padding="max_length",
-        )
-        startposition = np.array(features["answers"]["answer_start"])
-        for i, position in enumerate(startposition):
-            position = (
-                position
-                if features["context"][
-                    position : position + len(features["answers"]["text"][i])
-                ]
-                == features["answers"]["text"][i]
-                else position - 1
-                if features["context"][
-                    position - 1 : position + len(features["answers"]["text"][i]) - 1
-                ]
-                == features["answers"]["text"][i]
-                else position - 2
+    def __iter__(self, id):
+        for features in self.dataset:
+            context_encodings = tokenizer(
+                features["context"],
             )
-            startposition[i] = (
-                train_encodings.char_to_token(position)
-                if train_encodings.char_to_token(position) is not None
-                else TASK["tydiqa"]["max seq length"] - 1
-            )
-        my_answer = {}
-        for i, answer_txt in enumerate(features["answers"]["text"]):
-            my_answer[i] = tokenizer.convert_tokens_to_string(
-                tokenizer.convert_ids_to_tokens(
-                    tokenizer(features["answers"]["text"][i]).input_ids[1:-1]
+            question_encodings = tokenizer(features["question"])
+            startposition = np.array(features["answers"]["answer_start"])
+            for i, position in enumerate(startposition):
+                position = (
+                    position
+                    if features["context"][
+                        position : position + len(features["answers"]["text"][i])
+                    ]
+                    == features["answers"]["text"][i]
+                    else position - 1
+                    if features["context"][
+                        position
+                        - 1 : position
+                        + len(features["answers"]["text"][i])
+                        - 1
+                    ]
+                    == features["answers"]["text"][i]
+                    else position - 2
+                    if features["context"][
+                        position
+                        - 2 : position
+                        + len(features["answers"]["text"][i])
+                        - 2
+                    ]
+                    == features["answers"]["text"][i]
+                    else position
                 )
-            )
-        endposition = np.copy(startposition + 1)
-        for i, position in enumerate(endposition):
-            while my_answer[i] not in tokenizer.convert_tokens_to_string(
-                tokenizer.convert_ids_to_tokens(
-                    train_encodings.input_ids[startposition[i] : endposition[i]]
+                startposition[i] = context_encodings.char_to_token(position)
+            my_answer = {}
+            for i, answer_txt in enumerate(features["answers"]["text"]):
+                my_answer[i] = tokenizer.convert_tokens_to_string(
+                    tokenizer.convert_ids_to_tokens(
+                        tokenizer(features["answers"]["text"][i]).input_ids[1:-1]
+                    )
                 )
-            ):
-                if endposition[i] > TASK["xquad"]["max seq length"] - 1:
-                    endposition[i] = TASK["xquad"]["max seq length"] - 1
-                    break
-                if (
-                    train_encodings.input_ids[endposition[i] + 1]
-                    == tokenizer.eos_token_id
+            endposition = np.copy(startposition + 1)
+            for i, position in enumerate(endposition):
+                while my_answer[i] not in tokenizer.convert_tokens_to_string(
+                    tokenizer.convert_ids_to_tokens(
+                        context_encodings.input_ids[startposition[i] : endposition[i]]
+                    )
                 ):
+                    if endposition[i] > TASK["tydiqa"]["max seq length"] - 1:
+                        endposition[i] = TASK["tydiqa"]["max seq length"] - 1
+                        break
                     if (
-                        train_encodings.input_ids[endposition[i]]
-                        != tokenizer.eos_token_id
+                        context_encodings.input_ids[endposition[i] + 1]
+                        == tokenizer.eos_token_id
                     ):
-                        endposition[i] += 1
-                    break
-                endposition[i] += 1
-        return {
-            "tokens": torch.LongTensor(train_encodings.input_ids),
-            "start_positions": torch.tensor(startposition).long(),
-            "end_positions": torch.tensor(endposition).long(),
-            "id": features["id"],
-            "answers": features["answers"],
-            "lan": LANG2ISO[features["id"].split("-")[0]],
-        }
+                        if (
+                            context_encodings.input_ids[endposition[i]]
+                            != tokenizer.eos_token_id
+                        ):
+                            endposition[i] += 1
+                        break
+                    endposition[i] += 1
+            block_size = TASK["tydiqa"]["max seq length"]
+            question_size = len(question_encodings.input_ids)
+            max_context_size = block_size - question_size
+            for block_id in range(
+                1 + (len(context_encodings.input_ids) // max_context_size)
+            ):
+                context_size = min(
+                    max_context_size,
+                    len(context_encodings.input_ids) - block_id * max_context_size,
+                )
+                context_question_size = context_size + question_size
+                ids_block = np.ones(block_size, dtype=int) * tokenizer.pad_token_id
+                context_start = block_id * max_context_size
+                context_end = block_id * max_context_size + context_size
+                chosen_context = context_encodings.input_ids[context_start:context_end]
+                ids_block[:context_question_size] = np.hstack(
+                    (chosen_context, question_encodings.input_ids)
+                )
+                s_p = max_context_size
+                e_p = max_context_size
+                for i, s_potition in enumerate(startposition):
+                    if (
+                        context_start <= startposition[i]
+                        and startposition[i] < context_end
+                        and context_start <= endposition[i]
+                        and endposition[i] < context_end
+                    ):
+                        s_p = startposition[i]
+                        e_p = endposition[i]
+                        break
+                yield {
+                    "tokens": torch.from_numpy(ids_block).long(),
+                    "start_positions": torch.tensor(s_p).long(),
+                    "end_positions": torch.tensor(e_p).long(),
+                    "answer_offset": i,
+                    "features": features,
+                    "lan": LANG2ISO[features["id"].split("-")[0]],
+                }
 
 
 class bucc2018Dataset(torch.utils.data.Dataset):
@@ -1500,7 +1670,7 @@ class bucc2018Dataset(torch.utils.data.Dataset):
         for lan in self.dataset:
             length = len(self.dataset[lan])
             if id_absolute < length:
-                id = id_absolute
+                instnace_id = id_absolute
                 features = self.dataset[lan][id]
                 source_encodings = tokenizer(
                     features["source_sentence"],
@@ -1537,7 +1707,7 @@ class tatoebaDataset(torch.utils.data.Dataset):
         for lan in self.dataset:
             length = len(self.dataset[lan])
             if id_absolute < length:
-                id = id_absolute
+                instnace_id = id_absolute
                 features = self.dataset[lan][id]
                 source_encodings = tokenizer(
                     features["source_sentence"],
