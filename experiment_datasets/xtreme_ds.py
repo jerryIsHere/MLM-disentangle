@@ -574,8 +574,10 @@ class udposTrainDataset(torch.utils.data.Dataset):
                 self.dataset,
             )
         )
+
     def __iter__(self):
         return self
+
     def __next__(self):
         for features in random.sample(
             self.dataset_features, len(self.dataset_features)
@@ -625,6 +627,7 @@ class udposValidationDataset(torch.utils.data.Dataset):
 
     def __iter__(self):
         return self
+
     def __next__(self):
         for features in self.dataset:
             txt = features["tokens"]
@@ -674,6 +677,7 @@ class udposTestDataset(torch.utils.data.Dataset):
 
     def __iter__(self):
         return self
+
     def __next__(self):
         for lan in self.dataset:
             for features in self.dataset[lan]:
@@ -744,6 +748,7 @@ class panxTrainDataset(torch.utils.data.Dataset):
 
     def __iter__(self):
         return self
+
     def __next__(self):
         for features in random.sample(
             self.dataset_features, len(self.dataset_features)
@@ -793,6 +798,7 @@ class panxValidationDataset(torch.utils.data.Dataset):
 
     def __iter__(self):
         return self
+
     def __next__(self):
         for features in self.dataset:
             txt = features["tokens"]
@@ -842,6 +848,7 @@ class panxTestDataset(torch.utils.data.Dataset):
 
     def __iter__(self):
         return self
+
     def __next__(self):
         for lan in self.dataset:
             for features in self.dataset[lan]:
@@ -1202,6 +1209,7 @@ class xquadTrainDataset(torch.utils.data.Dataset):
 
     def __iter__(self):
         return self
+
     def __next__(self):
         for features in random.sample(
             self.dataset_features, len(self.dataset_features)
@@ -1217,6 +1225,7 @@ class xquadValidationDataset(torch.utils.data.Dataset):
 
     def __iter__(self):
         return self
+
     def __next__(self):
         for features in self.dataset:
             yield features_to_torch_example(features)
@@ -1232,6 +1241,7 @@ class xquadTestDataset(torch.utils.data.Dataset):
 
     def __iter__(self):
         return self
+
     def __next__(self):
         for lan in self.dataset:
             for features in self.dataset[lan]:
@@ -1248,6 +1258,7 @@ class mlqaTestDataset(torch.utils.data.Dataset):
 
     def __iter__(self):
         return self
+
     def __next__(self):
         for lan in self.dataset:
             for features in self.dataset[lan]:
@@ -1272,6 +1283,7 @@ class tydiqaTrainDataset(torch.utils.data.Dataset):
 
     def __iter__(self):
         return self
+
     def __next__(self):
         for features in random.sample(
             self.dataset_features, len(self.dataset_features)
@@ -1302,6 +1314,7 @@ class tydiqaTestDataset(torch.utils.data.Dataset):
 
     def __iter__(self):
         return self
+
     def __next__(self):
         for features in self.dataset:
             yield features_to_torch_example(
