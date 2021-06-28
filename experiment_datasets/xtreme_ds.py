@@ -1162,7 +1162,7 @@ class xquadTrainDataset(torch.utils.data.Dataset):
         self.dataset = get_dataset(set_name, subset_name)[split]
         self.dataset_features = [features for features in self.dataset]
     def __len__(self):
-        return len(self.dataseZ)
+        return len(self.datase)
 
     def __iter__(self):
         for features in random.sample(self.dataset_features, len(self.dataset_features)):
