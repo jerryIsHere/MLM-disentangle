@@ -548,13 +548,12 @@ def batcher(iterableDS, batch_size):
     it = iter(iterableDS)
     while True:
         batch = list()
-        for i in range(max(1, batch_size)):
-            try:
-                batch.append(next(it))
-            except StopIteration:
-                raise StopIteration
-        yield reducer(batch)
-
+        try:
+            for i in range(max(1, batch_size)):
+                    batch.append(next(it))
+            yield reducer(batch)
+        except StopIteration:
+            raise StopIteration
 
 class udposTrainDataset(torch.utils.data.Dataset):
     def __init__(self):
