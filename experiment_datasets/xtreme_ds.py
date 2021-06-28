@@ -1066,24 +1066,7 @@ def features_to_torch_example(features, lan):
                 if endposition[i] < context_end:
                     s_p = startposition[i] - context_start
                     e_p = endposition[i] - context_start
-                    return (
-                        {
-                            "tokens": torch.from_numpy(ids_block).long(),
-                            "start_positions": torch.tensor(s_p).long(),
-                            "end_positions": torch.tensor(e_p).long(),
-                            "answer_offset": i,
-                            "features": features,
-                        }
-                        if lan is None
-                        else {
-                            "tokens": torch.from_numpy(ids_block).long(),
-                            "start_positions": torch.tensor(s_p).long(),
-                            "end_positions": torch.tensor(e_p).long(),
-                            "answer_offset": i,
-                            "features": features,
-                            "lan": lan,
-                        }
-                    )
+
                 else:
                     offset = endposition[i] - context_end
                     context_size = min(
@@ -1104,24 +1087,24 @@ def features_to_torch_example(features, lan):
                     )
                     s_p = startposition[i] - context_start
                     e_p = endposition[i] - context_start
-                    return (
-                        {
-                            "tokens": torch.from_numpy(ids_block).long(),
-                            "start_positions": torch.tensor(s_p).long(),
-                            "end_positions": torch.tensor(e_p).long(),
-                            "answer_offset": i,
-                            "features": features,
-                        }
-                        if lan is None
-                        else {
-                            "tokens": torch.from_numpy(ids_block).long(),
-                            "start_positions": torch.tensor(s_p).long(),
-                            "end_positions": torch.tensor(e_p).long(),
-                            "answer_offset": i,
-                            "features": features,
-                            "lan": lan,
-                        }
-                    )
+                return (
+                    {
+                        "tokens": torch.from_numpy(ids_block).long(),
+                        "start_positions": torch.tensor(s_p).long(),
+                        "end_positions": torch.tensor(e_p).long(),
+                        "answer_offset": i,
+                        "features": features,
+                    }
+                    if lan is None
+                    else {
+                        "tokens": torch.from_numpy(ids_block).long(),
+                        "start_positions": torch.tensor(s_p).long(),
+                        "end_positions": torch.tensor(e_p).long(),
+                        "answer_offset": i,
+                        "features": features,
+                        "lan": lan,
+                    }
+                )
     raise Exception()
 
 
