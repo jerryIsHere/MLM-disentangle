@@ -693,6 +693,18 @@ class panxTrainDataset(torch.utils.data.Dataset):
         set_name, subset_name, split = TASK["panx"]["train"]
         self.dataset = get_dataset(set_name, subset_name)[split]
 
+    def __len__(self):
+        return sum(
+            map(
+                lambda features: 1
+                + (
+                    len(tokenizer(features["tokens"]).input_ids)
+                    // TASK["udpos"]["max seq length"]
+                ),
+                self.dataset,
+            )
+        )
+
     def __iter__(self):
         for features in random.shuffle(self.dataset):
             txt = features["tokens"]
