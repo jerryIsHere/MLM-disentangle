@@ -533,6 +533,7 @@ import torch
 
 class udposTrainDataset(torch.utils.data.Dataset):
     def __init__(self):
+        self.task = "udpos"
         set_name, subset_name, split = TASK["udpos"]["train"]
         self.dataset = get_dataset(set_name, subset_name)[split]
 
@@ -577,6 +578,7 @@ class udposTrainDataset(torch.utils.data.Dataset):
 
 class udposValidationDataset(torch.utils.data.Dataset):
     def __init__(self):
+        self.task = "udpos"
         set_name, subset_name, split = TASK["udpos"]["validation"]
         self.dataset = get_dataset(set_name, subset_name)[split]
 
@@ -621,6 +623,7 @@ class udposValidationDataset(torch.utils.data.Dataset):
 
 class udposTestDataset(torch.utils.data.Dataset):
     def __init__(self):
+        self.task = "udpos"
         self.dataset = {}
         for lan in TASK["udpos"]["test"]:
             set_name, subset_name, split = TASK["udpos"]["test"][lan]
@@ -673,6 +676,7 @@ class udposTestDataset(torch.utils.data.Dataset):
 
 class panxTrainDataset(torch.utils.data.Dataset):
     def __init__(self):
+        self.task = "panx"
         set_name, subset_name, split = TASK["panx"]["train"]
         self.dataset = get_dataset(set_name, subset_name)[split]
 
@@ -717,6 +721,7 @@ class panxTrainDataset(torch.utils.data.Dataset):
 
 class panxValidationDataset(torch.utils.data.Dataset):
     def __init__(self):
+        self.task = "panx"
         set_name, subset_name, split = TASK["panx"]["validation"]
         self.dataset = get_dataset(set_name, subset_name)[split]
 
@@ -761,6 +766,7 @@ class panxValidationDataset(torch.utils.data.Dataset):
 
 class panxTestDataset(torch.utils.data.Dataset):
     def __init__(self):
+        self.task = "panx"
         self.dataset = {}
         for lan in TASK["panx"]["test"]:
             set_name, subset_name, split = TASK["panx"]["test"][lan]
@@ -815,6 +821,7 @@ class xnliTrainDataset(torch.utils.data.Dataset):
     class_label = [0, 1, 2]
 
     def __init__(self):
+        self.task = "xnli"
         set_name, subset_name, split = TASK["xnli"]["train"]
         self.dataset = get_dataset(set_name, subset_name)[split]
 
@@ -840,6 +847,7 @@ class xnliTrainDataset(torch.utils.data.Dataset):
 
 class xnliValidationDataset(torch.utils.data.Dataset):
     def __init__(self):
+        self.task = "xnli"
         self.dataset = {}
         for split in TASK["xnli"]["validation"]:
             set_name, subset_name, split = TASK["xnli"]["validation"][split]
@@ -875,6 +883,7 @@ class xnliTestDataset(torch.utils.data.Dataset):
     class_label = ["entailment", "neutral", "contradiction"]
 
     def __init__(self):
+        self.task = "xnli"
         set_name, subset_name, split = TASK["xnli"]["test"]
         self.dataset = get_dataset(set_name, subset_name)[split]
 
@@ -906,6 +915,7 @@ class pawsxTrainDataset(torch.utils.data.Dataset):
     ]
 
     def __init__(self):
+        self.task = "pawsx"
         set_name, subset_name, split = TASK["pawsx"]["train"]
         self.dataset = get_dataset(set_name, subset_name)[split]
 
@@ -931,6 +941,7 @@ class pawsxTrainDataset(torch.utils.data.Dataset):
 
 class pawsxValidationDataset(torch.utils.data.Dataset):
     def __init__(self):
+        self.task = "pawsx"
         set_name, subset_name, split = TASK["pawsx"]["validation"]
         self.dataset = get_dataset(set_name, subset_name)[split]
 
@@ -956,6 +967,7 @@ class pawsxValidationDataset(torch.utils.data.Dataset):
 
 class pawsxTestDataset(torch.utils.data.Dataset):
     def __init__(self):
+        self.task = "pawsx"
         self.dataset = {}
         for lan in TASK["pawsx"]["test"]:
             set_name, subset_name, split = TASK["pawsx"]["test"][lan]
@@ -988,7 +1000,7 @@ class pawsxTestDataset(torch.utils.data.Dataset):
         raise StopIteration
 
 
-def features_to_torch_example(features, lan = None):
+def features_to_torch_example(features, lan=None):
     context_encodings = tokenizer(
         features["context"],
     )
@@ -1110,6 +1122,7 @@ def features_to_torch_example(features, lan = None):
 
 class xquadTrainDataset(torch.utils.data.Dataset):
     def __init__(self):
+        self.task = "xquad"
         set_name, subset_name, split = TASK["xquad"]["train"]
         self.dataset = get_dataset(set_name, subset_name)[split]
 
@@ -1120,6 +1133,7 @@ class xquadTrainDataset(torch.utils.data.Dataset):
 
 class xquadValidationDataset(torch.utils.data.Dataset):
     def __init__(self):
+        self.task = "xquad"
         set_name, subset_name, split = TASK["xquad"]["validation"]
         self.dataset = get_dataset(set_name, subset_name)[split]
 
@@ -1130,6 +1144,7 @@ class xquadValidationDataset(torch.utils.data.Dataset):
 
 class xquadTestDataset(torch.utils.data.Dataset):
     def __init__(self):
+        self.task = "xquad"
         self.dataset = {}
         for lan in TASK["xquad"]["test"]:
             set_name, subset_name, split = TASK["xquad"]["test"][lan]
@@ -1143,6 +1158,7 @@ class xquadTestDataset(torch.utils.data.Dataset):
 
 class mlqaTestDataset(torch.utils.data.Dataset):
     def __init__(self):
+        self.task = "mlqa"
         self.dataset = {}
         for lan in TASK["mlqa"]["test"]:
             set_name, subset_name, split = TASK["mlqa"]["test"][lan]
@@ -1156,6 +1172,7 @@ class mlqaTestDataset(torch.utils.data.Dataset):
 
 class tydiqaTrainDataset(torch.utils.data.Dataset):
     def __init__(self):
+        self.task = "tydiqa"
         set_name, subset_name, split = TASK["tydiqa"]["train"]
         self.dataset = get_dataset(set_name, subset_name)[split]
 
@@ -1181,6 +1198,7 @@ LANG2ISO = {
 
 class tydiqaTestDataset(torch.utils.data.Dataset):
     def __init__(self):
+        self.task = "tydiqa"
         set_name, subset_name, split = TASK["tydiqa"]["test"]
         self.dataset = get_dataset(set_name, subset_name)[split]
 
@@ -1193,6 +1211,7 @@ class tydiqaTestDataset(torch.utils.data.Dataset):
 
 class bucc2018Dataset(torch.utils.data.Dataset):
     def __init__(self):
+        self.task = "bucc2018"
         self.dataset = {}
         for lan in TASK["bucc2018"]["src"]:
             set_name, subset_name, split = TASK["bucc2018"]["src"][lan]
@@ -1230,6 +1249,7 @@ class bucc2018Dataset(torch.utils.data.Dataset):
 
 class tatoebaDataset(torch.utils.data.Dataset):
     def __init__(self):
+        self.task = "tatoeba"
         self.dataset = {}
         for lan in TASK["tatoeba"]["src"]:
             set_name, subset_name, split = TASK["tatoeba"]["src"][lan]

@@ -112,7 +112,7 @@ assert i == len(ds) - 1
 ds = xtreme_ds.pawsxTestDataset()
 for i, each in enumerate(ds):
     instnace_id = i
-    for lan in ds.dataset:
+    for lan in xtreme_ds.TASK2LANGS[ds.task]:
         length = len(ds.dataset[lan])
         if instnace_id < length:
             break
@@ -183,15 +183,19 @@ assert len(instnace_ids[ds.__class__.__name__]) == len(
     ds.dataset
 )  # each question is at least answered once
 ds = xtreme_ds.xquadTestDataset()
-squad_metrics[ds.__class__.__name__] = datasets.load_metric("squad")
-instnace_ids[ds.__class__.__name__] = set()
+squad_metrics[ds.__class__.__name__] = {}
+instnace_ids[ds.__class__.__name__] = {}
+for lan in xtreme_ds.TASK2LANGS[ds.task]:
+    squad_metrics[ds.__class__.__name__][lan] = datasets.load_metric("squad")
+    instnace_ids[ds.__class__.__name__][lan] = set()
 for i, each in enumerate(ds):
-    instnace_ids[ds.__class__.__name__].add(each["lan"] + each["features"]["id"])
+    lan = each["lan"]
+    instnace_ids[ds.__class__.__name__][lan].add(each["features"]["id"])
     reply = normalize_ids(
         each["tokens"][each["start_positions"] : each["end_positions"]]
     )
 
-    squad_metrics[ds.__class__.__name__].add(
+    squad_metrics[ds.__class__.__name__][lan].add(
         prediction={
             "id": each["features"]["id"],
             "prediction_text": reply,
@@ -206,21 +210,25 @@ for i, each in enumerate(ds):
             },
         },
     )
-assert len(instnace_ids[ds.__class__.__name__]) == sum(
-    map(len, ds.dataset.values())
-)  # each question is at least answered once
+for lan in xtreme_ds.TASK2LANGS[ds.task]:
+    assert len(instnace_ids[ds.__class__.__name__][lan]) == len(ds.dataset[lan])
+    # each question is at least answered once
 
 
 ds = xtreme_ds.mlqaTestDataset()
-squad_metrics[ds.__class__.__name__] = datasets.load_metric("squad")
-instnace_ids[ds.__class__.__name__] = set()
+squad_metrics[ds.__class__.__name__] = {}
+instnace_ids[ds.__class__.__name__] = {}
+for lan in xtreme_ds.TASK2LANGS[ds.task]:
+    squad_metrics[ds.__class__.__name__][lan] = datasets.load_metric("squad")
+    instnace_ids[ds.__class__.__name__][lan] = set()
 for i, each in enumerate(ds):
-    instnace_ids[ds.__class__.__name__].add(each["lan"] + each["features"]["id"])
+    lan = each["lan"]
+    instnace_ids[ds.__class__.__name__][lan].add(each["features"]["id"])
     reply = normalize_ids(
         each["tokens"][each["start_positions"] : each["end_positions"]]
     )
 
-    squad_metrics[ds.__class__.__name__].add(
+    squad_metrics[ds.__class__.__name__][lan].add(
         prediction={
             "id": each["features"]["id"],
             "prediction_text": reply,
@@ -235,9 +243,9 @@ for i, each in enumerate(ds):
             },
         },
     )
-assert len(instnace_ids[ds.__class__.__name__]) == sum(
-    map(len, ds.dataset.values())
-)  # each question is at least answered once
+for lan in xtreme_ds.TASK2LANGS[ds.task]:
+    assert len(instnace_ids[ds.__class__.__name__][lan]) == len(ds.dataset[lan])
+    # each question is at least answered once
 
 
 ds = xtreme_ds.tydiqaTrainDataset()
@@ -272,15 +280,19 @@ assert len(instnace_ids[ds.__class__.__name__]) == len(
     ]
 )  # each question is at least answered once
 ds = xtreme_ds.tydiqaTestDataset()
-squad_metrics[ds.__class__.__name__] = datasets.load_metric("squad")
-instnace_ids[ds.__class__.__name__] = set()
+squad_metrics[ds.__class__.__name__] = {}
+instnace_ids[ds.__class__.__name__] = {}
+for lan in xtreme_ds.LANG2ISO.values():
+    squad_metrics[ds.__class__.__name__][lan] = datasets.load_metric("squad")
+    instnace_ids[ds.__class__.__name__][lan] = set()
 for i, each in enumerate(ds):
-    instnace_ids[ds.__class__.__name__].add(each["features"]["id"])
+    lan = each["lan"]
+    instnace_ids[ds.__class__.__name__][lan].add(each["features"]["id"])
     reply = normalize_ids(
         each["tokens"][each["start_positions"] : each["end_positions"]]
     )
 
-    squad_metrics[ds.__class__.__name__].add(
+    squad_metrics[ds.__class__.__name__][lan].add(
         prediction={
             "id": each["features"]["id"],
             "prediction_text": reply,
@@ -295,9 +307,9 @@ for i, each in enumerate(ds):
             },
         },
     )
-assert len(instnace_ids[ds.__class__.__name__]) == len(
-    ds.dataset
-)  # each question is at least answered once
+for lan in xtreme_ds.TASK2LANGS[ds.task]:
+    assert len(instnace_ids[ds.__class__.__name__][lan]) == len(ds.dataset[lan])
+    # each question is at least answered once
 
 
 ds = xtreme_ds.bucc2018Dataset()
@@ -311,4 +323,9 @@ assert i == len(ds) - 1
 print("check done")
 for dataset_name in squad_metrics:
     print(dataset_name)
-    print(squad_metrics[dataset_name].compute())
+    if "Test" in dataset_name:
+        for lan in squad_metrics[dataset_name]:
+            print(lan)
+            print(squad_metrics[dataset_name][lan].compute())
+    else:
+        print(squad_metrics[dataset_name].compute())
