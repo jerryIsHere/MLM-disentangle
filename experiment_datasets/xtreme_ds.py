@@ -549,7 +549,6 @@ def batcher(iterableDS, batch_size):
         batch = list()
         for i in range(max(1, batch_size)):
             batch.append(next(iterableDS))
-        reducer(batch, output_batch)
         yield reducer(batch)
 
 
