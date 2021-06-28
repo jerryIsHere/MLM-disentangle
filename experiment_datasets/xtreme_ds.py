@@ -545,7 +545,7 @@ def reducer(source):
 
 
 def batcher(iterableDS, batch_size):
-    it = iter(next(iterableDS))
+    it = iter(iterableDS)
     while True:
         batch = list()
         for i in range(max(1, batch_size)):
