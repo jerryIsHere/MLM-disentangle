@@ -534,10 +534,10 @@ import random
 
 def batcher(iterableDS, batch_size):
     while True:
-        batch = torch.stack(next(iterableDS))
-        for i in range(max(0, batch_size - 1)):
-            batch = torch.stack((batch, next(iterableDS)))
-        yield batch
+        batch = list()
+        for i in range(max(1, batch_size)):
+            batch.append(next(iterableDS))
+        yield torch.stack(batch)
 
 
 class udposTrainDataset(torch.utils.data.Dataset):
@@ -545,6 +545,7 @@ class udposTrainDataset(torch.utils.data.Dataset):
         self.task = "udpos"
         set_name, subset_name, split = TASK["udpos"]["train"]
         self.dataset = get_dataset(set_name, subset_name)[split]
+        self.dataset_features = [features for features in self.dataset]
 
     def __len__(self):
         return sum(
@@ -559,7 +560,7 @@ class udposTrainDataset(torch.utils.data.Dataset):
         )
 
     def __iter__(self):
-        for features in random.shuffle(self.dataset):
+        for features in random.shuffle(self.dataset_features):
             txt = features["tokens"]
             for i, each in enumerate(txt):
                 txt[i] = tokenizer._tokenizer.normalizer.normalize_str(txt[i])
@@ -700,6 +701,7 @@ class panxTrainDataset(torch.utils.data.Dataset):
         self.task = "panx"
         set_name, subset_name, split = TASK["panx"]["train"]
         self.dataset = get_dataset(set_name, subset_name)[split]
+        self.dataset_features = [features for features in self.dataset]
 
     def __len__(self):
         return sum(
@@ -714,7 +716,7 @@ class panxTrainDataset(torch.utils.data.Dataset):
         )
 
     def __iter__(self):
-        for features in random.shuffle(self.dataset):
+        for features in random.shuffle(self.dataset_features):
             txt = features["tokens"]
             for i, each in enumerate(txt):
                 txt[i] = tokenizer._tokenizer.normalizer.normalize_str(txt[i])
@@ -1158,12 +1160,12 @@ class xquadTrainDataset(torch.utils.data.Dataset):
         self.task = "xquad"
         set_name, subset_name, split = TASK["xquad"]["train"]
         self.dataset = get_dataset(set_name, subset_name)[split]
-
+        self.dataset_features = [features for features in self.dataset]
     def __len__(self):
         return len(self.dataseZ)
 
     def __iter__(self):
-        for features in random.shuffle(self.dataset):
+        for features in random.shuffle(self.dataset_features):
             yield features_to_torch_example(features)
 
 
@@ -1211,7 +1213,7 @@ class tydiqaTrainDataset(torch.utils.data.Dataset):
         self.task = "tydiqa"
         set_name, subset_name, split = TASK["tydiqa"]["train"]
         self.dataset = get_dataset(set_name, subset_name)[split]
-
+        self.dataset_features = [features for features in self.dataset]
     def __len__(self):
         return len(
             [
@@ -1222,7 +1224,7 @@ class tydiqaTrainDataset(torch.utils.data.Dataset):
         )
 
     def __iter__(self):
-        for features in random.shuffle(self.dataset):
+        for features in random.shuffle(self.dataset_features):
             if LANG2ISO[features["id"].split("-")[0]] != "en":
                 continue
             yield features_to_torch_example(features)
