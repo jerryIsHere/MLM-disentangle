@@ -553,7 +553,8 @@ def batcher(iterableDS, batch_size):
                     batch.append(next(it))
             yield reducer(batch)
         except StopIteration:
-            raise StopIteration
+            break
+    #raise StopIteration
 
 class udposTrainDataset(torch.utils.data.Dataset):
     def __init__(self):
