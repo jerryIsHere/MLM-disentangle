@@ -553,8 +553,9 @@ class udposTrainDataset(torch.utils.data.Dataset):
                 lambda features: 1
                 + (
                     len(
-                        tokenizer(features["tokens"]).input_ids,
-                        is_split_into_words=True,
+                        tokenizer(
+                            features["tokens"], is_split_into_words=True
+                        ).input_ids,
                     )
                     // TASK["udpos"]["max seq length"]
                 ),
@@ -714,8 +715,9 @@ class panxTrainDataset(torch.utils.data.Dataset):
                 lambda features: 1
                 + (
                     len(
-                        tokenizer(features["tokens"]).input_ids,
-                        is_split_into_words=True,
+                        tokenizer(
+                            features["tokens"], is_split_into_words=True
+                        ).input_ids
                     )
                     // TASK["panx"]["max seq length"]
                 ),
