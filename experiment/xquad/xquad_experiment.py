@@ -15,34 +15,25 @@ task = "xquad"
 
 
 def normalize_string(txt):
-    return txt
-    if re.search("^[\d]+$", txt):
+    if " " in txt:
         return txt
-    tokenized_detokenized = " ".join(
-        xtreme_ds.tokenizer.convert_ids_to_tokens(
-            xtreme_ds.tokenizer(txt).input_ids[1:-1]
-        )
+    return " ".join(
+        [
+            xtreme_ds.tokenizer.convert_tokens_to_string(token)
+            for token in xtreme_ds.tokenizer.convert_ids_to_tokens(
+                xtreme_ds.tokenizer(txt).input_ids[1:-1]
+            )
+        ]
     )
-    tokenized_detokenized = tokenized_detokenized[1:]
-    return tokenized_detokenized
 
 
 def normalize_ids(ids):
-    return xtreme_ds.tokenizer.convert_tokens_to_string(
-        xtreme_ds.tokenizer.convert_ids_to_tokens(ids)
+    tokens = xtreme_ds.tokenizer.convert_ids_to_tokens(ids)
+    if 6 in ids:
+        return xtreme_ds.tokenizer.convert_token_toString(tokens)
+    return " ".join(
+        [xtreme_ds.tokenizer.convert_tokens_to_string(token) for token in tokens]
     )
-    tokenized_detokenized = " ".join(xtreme_ds.tokenizer.convert_ids_to_tokens(ids))
-    if tokenized_detokenized[0] == "▁":
-        tokenized_detokenized = tokenized_detokenized[1:]
-    if re.search("^\([\d\s]+\)$", tokenized_detokenized):  # is number with brancket
-        tokenized_detokenized = tokenized_detokenized[1:-1]
-    elif re.search("^\([\d\s]+$", tokenized_detokenized):  # is number with brancket
-        tokenized_detokenized = tokenized_detokenized[1:]
-    elif re.search("^[\d\s]+\)$", tokenized_detokenized):  # is number with brancket
-        tokenized_detokenized = tokenized_detokenized[:-1]
-    if re.search("^[\d\s]+$", tokenized_detokenized):  # is
-        tokenized_detokenized = "".join(tokenized_detokenized.split())
-    return tokenized_detokenized
 
 
 def qa_build_model(experiment_config_dict, mlm_model_path, task):
