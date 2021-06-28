@@ -988,6 +988,132 @@ class pawsxTestDataset(torch.utils.data.Dataset):
         raise StopIteration
 
 
+def features_to_torch_example(features, lan):
+    context_encodings = tokenizer(
+        features["context"],
+    )
+    question_encodings = tokenizer(features["question"])
+    startposition = np.array(features["answers"]["answer_start"])
+    for i, position in enumerate(startposition):
+        position = (
+            position
+            if features["context"][
+                position : position + len(features["answers"]["text"][i])
+            ]
+            == features["answers"]["text"][i]
+            else position - 1
+            if features["context"][
+                position - 1 : position + len(features["answers"]["text"][i]) - 1
+            ]
+            == features["answers"]["text"][i]
+            else position - 2
+            if features["context"][
+                position - 2 : position + len(features["answers"]["text"][i]) - 2
+            ]
+            == features["answers"]["text"][i]
+            else position
+        )
+        if (
+            tokenizer._tokenizer.normalizer.normalize_str(features["context"][position])
+            == " "
+        ):
+            position = position + 1
+            features["answers"]["text"][i] = features["answers"]["text"][i][1:]
+        startposition[i] = context_encodings.char_to_token(position)
+    my_answer = {}
+    for i, answer_txt in enumerate(features["answers"]["text"]):
+        my_answer[i] = tokenizer.convert_tokens_to_string(
+            tokenizer.convert_ids_to_tokens(
+                tokenizer(features["answers"]["text"][i]).input_ids[1:-1]
+            )
+        )
+    endposition = np.copy(startposition + 1)
+    for i, position in enumerate(endposition):
+        while my_answer[i] not in tokenizer.convert_tokens_to_string(
+            tokenizer.convert_ids_to_tokens(
+                context_encodings.input_ids[startposition[i] : endposition[i]]
+            )
+        ):
+            if (
+                context_encodings.input_ids[endposition[i] + 1]
+                == tokenizer.eos_token_id
+            ):
+                if (
+                    context_encodings.input_ids[endposition[i]]
+                    != tokenizer.eos_token_id
+                ):
+                    endposition[i] += 1
+                break
+            endposition[i] += 1
+    block_size = TASK["xquad"]["max seq length"]
+    question_size = len(question_encodings.input_ids)
+    max_context_size = block_size - question_size
+    for block_id in range(1 + (len(context_encodings.input_ids) // max_context_size)):
+        context_size = min(
+            max_context_size,
+            len(context_encodings.input_ids) - block_id * max_context_size,
+        )
+        context_question_size = context_size + question_size
+        ids_block = np.ones(block_size, dtype=int) * tokenizer.pad_token_id
+        context_start = block_id * max_context_size
+        context_end = block_id * max_context_size + context_size
+        chosen_context = context_encodings.input_ids[context_start:context_end]
+        ids_block[:context_question_size] = np.hstack(
+            (chosen_context, question_encodings.input_ids)
+        )
+        for i, s_potition in enumerate(startposition):
+            if context_start <= startposition[i] and startposition[i] < context_end:
+                if endposition[i] < context_end:
+                    s_p = startposition[i] - context_start
+                    e_p = endposition[i] - context_start
+                    return (
+                        {
+                            "tokens": torch.from_numpy(ids_block).long(),
+                            "start_positions": torch.tensor(s_p).long(),
+                            "end_positions": torch.tensor(e_p).long(),
+                            "answer_offset": i,
+                            "features": features,
+                        }
+                        if lan is None
+                        else {
+                            "tokens": torch.from_numpy(ids_block).long(),
+                            "start_positions": torch.tensor(s_p).long(),
+                            "end_positions": torch.tensor(e_p).long(),
+                            "answer_offset": i,
+                            "features": features,
+                            "lan": lan,
+                        }
+                    )
+                else:
+                    offset = endposition[i] - context_end
+                    context_size = min(
+                        max_context_size,
+                        len(context_encodings.input_ids)
+                        - block_id * max_context_size
+                        - offset,
+                    )
+                    context_question_size = context_size + question_size
+                    ids_block = np.ones(block_size, dtype=int) * tokenizer.pad_token_id
+                    context_start = block_id * max_context_size + offset
+                    context_end = block_id * max_context_size + context_size + offset
+                    chosen_context = context_encodings.input_ids[
+                        context_start:context_end
+                    ]
+                    ids_block[:context_question_size] = np.hstack(
+                        (chosen_context, question_encodings.input_ids)
+                    )
+                    s_p = startposition[i] - context_start
+                    e_p = endposition[i] - context_start
+                    return {
+                        "tokens": torch.from_numpy(ids_block).long(),
+                        "start_positions": torch.tensor(s_p).long(),
+                        "end_positions": torch.tensor(e_p).long(),
+                        "answer_offset": i,
+                        "features": features,
+                    }
+    raise Exception()
+
+
 class xquadTrainDataset(torch.utils.data.Dataset):
     def __init__(self):
         set_name, subset_name, split = TASK["xquad"]["train"]
@@ -995,141 +1121,7 @@ class xquadTrainDataset(torch.utils.data.Dataset):
 
     def __iter__(self):
         for features in self.dataset:
-            context_encodings = tokenizer(
-                features["context"],
-            )
-            question_encodings = tokenizer(features["question"])
-            startposition = np.array(features["answers"]["answer_start"])
-            for i, position in enumerate(startposition):
-                position = (
-                    position
-                    if features["context"][
-                        position : position + len(features["answers"]["text"][i])
-                    ]
-                    == features["answers"]["text"][i]
-                    else position - 1
-                    if features["context"][
-                        position
-                        - 1 : position
-                        + len(features["answers"]["text"][i])
-                        - 1
-                    ]
-                    == features["answers"]["text"][i]
-                    else position - 2
-                    if features["context"][
-                        position
-                        - 2 : position
-                        + len(features["answers"]["text"][i])
-                        - 2
-                    ]
-                    == features["answers"]["text"][i]
-                    else position
-                )
-                if (
-                    tokenizer._tokenizer.normalizer.normalize_str(
-                        features["context"][position]
-                    )
-                    == " "
-                ):
-                    position = position + 1
-                    features["answers"]["text"][i] = features["answers"]["text"][i][1:]
-                startposition[i] = context_encodings.char_to_token(position)
-            my_answer = {}
-            for i, answer_txt in enumerate(features["answers"]["text"]):
-                my_answer[i] = tokenizer.convert_tokens_to_string(
-                    tokenizer.convert_ids_to_tokens(
-                        tokenizer(features["answers"]["text"][i]).input_ids[1:-1]
-                    )
-                )
-            endposition = np.copy(startposition + 1)
-            for i, position in enumerate(endposition):
-                while my_answer[i] not in tokenizer.convert_tokens_to_string(
-                    tokenizer.convert_ids_to_tokens(
-                        context_encodings.input_ids[startposition[i] : endposition[i]]
-                    )
-                ):
-                    if (
-                        context_encodings.input_ids[endposition[i] + 1]
-                        == tokenizer.eos_token_id
-                    ):
-                        if (
-                            context_encodings.input_ids[endposition[i]]
-                            != tokenizer.eos_token_id
-                        ):
-                            endposition[i] += 1
-                        break
-                    endposition[i] += 1
-            block_size = TASK["xquad"]["max seq length"]
-            question_size = len(question_encodings.input_ids)
-            max_context_size = block_size - question_size
-            yielded = False
-            for block_id in range(
-                1 + (len(context_encodings.input_ids) // max_context_size)
-            ):
-                context_size = min(
-                    max_context_size,
-                    len(context_encodings.input_ids) - block_id * max_context_size,
-                )
-                context_question_size = context_size + question_size
-                ids_block = np.ones(block_size, dtype=int) * tokenizer.pad_token_id
-                context_start = block_id * max_context_size
-                context_end = block_id * max_context_size + context_size
-                chosen_context = context_encodings.input_ids[context_start:context_end]
-                ids_block[:context_question_size] = np.hstack(
-                    (chosen_context, question_encodings.input_ids)
-                )
-                for i, s_potition in enumerate(startposition):
-                    if (
-                        context_start <= startposition[i]
-                        and startposition[i] < context_end
-                    ):
-                        if endposition[i] < context_end:
-                            s_p = startposition[i] - context_start
-                            e_p = endposition[i] - context_start
-                            yield {
-                                "tokens": torch.from_numpy(ids_block).long(),
-                                "start_positions": torch.tensor(s_p).long(),
-                                "end_positions": torch.tensor(e_p).long(),
-                                "answer_offset": i,
-                                "features": features,
-                            }
-                            yielded = True
-                        else:
-                            offset = endposition[i] - context_end
-                            context_size = min(
-                                max_context_size,
-                                len(context_encodings.input_ids)
-                                - block_id * max_context_size
-                                - offset,
-                            )
-                            context_question_size = context_size + question_size
-                            ids_block = (
-                                np.ones(block_size, dtype=int) * tokenizer.pad_token_id
-                            )
-                            context_start = block_id * max_context_size + offset
-                            context_end = (
-                                block_id * max_context_size + context_size + offset
-                            )
-                            chosen_context = context_encodings.input_ids[
-                                context_start:context_end
-                            ]
-                            ids_block[:context_question_size] = np.hstack(
-                                (chosen_context, question_encodings.input_ids)
-                            )
-                            s_p = startposition[i] - context_start
-                            e_p = endposition[i] - context_start
-                            yield {
-                                "tokens": torch.from_numpy(ids_block).long(),
-                                "start_positions": torch.tensor(s_p).long(),
-                                "end_positions": torch.tensor(e_p).long(),
-                                "answer_offset": i,
-                                "features": features,
-                            }
-                            yielded = True
-                    if yielded:
-                        break
-                if yielded:
-                    break
+            yield features_to_torch_example(features)
 
 
 class xquadValidationDataset(torch.utils.data.Dataset):
@@ -1139,142 +1131,7 @@ class xquadValidationDataset(torch.utils.data.Dataset):
 
     def __iter__(self):
         for features in self.dataset:
-            context_encodings = tokenizer(
-                features["context"],
-            )
-            question_encodings = tokenizer(features["question"])
-            startposition = np.array(features["answers"]["answer_start"])
-            for i, position in enumerate(startposition):
-                position = (
-                    position
-                    if features["context"][
-                        position : position + len(features["answers"]["text"][i])
-                    ]
-                    == features["answers"]["text"][i]
-                    else position - 1
-                    if features["context"][
-                        position
-                        - 1 : position
-                        + len(features["answers"]["text"][i])
-                        - 1
-                    ]
-                    == features["answers"]["text"][i]
-                    else position - 2
-                    if features["context"][
-                        position
-                        - 2 : position
-                        + len(features["answers"]["text"][i])
-                        - 2
-                    ]
-                    == features["answers"]["text"][i]
-                    else position
-                )
-                if (
-                    tokenizer._tokenizer.normalizer.normalize_str(
-                        features["context"][position]
-                    )
-                    == " "
-                ):
-                    position = position + 1
-                    features["answers"]["text"][i] = features["answers"]["text"][i][1:]
-                startposition[i] = context_encodings.char_to_token(position)
-            my_answer = {}
-            for i, answer_txt in enumerate(features["answers"]["text"]):
-                my_answer[i] = tokenizer.convert_tokens_to_string(
-                    tokenizer.convert_ids_to_tokens(
-                        tokenizer(features["answers"]["text"][i]).input_ids[1:-1]
-                    )
-                )
-            endposition = np.copy(startposition + 1)
-            for i, position in enumerate(endposition):
-                while my_answer[i] not in tokenizer.convert_tokens_to_string(
-                    tokenizer.convert_ids_to_tokens(
-                        context_encodings.input_ids[startposition[i] : endposition[i]]
-                    )
-                ):
-
-                    if (
-                        context_encodings.input_ids[endposition[i] + 1]
-                        == tokenizer.eos_token_id
-                    ):
-                        if (
-                            context_encodings.input_ids[endposition[i]]
-                            != tokenizer.eos_token_id
-                        ):
-                            endposition[i] += 1
-                        break
-                    endposition[i] += 1
-            block_size = TASK["xquad"]["max seq length"]
-            question_size = len(question_encodings.input_ids)
-            max_context_size = block_size - question_size
-            yielded = False
-            for block_id in range(
-                1 + (len(context_encodings.input_ids) // max_context_size)
-            ):
-                context_size = min(
-                    max_context_size,
-                    len(context_encodings.input_ids) - block_id * max_context_size,
-                )
-                context_question_size = context_size + question_size
-                ids_block = np.ones(block_size, dtype=int) * tokenizer.pad_token_id
-                context_start = block_id * max_context_size
-                context_end = block_id * max_context_size + context_size
-                chosen_context = context_encodings.input_ids[context_start:context_end]
-                ids_block[:context_question_size] = np.hstack(
-                    (chosen_context, question_encodings.input_ids)
-                )
-                for i, s_potition in enumerate(startposition):
-                    if (
-                        context_start <= startposition[i]
-                        and startposition[i] < context_end
-                    ):
-                        if endposition[i] < context_end:
-                            s_p = startposition[i] - context_start
-                            e_p = endposition[i] - context_start
-                            yield {
-                                "tokens": torch.from_numpy(ids_block).long(),
-                                "start_positions": torch.tensor(s_p).long(),
-                                "end_positions": torch.tensor(e_p).long(),
-                                "answer_offset": i,
-                                "features": features,
-                            }
-                            yielded = True
-                        else:
-                            offset = endposition[i] - context_end
-                            context_size = min(
-                                max_context_size,
-                                len(context_encodings.input_ids)
-                                - block_id * max_context_size
-                                - offset,
-                            )
-                            context_question_size = context_size + question_size
-                            ids_block = (
-                                np.ones(block_size, dtype=int) * tokenizer.pad_token_id
-                            )
-                            context_start = block_id * max_context_size + offset
-                            context_end = (
-                                block_id * max_context_size + context_size + offset
-                            )
-                            chosen_context = context_encodings.input_ids[
-                                context_start:context_end
-                            ]
-                            ids_block[:context_question_size] = np.hstack(
-                                (chosen_context, question_encodings.input_ids)
-                            )
-                            s_p = startposition[i] - context_start
-                            e_p = endposition[i] - context_start
-                            yield {
-                                "tokens": torch.from_numpy(ids_block).long(),
-                                "start_positions": torch.tensor(s_p).long(),
-                                "end_positions": torch.tensor(e_p).long(),
-                                "answer_offset": i,
-                                "features": features,
-                            }
-                            yielded = True
-                    if yielded:
-                        break
-                if yielded:
-                    break
+            yield features_to_torch_example(features)
 
 
 class xquadTestDataset(torch.utils.data.Dataset):
@@ -1287,150 +1144,7 @@ class xquadTestDataset(torch.utils.data.Dataset):
     def __iter__(self):
         for lan in self.dataset:
             for features in self.dataset[lan]:
-                context_encodings = tokenizer(
-                    features["context"],
-                )
-                question_encodings = tokenizer(features["question"])
-                startposition = np.array(features["answers"]["answer_start"])
-                for i, position in enumerate(startposition):
-                    position = (
-                        position
-                        if features["context"][
-                            position : position + len(features["answers"]["text"][i])
-                        ]
-                        == features["answers"]["text"][i]
-                        else position - 1
-                        if features["context"][
-                            position
-                            - 1 : position
-                            + len(features["answers"]["text"][i])
-                            - 1
-                        ]
-                        == features["answers"]["text"][i]
-                        else position - 2
-                        if features["context"][
-                            position
-                            - 2 : position
-                            + len(features["answers"]["text"][i])
-                            - 2
-                        ]
-                        == features["answers"]["text"][i]
-                        else position
-                    )
-                    if (
-                        tokenizer._tokenizer.normalizer.normalize_str(
-                            features["context"][position]
-                        )
-                        == " "
-                    ):
-                        position = position + 1
-                        features["answers"]["text"][i] = features["answers"]["text"][i][
-                            1:
-                        ]
-                    startposition[i] = context_encodings.char_to_token(position)
-                my_answer = {}
-                for i, answer_txt in enumerate(features["answers"]["text"]):
-                    my_answer[i] = tokenizer.convert_tokens_to_string(
-                        tokenizer.convert_ids_to_tokens(
-                            tokenizer(features["answers"]["text"][i]).input_ids[1:-1]
-                        )
-                    )
-                endposition = np.copy(startposition + 1)
-                for i, position in enumerate(endposition):
-                    while my_answer[i] not in tokenizer.convert_tokens_to_string(
-                        tokenizer.convert_ids_to_tokens(
-                            context_encodings.input_ids[
-                                startposition[i] : endposition[i]
-                            ]
-                        )
-                    ):
-                        if (
-                            context_encodings.input_ids[endposition[i] + 1]
-                            == tokenizer.eos_token_id
-                        ):
-                            if (
-                                context_encodings.input_ids[endposition[i]]
-                                != tokenizer.eos_token_id
-                            ):
-                                endposition[i] += 1
-                            break
-                        endposition[i] += 1
-                block_size = TASK["xquad"]["max seq length"]
-                question_size = len(question_encodings.input_ids)
-                max_context_size = block_size - question_size
-                yielded = False
-                for block_id in range(
-                    1 + (len(context_encodings.input_ids) // max_context_size)
-                ):
-                    context_size = min(
-                        max_context_size,
-                        len(context_encodings.input_ids) - block_id * max_context_size,
-                    )
-                    context_question_size = context_size + question_size
-                    ids_block = np.ones(block_size, dtype=int) * tokenizer.pad_token_id
-                    context_start = block_id * max_context_size
-                    context_end = block_id * max_context_size + context_size
-                    chosen_context = context_encodings.input_ids[
-                        context_start:context_end
-                    ]
-                    ids_block[:context_question_size] = np.hstack(
-                        (chosen_context, question_encodings.input_ids)
-                    )
-                    for i, s_potition in enumerate(startposition):
-                        if (
-                            context_start <= startposition[i]
-                            and startposition[i] < context_end
-                        ):
-                            if endposition[i] < context_end:
-                                s_p = startposition[i] - context_start
-                                e_p = endposition[i] - context_start
-                                yield {
-                                    "tokens": torch.from_numpy(ids_block).long(),
-                                    "start_positions": torch.tensor(s_p).long(),
-                                    "end_positions": torch.tensor(e_p).long(),
-                                    "answer_offset": i,
-                                    "features": features,
-                                    "lan": lan,
-                                }
-                                yielded = True
-                            else:
-                                offset = endposition[i] - context_end
-                                context_size = min(
-                                    max_context_size,
-                                    len(context_encodings.input_ids)
-                                    - block_id * max_context_size
-                                    - offset,
-                                )
-                                context_question_size = context_size + question_size
-                                ids_block = (
-                                    np.ones(block_size, dtype=int)
-                                    * tokenizer.pad_token_id
-                                )
-                                context_start = block_id * max_context_size + offset
-                                context_end = (
-                                    block_id * max_context_size + context_size + offset
-                                )
-                                chosen_context = context_encodings.input_ids[
-                                    context_start:context_end
-                                ]
-                                ids_block[:context_question_size] = np.hstack(
-                                    (chosen_context, question_encodings.input_ids)
-                                )
-                                s_p = startposition[i] - context_start
-                                e_p = endposition[i] - context_start
-                                yield {
-                                    "tokens": torch.from_numpy(ids_block).long(),
-                                    "start_positions": torch.tensor(s_p).long(),
-                                    "end_positions": torch.tensor(e_p).long(),
-                                    "answer_offset": i,
-                                    "features": features,
-                                    "lan": lan,
-                                }
-                                yielded = True
-                        if yielded:
-                            break
-                    if yielded:
-                        break
+                yield features_to_torch_example(features, lan)
 
 
 class mlqaTestDataset(torch.utils.data.Dataset):
@@ -1443,150 +1157,7 @@ class mlqaTestDataset(torch.utils.data.Dataset):
     def __iter__(self):
         for lan in self.dataset:
             for features in self.dataset[lan]:
-                context_encodings = tokenizer(
-                    features["context"],
-                )
-                question_encodings = tokenizer(features["question"])
-                startposition = np.array(features["answers"]["answer_start"])
-                for i, position in enumerate(startposition):
-                    position = (
-                        position
-                        if features["context"][
-                            position : position + len(features["answers"]["text"][i])
-                        ]
-                        == features["answers"]["text"][i]
-                        else position - 1
-                        if features["context"][
-                            position
-                            - 1 : position
-                            + len(features["answers"]["text"][i])
-                            - 1
-                        ]
-                        == features["answers"]["text"][i]
-                        else position - 2
-                        if features["context"][
-                            position
-                            - 2 : position
-                            + len(features["answers"]["text"][i])
-                            - 2
-                        ]
-                        == features["answers"]["text"][i]
-                        else position
-                    )
-                    if (
-                        tokenizer._tokenizer.normalizer.normalize_str(
-                            features["context"][position]
-                        )
-                        == " "
-                    ):
-                        position = position + 1
-                        features["answers"]["text"][i] = features["answers"]["text"][i][
-                            1:
-                        ]
-                    startposition[i] = context_encodings.char_to_token(position)
-                my_answer = {}
-                for i, answer_txt in enumerate(features["answers"]["text"]):
-                    my_answer[i] = tokenizer.convert_tokens_to_string(
-                        tokenizer.convert_ids_to_tokens(
-                            tokenizer(features["answers"]["text"][i]).input_ids[1:-1]
-                        )
-                    )
-                endposition = np.copy(startposition + 1)
-                for i, position in enumerate(endposition):
-                    while my_answer[i] not in tokenizer.convert_tokens_to_string(
-                        tokenizer.convert_ids_to_tokens(
-                            context_encodings.input_ids[
-                                startposition[i] : endposition[i]
-                            ]
-                        )
-                    ):
-                        if (
-                            context_encodings.input_ids[endposition[i] + 1]
-                            == tokenizer.eos_token_id
-                        ):
-                            if (
-                                context_encodings.input_ids[endposition[i]]
-                                != tokenizer.eos_token_id
-                            ):
-                                endposition[i] += 1
-                            break
-                        endposition[i] += 1
-                block_size = TASK["mlqa"]["max seq length"]
-                question_size = len(question_encodings.input_ids)
-                max_context_size = block_size - question_size
-                yielded = False
-                for block_id in range(
-                    1 + (len(context_encodings.input_ids) // max_context_size)
-                ):
-                    context_size = min(
-                        max_context_size,
-                        len(context_encodings.input_ids) - block_id * max_context_size,
-                    )
-                    context_question_size = context_size + question_size
-                    ids_block = np.ones(block_size, dtype=int) * tokenizer.pad_token_id
-                    context_start = block_id * max_context_size
-                    context_end = block_id * max_context_size + context_size
-                    chosen_context = context_encodings.input_ids[
-                        context_start:context_end
-                    ]
-                    ids_block[:context_question_size] = np.hstack(
-                        (chosen_context, question_encodings.input_ids)
-                    )
-                    for i, s_potition in enumerate(startposition):
-                        if (
-                            context_start <= startposition[i]
-                            and startposition[i] < context_end
-                        ):
-                            if endposition[i] < context_end:
-                                s_p = startposition[i] - context_start
-                                e_p = endposition[i] - context_start
-                                yield {
-                                    "tokens": torch.from_numpy(ids_block).long(),
-                                    "start_positions": torch.tensor(s_p).long(),
-                                    "end_positions": torch.tensor(e_p).long(),
-                                    "answer_offset": i,
-                                    "features": features,
-                                    "lan": lan,
-                                }
-                                yielded = True
-                            else:
-                                offset = endposition[i] - context_end
-                                context_size = min(
-                                    max_context_size,
-                                    len(context_encodings.input_ids)
-                                    - block_id * max_context_size
-                                    - offset,
-                                )
-                                context_question_size = context_size + question_size
-                                ids_block = (
-                                    np.ones(block_size, dtype=int)
-                                    * tokenizer.pad_token_id
-                                )
-                                context_start = block_id * max_context_size + offset
-                                context_end = (
-                                    block_id * max_context_size + context_size + offset
-                                )
-                                chosen_context = context_encodings.input_ids[
-                                    context_start:context_end
-                                ]
-                                ids_block[:context_question_size] = np.hstack(
-                                    (chosen_context, question_encodings.input_ids)
-                                )
-                                s_p = startposition[i] - context_start
-                                e_p = endposition[i] - context_start
-                                yield {
-                                    "tokens": torch.from_numpy(ids_block).long(),
-                                    "start_positions": torch.tensor(s_p).long(),
-                                    "end_positions": torch.tensor(e_p).long(),
-                                    "answer_offset": i,
-                                    "features": features,
-                                    "lan": lan,
-                                }
-                                yielded = True
-                        if yielded:
-                            break
-                    if yielded:
-                        break
+                yield features_to_torch_example(features, lan)
 
 
 class tydiqaTrainDataset(torch.utils.data.Dataset):
@@ -1596,143 +1167,9 @@ class tydiqaTrainDataset(torch.utils.data.Dataset):
 
     def __iter__(self):
         for features in self.dataset:
-            if LANG2ISO[features["id"].split("-")[0]] != 'en':
+            if LANG2ISO[features["id"].split("-")[0]] != "en":
                 continue
-            context_encodings = tokenizer(
-                features["context"],
-            )
-            question_encodings = tokenizer(features["question"])
-            startposition = np.array(features["answers"]["answer_start"])
-            for i, position in enumerate(startposition):
-                position = (
-                    position
-                    if features["context"][
-                        position : position + len(features["answers"]["text"][i])
-                    ]
-                    == features["answers"]["text"][i]
-                    else position - 1
-                    if features["context"][
-                        position
-                        - 1 : position
-                        + len(features["answers"]["text"][i])
-                        - 1
-                    ]
-                    == features["answers"]["text"][i]
-                    else position - 2
-                    if features["context"][
-                        position
-                        - 2 : position
-                        + len(features["answers"]["text"][i])
-                        - 2
-                    ]
-                    == features["answers"]["text"][i]
-                    else position
-                )
-                if (
-                    tokenizer._tokenizer.normalizer.normalize_str(
-                        features["context"][position]
-                    )
-                    == " "
-                ):
-                    position = position + 1
-                    features["answers"]["text"][i] = features["answers"]["text"][i][1:]
-                startposition[i] = context_encodings.char_to_token(position)
-            my_answer = {}
-            for i, answer_txt in enumerate(features["answers"]["text"]):
-                my_answer[i] = tokenizer.convert_tokens_to_string(
-                    tokenizer.convert_ids_to_tokens(
-                        tokenizer(features["answers"]["text"][i]).input_ids[1:-1]
-                    )
-                )
-            endposition = np.copy(startposition + 1)
-            for i, position in enumerate(endposition):
-                while my_answer[i] not in tokenizer.convert_tokens_to_string(
-                    tokenizer.convert_ids_to_tokens(
-                        context_encodings.input_ids[startposition[i] : endposition[i]]
-                    )
-                ):
-                    if (
-                        context_encodings.input_ids[endposition[i] + 1]
-                        == tokenizer.eos_token_id
-                    ):
-                        if (
-                            context_encodings.input_ids[endposition[i]]
-                            != tokenizer.eos_token_id
-                        ):
-                            endposition[i] += 1
-                        break
-                    endposition[i] += 1
-            block_size = TASK["tydiqa"]["max seq length"]
-            question_size = len(question_encodings.input_ids)
-            max_context_size = block_size - question_size
-            yielded = False
-            for block_id in range(
-                1 + (len(context_encodings.input_ids) // max_context_size)
-            ):
-                context_size = min(
-                    max_context_size,
-                    len(context_encodings.input_ids) - block_id * max_context_size,
-                )
-                context_question_size = context_size + question_size
-                ids_block = np.ones(block_size, dtype=int) * tokenizer.pad_token_id
-                context_start = block_id * max_context_size
-                context_end = block_id * max_context_size + context_size
-                chosen_context = context_encodings.input_ids[context_start:context_end]
-                ids_block[:context_question_size] = np.hstack(
-                    (chosen_context, question_encodings.input_ids)
-                )
-                for i, s_potition in enumerate(startposition):
-                    if (
-                        context_start <= startposition[i]
-                        and startposition[i] < context_end
-                    ):
-                        if endposition[i] < context_end:
-                            s_p = startposition[i] - context_start
-                            e_p = endposition[i] - context_start
-                            yield {
-                                "tokens": torch.from_numpy(ids_block).long(),
-                                "start_positions": torch.tensor(s_p).long(),
-                                "end_positions": torch.tensor(e_p).long(),
-                                "answer_offset": i,
-                                "features": features,
-                            }
-                            yielded = True
-                        else:
-                            offset = endposition[i] - context_end
-                            context_size = min(
-                                max_context_size,
-                                len(context_encodings.input_ids)
-                                - block_id * max_context_size
-                                - offset,
-                            )
-                            context_question_size = context_size + question_size
-                            ids_block = (
-                                np.ones(block_size, dtype=int) * tokenizer.pad_token_id
-                            )
-                            context_start = block_id * max_context_size + offset
-                            context_end = (
-                                block_id * max_context_size + context_size + offset
-                            )
-                            chosen_context = context_encodings.input_ids[
-                                context_start:context_end
-                            ]
-                            ids_block[:context_question_size] = np.hstack(
-                                (chosen_context, question_encodings.input_ids)
-                            )
-                            s_p = startposition[i] - context_start
-                            e_p = endposition[i] - context_start
-                            yield {
-                                "tokens": torch.from_numpy(ids_block).long(),
-                                "start_positions": torch.tensor(s_p).long(),
-                                "end_positions": torch.tensor(e_p).long(),
-                                "answer_offset": i,
-                                "features": features,
-                            }
-                            yielded = True
-                    if yielded:
-                        break
-                if yielded:
-                    break
+            yield features_to_torch_example(features)
 
 
 LANG2ISO = {
@@ -1755,143 +1192,9 @@ class tydiqaTestDataset(torch.utils.data.Dataset):
 
     def __iter__(self):
         for features in self.dataset:
-            context_encodings = tokenizer(
-                features["context"],
+            yield features_to_torch_example(
+                features, LANG2ISO[features["id"].split("-")[0]]
             )
-            question_encodings = tokenizer(features["question"])
-            startposition = np.array(features["answers"]["answer_start"])
-            for i, position in enumerate(startposition):
-                position = (
-                    position
-                    if features["context"][
-                        position : position + len(features["answers"]["text"][i])
-                    ]
-                    == features["answers"]["text"][i]
-                    else position - 1
-                    if features["context"][
-                        position
-                        - 1 : position
-                        + len(features["answers"]["text"][i])
-                        - 1
-                    ]
-                    == features["answers"]["text"][i]
-                    else position - 2
-                    if features["context"][
-                        position
-                        - 2 : position
-                        + len(features["answers"]["text"][i])
-                        - 2
-                    ]
-                    == features["answers"]["text"][i]
-                    else position
-                )
-                if (
-                    tokenizer._tokenizer.normalizer.normalize_str(
-                        features["context"][position]
-                    )
-                    == " "
-                ):
-                    position = position + 1
-                    features["answers"]["text"][i] = features["answers"]["text"][i][1:]
-                startposition[i] = context_encodings.char_to_token(position)
-            my_answer = {}
-            for i, answer_txt in enumerate(features["answers"]["text"]):
-                my_answer[i] = tokenizer.convert_tokens_to_string(
-                    tokenizer.convert_ids_to_tokens(
-                        tokenizer(features["answers"]["text"][i]).input_ids[1:-1]
-                    )
-                )
-            endposition = np.copy(startposition + 1)
-            for i, position in enumerate(endposition):
-                while my_answer[i] not in tokenizer.convert_tokens_to_string(
-                    tokenizer.convert_ids_to_tokens(
-                        context_encodings.input_ids[startposition[i] : endposition[i]]
-                    )
-                ):
-                    if (
-                        context_encodings.input_ids[endposition[i] + 1]
-                        == tokenizer.eos_token_id
-                    ):
-                        if (
-                            context_encodings.input_ids[endposition[i]]
-                            != tokenizer.eos_token_id
-                        ):
-                            endposition[i] += 1
-                        break
-                    endposition[i] += 1
-            block_size = TASK["tydiqa"]["max seq length"]
-            question_size = len(question_encodings.input_ids)
-            max_context_size = block_size - question_size
-            yielded = False
-            for block_id in range(
-                1 + (len(context_encodings.input_ids) // max_context_size)
-            ):
-                context_size = min(
-                    max_context_size,
-                    len(context_encodings.input_ids) - block_id * max_context_size,
-                )
-                context_question_size = context_size + question_size
-                ids_block = np.ones(block_size, dtype=int) * tokenizer.pad_token_id
-                context_start = block_id * max_context_size
-                context_end = block_id * max_context_size + context_size
-                chosen_context = context_encodings.input_ids[context_start:context_end]
-                ids_block[:context_question_size] = np.hstack(
-                    (chosen_context, question_encodings.input_ids)
-                )
-                for i, s_potition in enumerate(startposition):
-                    if (
-                        context_start <= startposition[i]
-                        and startposition[i] < context_end
-                    ):
-                        if endposition[i] < context_end:
-                            s_p = startposition[i] - context_start
-                            e_p = endposition[i] - context_start
-                            yield {
-                                "tokens": torch.from_numpy(ids_block).long(),
-                                "start_positions": torch.tensor(s_p).long(),
-                                "end_positions": torch.tensor(e_p).long(),
-                                "answer_offset": i,
-                                "features": features,
-                                "lan": LANG2ISO[features["id"].split("-")[0]],
-                            }
-                            yielded = True
-                        else:
-                            offset = endposition[i] - context_end
-                            context_size = min(
-                                max_context_size,
-                                len(context_encodings.input_ids)
-                                - block_id * max_context_size
-                                - offset,
-                            )
-                            context_question_size = context_size + question_size
-                            ids_block = (
-                                np.ones(block_size, dtype=int) * tokenizer.pad_token_id
-                            )
-                            context_start = block_id * max_context_size + offset
-                            context_end = (
-                                block_id * max_context_size + context_size + offset
-                            )
-                            chosen_context = context_encodings.input_ids[
-                                context_start:context_end
-                            ]
-                            ids_block[:context_question_size] = np.hstack(
-                                (chosen_context, question_encodings.input_ids)
-                            )
-                            s_p = startposition[i] - context_start
-                            e_p = endposition[i] - context_start
-                            yield {
-                                "tokens": torch.from_numpy(ids_block).long(),
-                                "start_positions": torch.tensor(s_p).long(),
-                                "end_positions": torch.tensor(e_p).long(),
-                                "answer_offset": i,
-                                "features": features,
-                                "lan": LANG2ISO[features["id"].split("-")[0]],
-                            }
-                            yielded = True
-                    if yielded:
-                        break
-                if yielded:
-                    break
 
 
 class bucc2018Dataset(torch.utils.data.Dataset):
