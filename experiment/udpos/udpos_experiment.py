@@ -116,6 +116,7 @@ def tag_train(
     i = 0
     for _ in range(xtreme_ds.TASK[task]["epochs"]):
         for batch in tag_ds_dataloader:
+            print(batch)
             #  input to gpu
             batch["tokens"] = batch["tokens"].cuda()
             batch["tags"] = batch["tags"].cuda()
