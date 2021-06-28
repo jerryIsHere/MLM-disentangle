@@ -621,7 +621,10 @@ class udposTrainDataset(torch.utils.data.Dataset):
                 }
 
     def __next__(self):
-        return next(self.generator)
+        try:
+            return next(self.generator)
+        except StopIteration:
+            raise StopIteration
 
 
 class udposValidationDataset(torch.utils.data.Dataset):
@@ -671,8 +674,12 @@ class udposValidationDataset(torch.utils.data.Dataset):
                     "tokens": torch.from_numpy(ids_block).long(),
                     "tags": torch.from_numpy(labels_block).long(),
                 }
+
     def __next__(self):
-        return next(self.generator)
+        try:
+            return next(self.generator)
+        except StopIteration:
+            raise StopIteration
 
 
 class udposTestDataset(torch.utils.data.Dataset):
@@ -730,8 +737,12 @@ class udposTestDataset(torch.utils.data.Dataset):
                         "tags": torch.from_numpy(labels_block).long(),
                         "lan": lan,
                     }
+
     def __next__(self):
-        return next(self.generator)
+        try:
+            return next(self.generator)
+        except StopIteration:
+            raise StopIteration
 
 
 class panxTrainDataset(torch.utils.data.Dataset):
@@ -800,8 +811,12 @@ class panxTrainDataset(torch.utils.data.Dataset):
                     "tokens": torch.from_numpy(ids_block).long(),
                     "tags": torch.from_numpy(labels_block).long(),
                 }
+
     def __next__(self):
-        return next(self.generator)
+        try:
+            return next(self.generator)
+        except StopIteration:
+            raise StopIteration
 
 
 class panxValidationDataset(torch.utils.data.Dataset):
@@ -851,8 +866,12 @@ class panxValidationDataset(torch.utils.data.Dataset):
                     "tokens": torch.from_numpy(ids_block).long(),
                     "tags": torch.from_numpy(labels_block).long(),
                 }
+
     def __next__(self):
-        return next(self.generator)
+        try:
+            return next(self.generator)
+        except StopIteration:
+            raise StopIteration
 
 
 class panxTestDataset(torch.utils.data.Dataset):
@@ -910,8 +929,12 @@ class panxTestDataset(torch.utils.data.Dataset):
                         "tags": torch.from_numpy(labels_block).long(),
                         "lan": lan,
                     }
+
     def __next__(self):
-        return next(self.generator)
+        try:
+            return next(self.generator)
+        except StopIteration:
+            raise StopIteration
 
 
 class xnliTrainDataset(torch.utils.data.Dataset):
@@ -1236,8 +1259,12 @@ class xquadTrainDataset(torch.utils.data.Dataset):
             self.dataset_features, len(self.dataset_features)
         ):
             yield features_to_torch_example(features)
+
     def __next__(self):
-        return next(self.generator)
+        try:
+            return next(self.generator)
+        except StopIteration:
+            raise StopIteration
 
 
 class xquadValidationDataset(torch.utils.data.Dataset):
@@ -1253,8 +1280,12 @@ class xquadValidationDataset(torch.utils.data.Dataset):
     def __generator__(self):
         for features in self.dataset:
             yield features_to_torch_example(features)
+
     def __next__(self):
-        return next(self.generator)
+        try:
+            return next(self.generator)
+        except StopIteration:
+            raise StopIteration
 
 
 class xquadTestDataset(torch.utils.data.Dataset):
@@ -1273,8 +1304,12 @@ class xquadTestDataset(torch.utils.data.Dataset):
         for lan in self.dataset:
             for features in self.dataset[lan]:
                 yield features_to_torch_example(features, lan)
+
     def __next__(self):
-        return next(self.generator)
+        try:
+            return next(self.generator)
+        except StopIteration:
+            raise StopIteration
 
 
 class mlqaTestDataset(torch.utils.data.Dataset):
@@ -1293,8 +1328,12 @@ class mlqaTestDataset(torch.utils.data.Dataset):
         for lan in self.dataset:
             for features in self.dataset[lan]:
                 yield features_to_torch_example(features, lan)
+
     def __next__(self):
-        return next(self.generator)
+        try:
+            return next(self.generator)
+        except StopIteration:
+            raise StopIteration
 
 
 class tydiqaTrainDataset(torch.utils.data.Dataset):
@@ -1324,8 +1363,12 @@ class tydiqaTrainDataset(torch.utils.data.Dataset):
             if LANG2ISO[features["id"].split("-")[0]] != "en":
                 continue
             yield features_to_torch_example(features)
+
     def __next__(self):
-        return next(self.generator)
+        try:
+            return next(self.generator)
+        except StopIteration:
+            raise StopIteration
 
 
 LANG2ISO = {
@@ -1356,8 +1399,12 @@ class tydiqaTestDataset(torch.utils.data.Dataset):
             yield features_to_torch_example(
                 features, LANG2ISO[features["id"].split("-")[0]]
             )
+
     def __next__(self):
-        return next(self.generator)
+        try:
+            return next(self.generator)
+        except StopIteration:
+            raise StopIteration
 
 
 class bucc2018Dataset(torch.utils.data.Dataset):
