@@ -86,7 +86,6 @@ def tag_train(
         shuffle=True,
     )
     disentangle_iter = iter(disentangle_dataloader)
-    print(tag_ds)
     tag_ds_dataloader = xtreme_ds.batcher(tag_ds, batch_size=2)
     gradient_acc_size = xtreme_ds.TASK[task]["gradient_acc_size"]
     batch_size = xtreme_ds.TASK[task]["batch_size"]
