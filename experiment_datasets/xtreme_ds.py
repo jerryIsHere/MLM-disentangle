@@ -560,7 +560,7 @@ class udposTrainDataset(torch.utils.data.Dataset):
         )
 
     def __iter__(self):
-        for features in random.shuffle(self.dataset_features):
+        for features in random.sample(self.dataset_features):
             txt = features["tokens"]
             for i, each in enumerate(txt):
                 txt[i] = tokenizer._tokenizer.normalizer.normalize_str(txt[i])
@@ -716,7 +716,7 @@ class panxTrainDataset(torch.utils.data.Dataset):
         )
 
     def __iter__(self):
-        for features in random.shuffle(self.dataset_features):
+        for features in random.sample(self.dataset_features):
             txt = features["tokens"]
             for i, each in enumerate(txt):
                 txt[i] = tokenizer._tokenizer.normalizer.normalize_str(txt[i])
@@ -1165,7 +1165,7 @@ class xquadTrainDataset(torch.utils.data.Dataset):
         return len(self.dataseZ)
 
     def __iter__(self):
-        for features in random.shuffle(self.dataset_features):
+        for features in random.sample(self.dataset_features):
             yield features_to_torch_example(features)
 
 
@@ -1224,7 +1224,7 @@ class tydiqaTrainDataset(torch.utils.data.Dataset):
         )
 
     def __iter__(self):
-        for features in random.shuffle(self.dataset_features):
+        for features in random.sample(self.dataset_features):
             if LANG2ISO[features["id"].split("-")[0]] != "en":
                 continue
             yield features_to_torch_example(features)
