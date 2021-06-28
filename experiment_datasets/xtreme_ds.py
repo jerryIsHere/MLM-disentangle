@@ -821,8 +821,8 @@ class xnliTrainDataset(torch.utils.data.Dataset):
     def __len__(self):
         return len(self.dataset)
 
-    def __getitem__(self, id):
-        features = self.dataset[id]
+    def __getitem__(self, dataset_id):
+        features = self.dataset[dataset_id]
         train_encodings = tokenizer(
             features["premise"],
             features["hypothesis"],
@@ -848,12 +848,12 @@ class xnliValidationDataset(torch.utils.data.Dataset):
     def __len__(self):
         return sum(map(len, self.dataset.values()))
 
-    def __getitem__(self, id_absolute):
+    def __getitem__(self, global_id):
         for split in self.dataset:
             length = len(self.dataset[split])
-            if id_absolute < length:
-                instnace_id = id_absolute
-                features = self.dataset[split][id]
+            if global_id < length:
+                dataset_id = global_id
+                features = self.dataset[split][dataset_id]
                 train_encodings = tokenizer(
                     features["premise"],
                     features["hypothesis"],
@@ -867,7 +867,7 @@ class xnliValidationDataset(torch.utils.data.Dataset):
                         xnliTrainDataset.class_label.index(features["label"])
                     ).long(),
                 }
-            id_absolute -= length
+            global_id -= length
         raise StopIteration
 
 
@@ -881,8 +881,8 @@ class xnliTestDataset(torch.utils.data.Dataset):
     def __len__(self):
         return len(self.dataset)
 
-    def __getitem__(self, id):
-        features = self.dataset[id]
+    def __getitem__(self, dataset_id):
+        features = self.dataset[dataset_id]
         train_encodings = tokenizer(
             features["sentence1"],
             features["sentence2"],
@@ -912,8 +912,8 @@ class pawsxTrainDataset(torch.utils.data.Dataset):
     def __len__(self):
         return len(self.dataset)
 
-    def __getitem__(self, id):
-        features = self.dataset[id]
+    def __getitem__(self, dataset_id):
+        features = self.dataset[dataset_id]
         train_encodings = tokenizer(
             features["sentence1"],
             features["sentence2"],
@@ -937,8 +937,8 @@ class pawsxValidationDataset(torch.utils.data.Dataset):
     def __len__(self):
         return len(self.dataset)
 
-    def __getitem__(self, id):
-        features = self.dataset[id]
+    def __getitem__(self, dataset_id):
+        features = self.dataset[dataset_id]
         train_encodings = tokenizer(
             features["sentence1"],
             features["sentence2"],
@@ -964,12 +964,12 @@ class pawsxTestDataset(torch.utils.data.Dataset):
     def __len__(self):
         return sum(map(len, self.dataset.values()))
 
-    def __getitem__(self, id_absolute):
+    def __getitem__(self, global_id):
         for lan in self.dataset:
             length = len(self.dataset[lan])
-            if id_absolute < length:
-                instnace_id = id_absolute
-                features = self.dataset[lan][id]
+            if global_id < length:
+                dataset_id = global_id
+                features = self.dataset[lan][dataset_id]
                 train_encodings = tokenizer(
                     features["sentence1"],
                     features["sentence2"],
@@ -984,7 +984,7 @@ class pawsxTestDataset(torch.utils.data.Dataset):
                     ).long(),
                     "lan": lan,
                 }
-            id_absolute -= length
+            global_id -= length
         raise StopIteration
 
 
@@ -1904,12 +1904,12 @@ class bucc2018Dataset(torch.utils.data.Dataset):
     def __len__(self):
         return sum(map(len, self.dataset.values()))
 
-    def __getitem__(self, id_absolute):
+    def __getitem__(self, global_id):
         for lan in self.dataset:
             length = len(self.dataset[lan])
-            if id_absolute < length:
-                instnace_id = id_absolute
-                features = self.dataset[lan][id]
+            if global_id < length:
+                dataset_id = global_id
+                features = self.dataset[lan][dataset_id]
                 source_encodings = tokenizer(
                     features["source_sentence"],
                     max_length=None,
@@ -1927,7 +1927,7 @@ class bucc2018Dataset(torch.utils.data.Dataset):
                     "target_tokens": torch.tensor(target_encodings.input_ids).long(),
                     "lan": lan,
                 }
-            id_absolute -= length
+            global_id -= length
         raise StopIteration
 
 
@@ -1941,12 +1941,12 @@ class tatoebaDataset(torch.utils.data.Dataset):
     def __len__(self):
         return sum(map(len, self.dataset.values()))
 
-    def __getitem__(self, id_absolute):
+    def __getitem__(self, global_id):
         for lan in self.dataset:
             length = len(self.dataset[lan])
-            if id_absolute < length:
-                instnace_id = id_absolute
-                features = self.dataset[lan][id]
+            if global_id < length:
+                dataset_id = global_id
+                features = self.dataset[lan][dataset_id]
                 source_encodings = tokenizer(
                     features["source_sentence"],
                     max_length=None,
@@ -1964,5 +1964,5 @@ class tatoebaDataset(torch.utils.data.Dataset):
                     "target_tokens": torch.tensor(target_encodings.input_ids).long(),
                     "lan": lan,
                 }
-            id_absolute -= length
+            global_id -= length
         raise StopIteration

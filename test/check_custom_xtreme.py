@@ -215,7 +215,7 @@ ds = xtreme_ds.mlqaTestDataset()
 squad_metrics[ds.__class__.__name__] = datasets.load_metric("squad")
 instnace_ids[ds.__class__.__name__] = set()
 for i, each in enumerate(ds):
-    instnace_ids[ds.__class__.__name__].add(each["features"]["id"])
+    instnace_ids[ds.__class__.__name__].add(each["lan"] + each["features"]["id"])
     reply = normalize_ids(
         each["tokens"][each["start_positions"] : each["end_positions"]]
     )
