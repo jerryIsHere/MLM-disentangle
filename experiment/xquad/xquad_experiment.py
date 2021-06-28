@@ -114,7 +114,7 @@ def qa_train(
     )
     disentangle_iter = iter(disentangle_dataloader)
     qa_ds_dataloader = torch.utils.data.DataLoader(
-        qa_ds, batch_size=2, num_workers=0, shuffle=True
+        qa_ds, batch_size=2, num_workers=0
     )
     gradient_acc_size = xtreme_ds.TASK[task]["gradient_acc_size"]
     batch_size = xtreme_ds.TASK[task]["batch_size"]
@@ -243,7 +243,7 @@ def qa_test(finetune_model, qa_ds):
     task = qa_ds.task
     print("evaluating " + task + " with dataset:" + qa_ds.__class__.__name__)
     test_dataloader = torch.utils.data.DataLoader(
-        qa_ds, batch_size=1, num_workers=0, shuffle=True
+        qa_ds, batch_size=1, num_workers=0
     )
     metric = xtreme_ds.METRIC_FUNCTION[task]()
     lan_metric = {}

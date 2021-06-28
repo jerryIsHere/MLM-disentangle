@@ -218,7 +218,7 @@ def cls_test(
     task = cls_ds.task
     print("evaluating " + task + " with dataset:" + cls_ds.__class__.__name__)
     test_dataloader = torch.utils.data.DataLoader(
-        cls_ds, batch_size=1, num_workers=0, shuffle=True
+        cls_ds, batch_size=1, num_workers=0
     )
     metric = xtreme_ds.METRIC_FUNCTION[task]()
     lan_metric = {}

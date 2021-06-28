@@ -529,6 +529,7 @@ tokenizer = XLMRobertaTokenizerFast.from_pretrained(
 )
 import numpy as np
 import torch
+import random
 
 
 class udposTrainDataset(torch.utils.data.Dataset):
@@ -538,7 +539,7 @@ class udposTrainDataset(torch.utils.data.Dataset):
         self.dataset = get_dataset(set_name, subset_name)[split]
 
     def __iter__(self):
-        for features in self.dataset:
+        for features in random.shuffle(self.dataset):
             txt = features["tokens"]
             for i, each in enumerate(txt):
                 txt[i] = tokenizer._tokenizer.normalizer.normalize_str(txt[i])
@@ -681,7 +682,7 @@ class panxTrainDataset(torch.utils.data.Dataset):
         self.dataset = get_dataset(set_name, subset_name)[split]
 
     def __iter__(self):
-        for features in self.dataset:
+        for features in random.shuffle(self.dataset):
             txt = features["tokens"]
             for i, each in enumerate(txt):
                 txt[i] = tokenizer._tokenizer.normalizer.normalize_str(txt[i])
@@ -1127,7 +1128,7 @@ class xquadTrainDataset(torch.utils.data.Dataset):
         self.dataset = get_dataset(set_name, subset_name)[split]
 
     def __iter__(self):
-        for features in self.dataset:
+        for features in random.shuffle(self.dataset):
             yield features_to_torch_example(features)
 
 
@@ -1177,7 +1178,7 @@ class tydiqaTrainDataset(torch.utils.data.Dataset):
         self.dataset = get_dataset(set_name, subset_name)[split]
 
     def __iter__(self):
-        for features in self.dataset:
+        for features in random.shuffle(self.dataset):
             if LANG2ISO[features["id"].split("-")[0]] != "en":
                 continue
             yield features_to_torch_example(features)
