@@ -11,7 +11,7 @@ for i, each in enumerate(ds):
             each["features"]["pos_tags"][each["offset"] : each["offset"] + len(tags)]
         )
     ).all()
-assert i >= len(ds.dataset) - 1
+assert i == len(ds) - 1
 ds = xtreme_ds.udposValidationDataset()
 for i, each in enumerate(ds):
     tags = each["tags"].numpy()
@@ -46,7 +46,7 @@ for i, each in enumerate(ds):
             each["features"]["ner_tags"][each["offset"] : each["offset"] + len(tags)]
         )
     ).all()
-assert i >= len(ds.dataset) - 1
+assert i == len(ds) - 1
 ds = xtreme_ds.panxValidationDataset()
 for i, each in enumerate(ds):
     tags = each["tags"].numpy()
@@ -169,9 +169,7 @@ for i, each in enumerate(ds):
             },
         },
     )
-assert len(instnace_ids[ds.__class__.__name__]) == len(
-    ds.dataset
-)  # each question is at least answered once
+assert i == len(ds) - 1
 ds = xtreme_ds.xquadValidationDataset()
 squad_metrics_normal[ds.__class__.__name__] = datasets.load_metric("squad")
 squad_metrics_custom[ds.__class__.__name__] = datasets.load_metric("squad")
@@ -339,13 +337,7 @@ for i, each in enumerate(ds):
             },
         },
     )
-assert len(instnace_ids[ds.__class__.__name__]) == len(
-    [
-        instance
-        for instance in ds.dataset
-        if xtreme_ds.LANG2ISO[instance["id"].split("-")[0]] == "en"
-    ]
-)  # each question is at least answered once
+assert i == len(ds) - 1
 ds = xtreme_ds.tydiqaTestDataset()
 squad_metrics_normal[ds.__class__.__name__] = {}
 squad_metrics_custom[ds.__class__.__name__] = {}

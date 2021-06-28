@@ -532,6 +532,14 @@ import torch
 import random
 
 
+def batcher(iterableDS, batch_size):
+    while True:
+        batch = torch.stack(next(iterableDS))
+        for i in range(max(0, batch_size - 1)):
+            batch = torch.stack((batch, next(iterableDS)))
+        yield batch
+
+
 class udposTrainDataset(torch.utils.data.Dataset):
     def __init__(self):
         self.task = "udpos"
@@ -699,7 +707,7 @@ class panxTrainDataset(torch.utils.data.Dataset):
                 lambda features: 1
                 + (
                     len(tokenizer(features["tokens"]).input_ids)
-                    // TASK["udpos"]["max seq length"]
+                    // TASK["panx"]["max seq length"]
                 ),
                 self.dataset,
             )
