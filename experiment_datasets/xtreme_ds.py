@@ -549,9 +549,8 @@ def batcher(iterableDS, batch_size):
         batch = list()
         for i in range(max(1, batch_size)):
             batch.append(next(iterableDS))
-        output_batch = {}
         reducer(batch, output_batch)
-        yield reducer(batch, output_batch)
+        yield reducer(batch)
 
 
 class udposTrainDataset(torch.utils.data.Dataset):
