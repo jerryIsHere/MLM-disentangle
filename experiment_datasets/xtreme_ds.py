@@ -544,12 +544,15 @@ def reducer(source):
         return source
 
 
-def batcher(iterableDS, batch_size):
+def batcher(iterableDS, batch_size): 
     it = iter(iterableDS)
     while True:
         batch = list()
         for i in range(max(1, batch_size)):
-            batch.append(next(it))
+            try:
+                batch.append(next(it))
+            except StopIteration:
+                raise StopIteration
         yield reducer(batch)
 
 
