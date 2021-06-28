@@ -532,12 +532,26 @@ import torch
 import random
 
 
+def reducer(source):
+    if isinstance(source[0], dict):
+        target = {}
+        for key in source[0]:
+            target[key] = reducer([each[key] for each in source])
+        return target
+    elif isinstance(source[0], torch.Tensor):
+        return torch.stack(source)
+    else:
+        return source
+
+
 def batcher(iterableDS, batch_size):
     while True:
         batch = list()
         for i in range(max(1, batch_size)):
             batch.append(next(iterableDS))
-        yield torch.stack(batch)
+        output_batch = {}
+        reducer(batch, output_batch)
+        yield reducer(batch, output_batch)
 
 
 class udposTrainDataset(torch.utils.data.Dataset):
