@@ -577,9 +577,10 @@ class udposTrainDataset(torch.utils.data.Dataset):
         )
 
     def __iter__(self):
+        self.generator = self.__generator__()
         return self
 
-    def __next__(self):
+    def __generator__(self):
         for features in random.sample(
             self.dataset_features, len(self.dataset_features)
         ):
@@ -608,7 +609,7 @@ class udposTrainDataset(torch.utils.data.Dataset):
                     block_id * block_size : (block_id + 1) * block_size
                 ]
                 labels_block[: len(chosen_label)] = chosen_label
-                return {
+                yield {
                     "features": features,
                     "offset": len(
                         labels[: block_id * block_size][
@@ -619,6 +620,9 @@ class udposTrainDataset(torch.utils.data.Dataset):
                     "tags": torch.from_numpy(labels_block).long(),
                 }
 
+    def __next__(self):
+        return next(self.generator)
+
 
 class udposValidationDataset(torch.utils.data.Dataset):
     def __init__(self):
@@ -627,9 +631,10 @@ class udposValidationDataset(torch.utils.data.Dataset):
         self.dataset = get_dataset(set_name, subset_name)[split]
 
     def __iter__(self):
+        self.generator = self.__generator__()
         return self
 
-    def __next__(self):
+    def __generator__(self):
         for features in self.dataset:
             txt = features["tokens"]
             for i, each in enumerate(txt):
@@ -656,7 +661,7 @@ class udposValidationDataset(torch.utils.data.Dataset):
                     block_id * block_size : (block_id + 1) * block_size
                 ]
                 labels_block[: len(chosen_label)] = chosen_label
-                return {
+                yield {
                     "features": features,
                     "offset": len(
                         labels[: block_id * block_size][
@@ -666,6 +671,8 @@ class udposValidationDataset(torch.utils.data.Dataset):
                     "tokens": torch.from_numpy(ids_block).long(),
                     "tags": torch.from_numpy(labels_block).long(),
                 }
+    def __next__(self):
+        return next(self.generator)
 
 
 class udposTestDataset(torch.utils.data.Dataset):
@@ -677,9 +684,10 @@ class udposTestDataset(torch.utils.data.Dataset):
             self.dataset[lan] = get_dataset(set_name, subset_name)[split]
 
     def __iter__(self):
+        self.generator = self.__generator__()
         return self
 
-    def __next__(self):
+    def __generator__(self):
         for lan in self.dataset:
             for features in self.dataset[lan]:
                 txt = features["tokens"]
@@ -711,7 +719,7 @@ class udposTestDataset(torch.utils.data.Dataset):
                         block_id * block_size : (block_id + 1) * block_size
                     ]
                     labels_block[: len(chosen_label)] = chosen_label
-                    return {
+                    yield {
                         "features": features,
                         "offset": len(
                             labels[: block_id * block_size][
@@ -722,6 +730,8 @@ class udposTestDataset(torch.utils.data.Dataset):
                         "tags": torch.from_numpy(labels_block).long(),
                         "lan": lan,
                     }
+    def __next__(self):
+        return next(self.generator)
 
 
 class panxTrainDataset(torch.utils.data.Dataset):
@@ -748,9 +758,10 @@ class panxTrainDataset(torch.utils.data.Dataset):
         )
 
     def __iter__(self):
+        self.generator = self.__generator__()
         return self
 
-    def __next__(self):
+    def __generator__(self):
         for features in random.sample(
             self.dataset_features, len(self.dataset_features)
         ):
@@ -779,7 +790,7 @@ class panxTrainDataset(torch.utils.data.Dataset):
                     block_id * block_size : (block_id + 1) * block_size
                 ]
                 labels_block[: len(chosen_label)] = chosen_label
-                return {
+                yield {
                     "features": features,
                     "offset": len(
                         labels[: block_id * block_size][
@@ -789,6 +800,8 @@ class panxTrainDataset(torch.utils.data.Dataset):
                     "tokens": torch.from_numpy(ids_block).long(),
                     "tags": torch.from_numpy(labels_block).long(),
                 }
+    def __next__(self):
+        return next(self.generator)
 
 
 class panxValidationDataset(torch.utils.data.Dataset):
@@ -798,9 +811,10 @@ class panxValidationDataset(torch.utils.data.Dataset):
         self.dataset = get_dataset(set_name, subset_name)[split]
 
     def __iter__(self):
+        self.generator = self.__generator__()
         return self
 
-    def __next__(self):
+    def __generator__(self):
         for features in self.dataset:
             txt = features["tokens"]
             for i, each in enumerate(txt):
@@ -827,7 +841,7 @@ class panxValidationDataset(torch.utils.data.Dataset):
                     block_id * block_size : (block_id + 1) * block_size
                 ]
                 labels_block[: len(chosen_label)] = chosen_label
-                return {
+                yield {
                     "features": features,
                     "offset": len(
                         labels[: block_id * block_size][
@@ -837,6 +851,8 @@ class panxValidationDataset(torch.utils.data.Dataset):
                     "tokens": torch.from_numpy(ids_block).long(),
                     "tags": torch.from_numpy(labels_block).long(),
                 }
+    def __next__(self):
+        return next(self.generator)
 
 
 class panxTestDataset(torch.utils.data.Dataset):
@@ -848,9 +864,10 @@ class panxTestDataset(torch.utils.data.Dataset):
             self.dataset[lan] = get_dataset(set_name, subset_name)[split]
 
     def __iter__(self):
+        self.generator = self.__generator__()
         return self
 
-    def __next__(self):
+    def __generator__(self):
         for lan in self.dataset:
             for features in self.dataset[lan]:
                 txt = features["tokens"]
@@ -882,7 +899,7 @@ class panxTestDataset(torch.utils.data.Dataset):
                         block_id * block_size : (block_id + 1) * block_size
                     ]
                     labels_block[: len(chosen_label)] = chosen_label
-                    return {
+                    yield {
                         "features": features,
                         "offset": len(
                             labels[: block_id * block_size][
@@ -893,6 +910,8 @@ class panxTestDataset(torch.utils.data.Dataset):
                         "tags": torch.from_numpy(labels_block).long(),
                         "lan": lan,
                     }
+    def __next__(self):
+        return next(self.generator)
 
 
 class xnliTrainDataset(torch.utils.data.Dataset):
@@ -1209,13 +1228,16 @@ class xquadTrainDataset(torch.utils.data.Dataset):
         return len(self.dataset)
 
     def __iter__(self):
+        self.generator = self.__generator__()
         return self
 
-    def __next__(self):
+    def __generator__(self):
         for features in random.sample(
             self.dataset_features, len(self.dataset_features)
         ):
-            return features_to_torch_example(features)
+            yield features_to_torch_example(features)
+    def __next__(self):
+        return next(self.generator)
 
 
 class xquadValidationDataset(torch.utils.data.Dataset):
@@ -1225,11 +1247,14 @@ class xquadValidationDataset(torch.utils.data.Dataset):
         self.dataset = get_dataset(set_name, subset_name)[split]
 
     def __iter__(self):
+        self.generator = self.__generator__()
         return self
 
-    def __next__(self):
+    def __generator__(self):
         for features in self.dataset:
-            return features_to_torch_example(features)
+            yield features_to_torch_example(features)
+    def __next__(self):
+        return next(self.generator)
 
 
 class xquadTestDataset(torch.utils.data.Dataset):
@@ -1241,12 +1266,15 @@ class xquadTestDataset(torch.utils.data.Dataset):
             self.dataset[lan] = get_dataset(set_name, subset_name)[split]
 
     def __iter__(self):
+        self.generator = self.__generator__()
         return self
 
-    def __next__(self):
+    def __generator__(self):
         for lan in self.dataset:
             for features in self.dataset[lan]:
-                return features_to_torch_example(features, lan)
+                yield features_to_torch_example(features, lan)
+    def __next__(self):
+        return next(self.generator)
 
 
 class mlqaTestDataset(torch.utils.data.Dataset):
@@ -1258,12 +1286,15 @@ class mlqaTestDataset(torch.utils.data.Dataset):
             self.dataset[lan] = get_dataset(set_name, subset_name)[split]
 
     def __iter__(self):
+        self.generator = self.__generator__()
         return self
 
-    def __next__(self):
+    def __generator__(self):
         for lan in self.dataset:
             for features in self.dataset[lan]:
-                return features_to_torch_example(features, lan)
+                yield features_to_torch_example(features, lan)
+    def __next__(self):
+        return next(self.generator)
 
 
 class tydiqaTrainDataset(torch.utils.data.Dataset):
@@ -1283,15 +1314,18 @@ class tydiqaTrainDataset(torch.utils.data.Dataset):
         )
 
     def __iter__(self):
+        self.generator = self.__generator__()
         return self
 
-    def __next__(self):
+    def __generator__(self):
         for features in random.sample(
             self.dataset_features, len(self.dataset_features)
         ):
             if LANG2ISO[features["id"].split("-")[0]] != "en":
                 continue
-            return features_to_torch_example(features)
+            yield features_to_torch_example(features)
+    def __next__(self):
+        return next(self.generator)
 
 
 LANG2ISO = {
@@ -1314,13 +1348,16 @@ class tydiqaTestDataset(torch.utils.data.Dataset):
         self.dataset = get_dataset(set_name, subset_name)[split]
 
     def __iter__(self):
+        self.generator = self.__generator__()
         return self
 
-    def __next__(self):
+    def __generator__(self):
         for features in self.dataset:
-            return features_to_torch_example(
+            yield features_to_torch_example(
                 features, LANG2ISO[features["id"].split("-")[0]]
             )
+    def __next__(self):
+        return next(self.generator)
 
 
 class bucc2018Dataset(torch.utils.data.Dataset):
