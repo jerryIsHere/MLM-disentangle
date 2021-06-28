@@ -988,7 +988,7 @@ class pawsxTestDataset(torch.utils.data.Dataset):
         raise StopIteration
 
 
-def features_to_torch_example(features, lan):
+def features_to_torch_example(features, lan = None):
     context_encodings = tokenizer(
         features["context"],
     )
