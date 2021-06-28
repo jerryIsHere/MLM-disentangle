@@ -538,6 +538,18 @@ class udposTrainDataset(torch.utils.data.Dataset):
         set_name, subset_name, split = TASK["udpos"]["train"]
         self.dataset = get_dataset(set_name, subset_name)[split]
 
+    def __len__(self):
+        return sum(
+            map(
+                lambda features: 1
+                + (
+                    len(tokenizer(features["tokens"]).input_ids)
+                    // TASK["udpos"]["max seq length"]
+                ),
+                self.dataset,
+            )
+        )
+
     def __iter__(self):
         for features in random.shuffle(self.dataset):
             txt = features["tokens"]
@@ -1127,6 +1139,9 @@ class xquadTrainDataset(torch.utils.data.Dataset):
         set_name, subset_name, split = TASK["xquad"]["train"]
         self.dataset = get_dataset(set_name, subset_name)[split]
 
+    def __len__(self):
+        return len(self.dataseZ)
+
     def __iter__(self):
         for features in random.shuffle(self.dataset):
             yield features_to_torch_example(features)
@@ -1176,6 +1191,15 @@ class tydiqaTrainDataset(torch.utils.data.Dataset):
         self.task = "tydiqa"
         set_name, subset_name, split = TASK["tydiqa"]["train"]
         self.dataset = get_dataset(set_name, subset_name)[split]
+
+    def __len__(self):
+        return len(
+            [
+                instance
+                for instance in self.dataset
+                if LANG2ISO[instance["id"].split("-")[0]] == "en"
+            ]
+        )
 
     def __iter__(self):
         for features in random.shuffle(self.dataset):
