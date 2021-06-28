@@ -30,7 +30,7 @@ def normalize_string(txt):
 def normalize_ids(ids):
     tokens = xtreme_ds.tokenizer.convert_ids_to_tokens(ids)
     if 6 in ids:
-        return xtreme_ds.tokenizer.convert_token_toString(tokens)
+        return xtreme_ds.tokenizer.convert_tokens_to_string(tokens)
     return " ".join(
         [xtreme_ds.tokenizer.convert_tokens_to_string(token) for token in tokens]
     )
