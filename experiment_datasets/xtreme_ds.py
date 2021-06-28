@@ -552,7 +552,10 @@ class udposTrainDataset(torch.utils.data.Dataset):
             map(
                 lambda features: 1
                 + (
-                    len(tokenizer(features["tokens"]).input_ids)
+                    len(
+                        tokenizer(features["tokens"]).input_ids,
+                        is_split_into_words=True,
+                    )
                     // TASK["udpos"]["max seq length"]
                 ),
                 self.dataset,
@@ -710,7 +713,10 @@ class panxTrainDataset(torch.utils.data.Dataset):
             map(
                 lambda features: 1
                 + (
-                    len(tokenizer(features["tokens"]).input_ids)
+                    len(
+                        tokenizer(features["tokens"]).input_ids,
+                        is_split_into_words=True,
+                    )
                     // TASK["panx"]["max seq length"]
                 ),
                 self.dataset,
