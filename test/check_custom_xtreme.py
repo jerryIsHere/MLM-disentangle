@@ -124,7 +124,11 @@ assert i == len(ds) - 1
 
 
 import datasets
-from experiment.xquad.xquad_experiment import normalize_string, normalize_ids
+from experiment.xquad.xquad_experiment import (
+    normalize_string,
+    normalize_ids,
+    stringify_ids,
+)
 
 squad_metrics_normal = {}
 squad_metrics_custom = {}
@@ -140,9 +144,7 @@ for i, each in enumerate(ds):
     squad_metrics_normal[ds.__class__.__name__].add(
         prediction={
             "id": each["features"]["id"],
-            "prediction_text": xtreme_ds.tokenizer.convert_tokens_to_string(
-                xtreme_ds.tokenizer.convert_ids_to_tokens(reply_ids)
-            ),
+            "prediction_text": stringify_ids(reply_ids),
         },
         reference={
             "id": each["features"]["id"],
@@ -181,9 +183,7 @@ for i, each in enumerate(ds):
     squad_metrics_normal[ds.__class__.__name__].add(
         prediction={
             "id": each["features"]["id"],
-            "prediction_text": xtreme_ds.tokenizer.convert_tokens_to_string(
-                xtreme_ds.tokenizer.convert_ids_to_tokens(reply_ids)
-            ),
+            "prediction_text": stringify_ids(reply_ids),
         },
         reference={
             "id": each["features"]["id"],
@@ -213,6 +213,7 @@ assert len(instnace_ids[ds.__class__.__name__]) == len(
 )  # each question is at least answered once
 ds = xtreme_ds.xquadTestDataset()
 squad_metrics_normal[ds.__class__.__name__] = {}
+squad_metrics_custom[ds.__class__.__name__] = {}
 instnace_ids[ds.__class__.__name__] = {}
 for lan in xtreme_ds.TASK2LANGS[ds.task]:
     squad_metrics_normal[ds.__class__.__name__][lan] = datasets.load_metric("squad")
@@ -223,12 +224,10 @@ for i, each in enumerate(ds):
     instnace_ids[ds.__class__.__name__][lan].add(each["features"]["id"])
     reply_ids = each["tokens"][each["start_positions"] : each["end_positions"]]
 
-    squad_metrics_normal[ds.__class__.__name__].add(
+    squad_metrics_normal[ds.__class__.__name__][lan].add(
         prediction={
             "id": each["features"]["id"],
-            "prediction_text": xtreme_ds.tokenizer.convert_tokens_to_string(
-                xtreme_ds.tokenizer.convert_ids_to_tokens(reply_ids)
-            ),
+            "prediction_text": stringify_ids(reply_ids),
         },
         reference={
             "id": each["features"]["id"],
@@ -238,7 +237,7 @@ for i, each in enumerate(ds):
             },
         },
     )
-    squad_metrics_custom[ds.__class__.__name__].add(
+    squad_metrics_custom[ds.__class__.__name__][lan].add(
         prediction={
             "id": each["features"]["id"],
             "prediction_text": normalize_ids(reply_ids),
@@ -260,6 +259,7 @@ for lan in xtreme_ds.TASK2LANGS[ds.task]:
 
 ds = xtreme_ds.mlqaTestDataset()
 squad_metrics_normal[ds.__class__.__name__] = {}
+squad_metrics_custom[ds.__class__.__name__] = {}
 instnace_ids[ds.__class__.__name__] = {}
 for lan in xtreme_ds.TASK2LANGS[ds.task]:
     squad_metrics_normal[ds.__class__.__name__][lan] = datasets.load_metric("squad")
@@ -270,12 +270,10 @@ for i, each in enumerate(ds):
     instnace_ids[ds.__class__.__name__][lan].add(each["features"]["id"])
     reply_ids = each["tokens"][each["start_positions"] : each["end_positions"]]
 
-    squad_metrics_normal[ds.__class__.__name__].add(
+    squad_metrics_normal[ds.__class__.__name__][lan].add(
         prediction={
             "id": each["features"]["id"],
-            "prediction_text": xtreme_ds.tokenizer.convert_tokens_to_string(
-                xtreme_ds.tokenizer.convert_ids_to_tokens(reply_ids)
-            ),
+            "prediction_text": stringify_ids(reply_ids),
         },
         reference={
             "id": each["features"]["id"],
@@ -285,7 +283,7 @@ for i, each in enumerate(ds):
             },
         },
     )
-    squad_metrics_custom[ds.__class__.__name__].add(
+    squad_metrics_custom[ds.__class__.__name__][lan].add(
         prediction={
             "id": each["features"]["id"],
             "prediction_text": normalize_ids(reply_ids),
@@ -307,6 +305,7 @@ for lan in xtreme_ds.TASK2LANGS[ds.task]:
 
 ds = xtreme_ds.tydiqaTrainDataset()
 squad_metrics_normal[ds.__class__.__name__] = datasets.load_metric("squad")
+squad_metrics_custom[ds.__class__.__name__] = datasets.load_metric("squad")
 instnace_ids[ds.__class__.__name__] = set()
 for i, each in enumerate(ds):
     instnace_ids[ds.__class__.__name__].add(each["features"]["id"])
@@ -315,9 +314,7 @@ for i, each in enumerate(ds):
     squad_metrics_normal[ds.__class__.__name__].add(
         prediction={
             "id": each["features"]["id"],
-            "prediction_text": xtreme_ds.tokenizer.convert_tokens_to_string(
-                xtreme_ds.tokenizer.convert_ids_to_tokens(reply_ids)
-            ),
+            "prediction_text": stringify_ids(reply_ids),
         },
         reference={
             "id": each["features"]["id"],
@@ -351,6 +348,7 @@ assert len(instnace_ids[ds.__class__.__name__]) == len(
 )  # each question is at least answered once
 ds = xtreme_ds.tydiqaTestDataset()
 squad_metrics_normal[ds.__class__.__name__] = {}
+squad_metrics_custom[ds.__class__.__name__] = {}
 instnace_ids[ds.__class__.__name__] = {}
 for lan in xtreme_ds.TASK2LANGS[ds.task]:
     squad_metrics_normal[ds.__class__.__name__][lan] = datasets.load_metric("squad")
@@ -361,12 +359,10 @@ for i, each in enumerate(ds):
     instnace_ids[ds.__class__.__name__][lan].add(each["features"]["id"])
     reply_ids = each["tokens"][each["start_positions"] : each["end_positions"]]
 
-    squad_metrics_normal[ds.__class__.__name__].add(
+    squad_metrics_normal[ds.__class__.__name__][lan].add(
         prediction={
             "id": each["features"]["id"],
-            "prediction_text": xtreme_ds.tokenizer.convert_tokens_to_string(
-                xtreme_ds.tokenizer.convert_ids_to_tokens(reply_ids)
-            ),
+            "prediction_text": stringify_ids(reply_ids),
         },
         reference={
             "id": each["features"]["id"],
@@ -376,7 +372,7 @@ for i, each in enumerate(ds):
             },
         },
     )
-    squad_metrics_custom[ds.__class__.__name__].add(
+    squad_metrics_custom[ds.__class__.__name__][lan].add(
         prediction={
             "id": each["features"]["id"],
             "prediction_text": normalize_ids(reply_ids),

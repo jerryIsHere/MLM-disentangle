@@ -27,6 +27,12 @@ def normalize_string(txt):
     )
 
 
+def stringify_ids(ids):
+    return xtreme_ds.tokenizer.convert_tokens_to_string(
+        xtreme_ds.tokenizer.convert_ids_to_tokens(ids)
+    )
+
+
 def normalize_ids(ids):
     tokens = xtreme_ds.tokenizer.convert_ids_to_tokens(ids)
     if 6 in ids:
@@ -253,15 +259,16 @@ def qa_test(finetune_model, qa_ds, task):
             start_predictions = torch.argmax(Output["start_logits"], dim=1)
             end_predictions = torch.argmax(Output["end_logits"], dim=1)
             for i, lan in enumerate(batch["lan"]):
+                instance_id = lan + "-" + batch["id"][i]
                 predictions = xtreme_ds.tokenizer.convert_tokens_to_string(
                     xtreme_ds.tokenizer.convert_ids_to_tokens(
                         batch["tokens"][i][start_predictions[i] : end_predictions[i]]
                     )
                 )
                 lan_metric[lan].add(
-                    prediction={"id": batch["id"][i], "prediction_text": predictions},
+                    prediction={"id": instance_id, "prediction_text": predictions},
                     reference={
-                        "id": batch["id"][i],
+                        "id": instance_id,
                         "answers": {
                             "text": xtreme_ds.normalize_string(
                                 batch["answers"]["text"][i]
@@ -271,9 +278,9 @@ def qa_test(finetune_model, qa_ds, task):
                     },
                 )
                 metric.add(
-                    prediction={"id": batch["id"][i], "prediction_text": predictions},
+                    prediction={"id": instance_id, "prediction_text": predictions},
                     reference={
-                        "id": batch["id"][i],
+                        "id": instance_id,
                         "answers": {
                             "text": xtreme_ds.normalize_string(
                                 batch["answers"]["text"][i]
