@@ -86,7 +86,7 @@ for i, each in enumerate(ds):
             break
         instnace_id -= length
     assert each["label"] == xtreme_ds.xnliTrainDataset.class_label.index(
-        ds.dataset[split][id]["label"]
+        ds.dataset[split][instnace_id]["label"]
     )
 assert i == len(ds) - 1
 ds = xtreme_ds.xnliTestDataset()
@@ -112,13 +112,13 @@ assert i == len(ds) - 1
 ds = xtreme_ds.pawsxTestDataset()
 for i, each in enumerate(ds):
     instnace_id = i
-    for lan in xtreme_ds.TASK2LANGS[ds.task]:
+    for lan in ds.dataset:
         length = len(ds.dataset[lan])
         if instnace_id < length:
             break
         instnace_id -= length
     assert each["label"] == xtreme_ds.pawsxTrainDataset.class_label.index(
-        ds.dataset[lan][id]["label"]
+        ds.dataset[lan][instnace_id]["label"]
     )
 assert i == len(ds) - 1
 
