@@ -10,7 +10,6 @@ import torch
 import time
 import os
 
-task = "tydiqa"
 if __name__ == "__main__":
     from experiment.xquad.xquad_experiment import qa_build_model, qa_train, qa_test
 
@@ -36,6 +35,7 @@ if __name__ == "__main__":
         mlm_model_path="/gpfs1/home/ckchan666/mlm_disentangle_experiment/model/mlm/"
         + experiment_config_dict["training"].model_name
         + "/pytorch_model.bin",
+        task="tydiqa",
     )
     start_time = time.time()
     from torch.utils.tensorboard import SummaryWriter

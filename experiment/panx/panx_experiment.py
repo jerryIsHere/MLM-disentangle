@@ -35,6 +35,7 @@ if __name__ == "__main__":
         mlm_model_path="/gpfs1/home/ckchan666/mlm_disentangle_experiment/model/mlm/"
         + experiment_config_dict["training"].model_name
         + "/pytorch_model.bin",
+        task="panx",
     )
     start_time = time.time()
     from torch.utils.tensorboard import SummaryWriter
@@ -59,11 +60,9 @@ if __name__ == "__main__":
         model_path=model_path,
         MLMD_ds=MLMD_ds,
         tag_ds=xtreme_ds.panxTrainDataset(),
-        task="panx",
     )
     print(str(time.time() - start_time) + " seconds elapsed for training")
     tag_test(
         model,
         tag_ds=xtreme_ds.panxTestDataset(),
-        task="panx",
     )

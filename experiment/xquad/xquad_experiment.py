@@ -11,10 +11,8 @@ import time
 import os
 import re
 
-task = "xquad"
 
-
-def normalize_string(txt):
+def normalize_string(txt):  # only used in check_custom_xtreme.py
     if " " in txt:
         return txt
     return " ".join(
@@ -27,18 +25,18 @@ def normalize_string(txt):
     )
 
 
-def stringify_ids(ids):
-    return xtreme_ds.tokenizer.convert_tokens_to_string(
-        xtreme_ds.tokenizer.convert_ids_to_tokens(ids)
-    )
-
-
-def normalize_ids(ids):
+def normalize_ids(ids):  # only used in check_custom_xtreme.py
     tokens = xtreme_ds.tokenizer.convert_ids_to_tokens(ids)
     if 6 in ids:
         return xtreme_ds.tokenizer.convert_tokens_to_string(tokens)
     return " ".join(
         [xtreme_ds.tokenizer.convert_tokens_to_string(token) for token in tokens]
+    )
+
+
+def stringify_ids(ids):
+    return xtreme_ds.tokenizer.convert_tokens_to_string(
+        xtreme_ds.tokenizer.convert_ids_to_tokens(ids)
     )
 
 
@@ -79,9 +77,9 @@ def qa_train(
     model_path,
     MLMD_ds,
     qa_ds,
-    task,
     custom_stop_condition=lambda gradient_step: False,
 ):
+    task = qa_ds.task
     print("training " + task + " with dataset:" + qa_ds.__class__.__name__)
     no_decay = ["bias", "LayerNorm.weight"]
     optimizer_grouped_parameters = [
@@ -241,7 +239,8 @@ def qa_train(
 
 
 # testing
-def qa_test(finetune_model, qa_ds, task):
+def qa_test(finetune_model, qa_ds):
+    task = qa_ds.task
     print("evaluating " + task + " with dataset:" + qa_ds.__class__.__name__)
     test_dataloader = torch.utils.data.DataLoader(
         qa_ds, batch_size=1, num_workers=0, shuffle=True
@@ -259,33 +258,41 @@ def qa_test(finetune_model, qa_ds, task):
             start_predictions = torch.argmax(Output["start_logits"], dim=1)
             end_predictions = torch.argmax(Output["end_logits"], dim=1)
             for i, lan in enumerate(batch["lan"]):
-                instance_id = lan + "-" + batch["id"][i]
-                predictions = xtreme_ds.tokenizer.convert_tokens_to_string(
-                    xtreme_ds.tokenizer.convert_ids_to_tokens(
-                        batch["tokens"][i][start_predictions[i] : end_predictions[i]]
-                    )
-                )
+                question_id = lan + "-" + batch["id"][i]
+                reply_ids = batch["tokens"][i][
+                    start_predictions[i] : end_predictions[i]
+                ]
                 lan_metric[lan].add(
-                    prediction={"id": instance_id, "prediction_text": predictions},
+                    prediction={
+                        "id": question_id,
+                        "prediction_text": stringify_ids(reply_ids),
+                    },
                     reference={
-                        "id": instance_id,
+                        "id": question_id,
                         "answers": {
-                            "text": xtreme_ds.normalize_string(
-                                batch["answers"]["text"][i]
-                            ),
-                            "answer_start": batch["answers"]["answer_start"][i],
+                            "text": [
+                                ans for ans in batch["features"]["answers"]["text"]
+                            ],
+                            "answer_start": batch["features"]["answers"][
+                                "answer_start"
+                            ][i],
                         },
                     },
                 )
                 metric.add(
-                    prediction={"id": instance_id, "prediction_text": predictions},
+                    prediction={
+                        "id": question_id,
+                        "prediction_text": stringify_ids(reply_ids),
+                    },
                     reference={
-                        "id": instance_id,
+                        "id": question_id,
                         "answers": {
-                            "text": xtreme_ds.normalize_string(
-                                batch["answers"]["text"][i]
-                            ),
-                            "answer_start": batch["answers"]["answer_start"][i],
+                            "text": [
+                                ans for ans in batch["features"]["answers"]["text"]
+                            ],
+                            "answer_start": batch["features"]["answers"][
+                                "answer_start"
+                            ][i],
                         },
                     },
                 )
@@ -323,6 +330,7 @@ if __name__ == "__main__":
         mlm_model_path="/gpfs1/home/ckchan666/mlm_disentangle_experiment/model/mlm/"
         + experiment_config_dict["training"].model_name
         + "/pytorch_model.bin",
+        task="xquad",
     )
     start_time = time.time()
     from torch.utils.tensorboard import SummaryWriter

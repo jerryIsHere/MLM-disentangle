@@ -60,7 +60,6 @@ if __name__ == "__main__":
         model_path=model_path,
         MLMD_ds=MLMD_ds,
         cls_ds=xtreme_ds.pawsxTrainDataset(),
-        task="pawsx",
     )
     print(str(time.time() - start_time) + " seconds elapsed for training")
-    cls_test(model, cls_ds=xtreme_ds.pawsxTestDataset(), task="pawsx")
+    cls_test(model, cls_ds=xtreme_ds.pawsxTestDataset())

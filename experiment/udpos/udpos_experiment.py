@@ -50,9 +50,9 @@ def tag_train(
     model_path,
     MLMD_ds,
     tag_ds,
-    task,
     custom_stop_condition=lambda gradient_step: False,
 ):
+    task = tag_ds.task
     print("training " + task + " with dataset:" + tag_ds.__class__.__name__)
     no_decay = ["bias", "LayerNorm.weight"]
     optimizer_grouped_parameters = [
@@ -211,7 +211,8 @@ def tag_train(
 
 
 # testing
-def tag_test(finetune_model, task, tag_ds):
+def tag_test(finetune_model, tag_ds):
+    task = tag_ds.task
     print("evaluating " + task + " with dataset:" + tag_ds.__class__.__name__)
     test_dataloader = torch.utils.data.DataLoader(
         tag_ds, batch_size=1, num_workers=0, shuffle=True
@@ -269,6 +270,7 @@ if __name__ == "__main__":
         mlm_model_path="/gpfs1/home/ckchan666/mlm_disentangle_experiment/model/mlm/"
         + experiment_config_dict["training"].model_name
         + "/pytorch_model.bin",
+        task="udpos",
     )
     start_time = time.time()
     from torch.utils.tensorboard import SummaryWriter
@@ -293,11 +295,9 @@ if __name__ == "__main__":
         model_path=model_path,
         MLMD_ds=MLMD_ds,
         tag_ds=xtreme_ds.udposTrainDataset(),
-        task="udpos",
     )
     print(str(time.time() - start_time) + " seconds elapsed for training")
     tag_test(
         model,
         tag_ds=xtreme_ds.udposTestDataset(),
-        task="udpos",
     )

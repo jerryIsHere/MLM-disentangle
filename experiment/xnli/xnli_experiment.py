@@ -50,9 +50,9 @@ def cls_train(
     model_path,
     MLMD_ds,
     cls_ds,
-    task,
     custom_stop_condition=lambda gradient_step: False,
 ):
+    task = cls_ds.task
     print("training " + task + " with dataset:" + cls_ds.__class__.__name__)
     no_decay = ["bias", "LayerNorm.weight"]
     optimizer_grouped_parameters = [
@@ -214,8 +214,8 @@ def cls_train(
 def cls_test(
     finetune_model,
     cls_ds,
-    task,
 ):
+    task = cls_ds.task
     print("evaluating " + task + " with dataset:" + cls_ds.__class__.__name__)
     test_dataloader = torch.utils.data.DataLoader(
         cls_ds, batch_size=1, num_workers=0, shuffle=True
@@ -295,7 +295,6 @@ if __name__ == "__main__":
         model_path=model_path,
         MLMD_ds=MLMD_ds,
         cls_ds=xtreme_ds.xnliTrainDataset(),
-        task="xnli",
     )
     print(str(time.time() - start_time) + " seconds elapsed for training")
-    cls_test(model, cls_ds=xtreme_ds.xnliTestDataset(), task="xnli")
+    cls_test(model, cls_ds=xtreme_ds.xnliTestDataset())
