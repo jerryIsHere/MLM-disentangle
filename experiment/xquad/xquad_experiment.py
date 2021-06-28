@@ -15,6 +15,7 @@ task = "xquad"
 
 
 def normalize_string(txt):
+    return txt
     if re.search("^[\d]+$", txt):
         return txt
     tokenized_detokenized = " ".join(
@@ -27,8 +28,11 @@ def normalize_string(txt):
 
 
 def normalize_ids(ids):
+    return xtreme_ds.tokenizer.convert_tokens_to_string(
+        xtreme_ds.tokenizer.convert_ids_to_tokens(ids)
+    )
     tokenized_detokenized = " ".join(xtreme_ds.tokenizer.convert_ids_to_tokens(ids))
-    if tokenized_detokenized [0] == "▁":
+    if tokenized_detokenized[0] == "▁":
         tokenized_detokenized = tokenized_detokenized[1:]
     if re.search("^\([\d\s]+\)$", tokenized_detokenized):  # is number with brancket
         tokenized_detokenized = tokenized_detokenized[1:-1]
