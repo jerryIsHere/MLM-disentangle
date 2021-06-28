@@ -86,6 +86,7 @@ def tag_train(
         shuffle=True,
     )
     disentangle_iter = iter(disentangle_dataloader)
+    print(tag_ds)
     tag_ds_dataloader = xtreme_ds.batcher(tag_ds, batch_size=2)
     gradient_acc_size = xtreme_ds.TASK[task]["gradient_acc_size"]
     batch_size = xtreme_ds.TASK[task]["batch_size"]
@@ -116,7 +117,6 @@ def tag_train(
     i = 0
     for _ in range(xtreme_ds.TASK[task]["epochs"]):
         for batch in tag_ds_dataloader:
-            print(batch)
             #  input to gpu
             batch["tokens"] = batch["tokens"].cuda()
             batch["tags"] = batch["tags"].cuda()
