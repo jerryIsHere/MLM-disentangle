@@ -608,7 +608,7 @@ class udposTrainDataset(torch.utils.data.Dataset):
                     block_id * block_size : (block_id + 1) * block_size
                 ]
                 labels_block[: len(chosen_label)] = chosen_label
-                yield {
+                return {
                     "features": features,
                     "offset": len(
                         labels[: block_id * block_size][
@@ -656,7 +656,7 @@ class udposValidationDataset(torch.utils.data.Dataset):
                     block_id * block_size : (block_id + 1) * block_size
                 ]
                 labels_block[: len(chosen_label)] = chosen_label
-                yield {
+                return {
                     "features": features,
                     "offset": len(
                         labels[: block_id * block_size][
@@ -711,7 +711,7 @@ class udposTestDataset(torch.utils.data.Dataset):
                         block_id * block_size : (block_id + 1) * block_size
                     ]
                     labels_block[: len(chosen_label)] = chosen_label
-                    yield {
+                    return {
                         "features": features,
                         "offset": len(
                             labels[: block_id * block_size][
@@ -779,7 +779,7 @@ class panxTrainDataset(torch.utils.data.Dataset):
                     block_id * block_size : (block_id + 1) * block_size
                 ]
                 labels_block[: len(chosen_label)] = chosen_label
-                yield {
+                return {
                     "features": features,
                     "offset": len(
                         labels[: block_id * block_size][
@@ -827,7 +827,7 @@ class panxValidationDataset(torch.utils.data.Dataset):
                     block_id * block_size : (block_id + 1) * block_size
                 ]
                 labels_block[: len(chosen_label)] = chosen_label
-                yield {
+                return {
                     "features": features,
                     "offset": len(
                         labels[: block_id * block_size][
@@ -882,7 +882,7 @@ class panxTestDataset(torch.utils.data.Dataset):
                         block_id * block_size : (block_id + 1) * block_size
                     ]
                     labels_block[: len(chosen_label)] = chosen_label
-                    yield {
+                    return {
                         "features": features,
                         "offset": len(
                             labels[: block_id * block_size][
@@ -1215,7 +1215,7 @@ class xquadTrainDataset(torch.utils.data.Dataset):
         for features in random.sample(
             self.dataset_features, len(self.dataset_features)
         ):
-            yield features_to_torch_example(features)
+            return features_to_torch_example(features)
 
 
 class xquadValidationDataset(torch.utils.data.Dataset):
@@ -1229,7 +1229,7 @@ class xquadValidationDataset(torch.utils.data.Dataset):
 
     def __next__(self):
         for features in self.dataset:
-            yield features_to_torch_example(features)
+            return features_to_torch_example(features)
 
 
 class xquadTestDataset(torch.utils.data.Dataset):
@@ -1246,7 +1246,7 @@ class xquadTestDataset(torch.utils.data.Dataset):
     def __next__(self):
         for lan in self.dataset:
             for features in self.dataset[lan]:
-                yield features_to_torch_example(features, lan)
+                return features_to_torch_example(features, lan)
 
 
 class mlqaTestDataset(torch.utils.data.Dataset):
@@ -1263,7 +1263,7 @@ class mlqaTestDataset(torch.utils.data.Dataset):
     def __next__(self):
         for lan in self.dataset:
             for features in self.dataset[lan]:
-                yield features_to_torch_example(features, lan)
+                return features_to_torch_example(features, lan)
 
 
 class tydiqaTrainDataset(torch.utils.data.Dataset):
@@ -1291,7 +1291,7 @@ class tydiqaTrainDataset(torch.utils.data.Dataset):
         ):
             if LANG2ISO[features["id"].split("-")[0]] != "en":
                 continue
-            yield features_to_torch_example(features)
+            return features_to_torch_example(features)
 
 
 LANG2ISO = {
@@ -1318,7 +1318,7 @@ class tydiqaTestDataset(torch.utils.data.Dataset):
 
     def __next__(self):
         for features in self.dataset:
-            yield features_to_torch_example(
+            return features_to_torch_example(
                 features, LANG2ISO[features["id"].split("-")[0]]
             )
 
