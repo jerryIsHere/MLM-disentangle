@@ -291,7 +291,7 @@ def qa_test(finetune_model, qa_ds):
                             ],
                             "answer_start": batch["features"]["answers"][
                                 "answer_start"
-                            ][i],
+                            ],
                         },
                     },
                 )
