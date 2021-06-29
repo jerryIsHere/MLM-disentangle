@@ -11,7 +11,7 @@ import time
 import os
 
 if __name__ == "__main__":
-    from experiment.udpos.udpos_experiment import build_model, tag_train, tag_test
+    from experiment.udpos.udpos_experiment import tag_build_model, tag_train, tag_test
 
     parser = argparse.ArgumentParser(description="panx disentangle experinment")
     parser.add_argument(
@@ -32,7 +32,7 @@ if __name__ == "__main__":
     experiment_config_dict["training"].model_name = (
         os.path.abspath(args.config_json).split("/")[-1].split(".")[0]
     )
-    model = build_model(
+    model = tag_build_model(
         experiment_config_dict=experiment_config_dict,
         mlm_model_path="/gpfs1/home/ckchan666/mlm_disentangle_experiment/model/mlm/"
         + experiment_config_dict["training"].model_name
