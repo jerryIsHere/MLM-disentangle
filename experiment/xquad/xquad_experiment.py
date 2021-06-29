@@ -153,8 +153,8 @@ def qa_train(
             finetune_model.taskmodels_dict[task].cuda()
             Output = finetune_model.taskmodels_dict[task](
                 input_ids=batch["tokens"],
-                start_positions=batch["start_positions"][:, 0],
-                end_positions=batch["end_positions"][:, 0],
+                start_positions=batch["start_positions"],
+                end_positions=batch["end_positions"],
             )
             Output["loss"].backward()
 
