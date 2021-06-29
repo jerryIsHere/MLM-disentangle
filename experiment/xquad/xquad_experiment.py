@@ -13,6 +13,7 @@ import re
 
 
 def normalize_string(txt):  # only used in check_custom_xtreme.py
+    return txt
     if " " in txt:
         return txt
     return " ".join(
@@ -26,6 +27,7 @@ def normalize_string(txt):  # only used in check_custom_xtreme.py
 
 
 def normalize_ids(ids):  # only used in check_custom_xtreme.py
+    return stringify_ids(ids)
     tokens = xtreme_ds.tokenizer.convert_ids_to_tokens(ids)
     if 6 in ids:
         return xtreme_ds.tokenizer.convert_tokens_to_string(tokens)
