@@ -256,7 +256,7 @@ def qa_test(finetune_model, qa_ds):
             start_predictions = torch.argmax(Output["start_logits"], dim=1)
             end_predictions = torch.argmax(Output["end_logits"], dim=1)
             for i, lan in enumerate(batch["lan"]):
-                question_id = lan + "-" + batch["id"][i]
+                question_id = lan + "-" + batch["features"]["id"][i]
                 reply_ids = batch["tokens"][i][
                     start_predictions[i] : end_predictions[i]
                 ]
