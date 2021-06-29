@@ -252,7 +252,9 @@ if __name__ == "__main__":
         type=str,
         help="path to configuration json file of the pretrained disentangled model",
         default=os.path.join(
-            os.path.dirname(os.path.abspath(__file__)), "/default.json"
+            os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+            "mlm",
+            "default.json",
         ),
     )
 
