@@ -56,7 +56,6 @@ class MultitaskModel(transformers.PreTrainedModel):
         taskmodels_dict = {}
         for task in task_dict:
             model = task_dict[task]["type"](
-                backbone_name,
                 config=task_dict[task]["config"],
             )
             if shared_backbone is None:
