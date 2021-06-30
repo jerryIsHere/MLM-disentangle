@@ -44,6 +44,33 @@ class MultitaskModel(transformers.PreTrainedModel):
         )
 
     @classmethod
+    def create_untrained(cls, backbone_name, task_dict):
+        """
+        This creates a MultitaskModel using the model class and config objects
+        from single-task models.
+
+        We do this by creating each single-task model, and having them share
+        the same backbone transformer.
+        """
+        shared_backbone = None
+        taskmodels_dict = {}
+        for task in task_dict:
+            model = task_dict[task]["type"](
+                backbone_name,
+                config=task_dict[task]["config"],
+            )
+            if shared_backbone is None:
+                shared_backbone = getattr(model, cls.get_backbone_attr_name(model))
+            else:
+                setattr(model, cls.get_backbone_attr_name(model), shared_backbone)
+            taskmodels_dict[task] = model
+        return cls(
+            backbone=shared_backbone,
+            taskmodels_dict=taskmodels_dict,
+            backbone_name=backbone_name,
+        )
+
+    @classmethod
     def get_backbone_attr_name(cls, model):
         """
         The backbone transformer is named differently in each model "architecture".
