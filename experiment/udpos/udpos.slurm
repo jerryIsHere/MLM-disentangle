@@ -11,4 +11,4 @@
 
 module load python37
 source /gpfs1/home/ckchan666/mnlpEnv/bin/activate
-python /gpfs1/home/ckchan666/MLM-disentangle/experiment/udpos/udpos_experiment.py
+python /gpfs1/home/ckchan666/MLM-disentangle/experiment/udpos/udpos_experiment.py --do_train --do_test
