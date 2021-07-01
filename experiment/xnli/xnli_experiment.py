@@ -175,7 +175,9 @@ def cls_train(
             # disentangle model to gpu
             finetune_model.taskmodels_dict["disentangle"].cuda()
             disentangleOutput = finetune_model.taskmodels_dict["disentangle"](
-                input_ids=batch["masked_tokens"],
+                input_ids=batch["masked_tokens"][
+                    0 : xtreme_ds.TASK[task]["max seq length"]
+                ],
                 labels={
                     "language_id": batch["language_id"],
                     "genus_label": batch["genus_label"],
