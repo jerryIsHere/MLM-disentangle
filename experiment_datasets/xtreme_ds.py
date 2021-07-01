@@ -570,15 +570,10 @@ class batcher:
         return self
 
     def __next__(self):
-        while True:
-            batch = list()
-            try:
-                for i in range(max(1, self.batch_size)):
-                    batch.append(next(self.it))
-                yield reducer(batch)
-            except StopIteration:
-                break
-        raise StopIteration()()
+        batch = list()
+        for i in range(max(1, self.batch_size)):
+            batch.append(next(self.it))
+        return reducer(batch)
 
 
 class udposTrainDataset(torch.utils.data.Dataset):
