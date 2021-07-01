@@ -533,8 +533,10 @@ import random
 
 
 class loop_iter:
-    def __iter__(self, iter_class):
+    def __init__(self, iter_class):
         self.source = iter_class
+
+    def __iter__(self):
         self.iterator = iter(self.source)
         return self
 
