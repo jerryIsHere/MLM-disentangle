@@ -560,16 +560,24 @@ def reducer(source):
         return source
 
 
-def batcher(iterableDS, batch_size):
-    it = iter(iterableDS)
-    while True:
-        batch = list()
-        try:
-            for i in range(max(1, batch_size)):
-                batch.append(next(it))
-            yield reducer(batch)
-        except StopIteration:
-            break
+class batcher:
+    def __init__(self, iterableDS, batch_size):
+        self.iterableDS = iterableDS
+        self.batch_size = batch_size
+
+    def __iter__(self):
+        self.it = iter(iterableDS)
+        return self
+
+    def __next__(self):
+        while True:
+            batch = list()
+            try:
+                for i in range(max(1, self.batch_size)):
+                    batch.append(next(self.it))
+                yield reducer(batch)
+            except StopIteration:
+                break
 
 
 class udposTrainDataset(torch.utils.data.Dataset):
