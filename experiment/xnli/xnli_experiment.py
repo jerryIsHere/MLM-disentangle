@@ -113,7 +113,7 @@ def cls_train(
         num_workers=0,
         shuffle=True,
     )
-    disentangle_iter = iter(disentangle_dataloader)
+    disentangle_iter = iter(xtreme_ds.loop_iter(disentangle_dataloader))
     xnli_ds_dataloader = torch.utils.data.DataLoader(
         cls_ds, batch_size=2, num_workers=0, shuffle=True
     )
@@ -145,7 +145,6 @@ def cls_train(
     )
     i = 0
     for _ in range(xtreme_ds.TASK[task]["epochs"]):
-        disentangle_iter = iter(disentangle_dataloader)
         for batch in xnli_ds_dataloader:
             #  input to gpu
             batch["tokens"] = batch["tokens"].cuda()

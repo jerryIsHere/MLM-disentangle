@@ -532,6 +532,20 @@ import torch
 import random
 
 
+class loop_iter:
+    def __iter__(self, iter_class):
+        self.source = iter_class
+        self.iterator = iter(self.source)
+        return self
+
+    def __next__(self):
+        try:
+            return next(self.iterator)
+        except StopIteration:
+            self.iterator = iter(self.source)
+            return next(self.iterator)
+
+
 def reducer(source):
     if isinstance(source[0], dict):
         target = {}
@@ -544,16 +558,17 @@ def reducer(source):
         return source
 
 
-def batcher(iterableDS, batch_size): 
+def batcher(iterableDS, batch_size):
     it = iter(iterableDS)
     while True:
         batch = list()
         try:
             for i in range(max(1, batch_size)):
-                    batch.append(next(it))
+                batch.append(next(it))
             yield reducer(batch)
         except StopIteration:
             break
+
 
 class udposTrainDataset(torch.utils.data.Dataset):
     def __init__(self):
