@@ -577,7 +577,7 @@ class batcher:
                     batch.append(next(self.it))
                 yield reducer(batch)
             except StopIteration:
-                break
+                raise StopIteration
 
 
 class udposTrainDataset(torch.utils.data.Dataset):
