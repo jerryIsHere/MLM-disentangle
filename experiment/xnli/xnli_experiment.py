@@ -17,7 +17,7 @@ def cls_build_model(experiment_config_dict, mlm_model_path, task):
 
     setattr(XLMRConfig, "discriminators", experiment_config_dict["discriminators"])
 
-    finetune_model = MultitaskModel.create(
+    finetune_model = MultitaskModel.create_untrained(
         backbone_name=backbone_name,
         task_dict={
             "mlm": {
@@ -42,6 +42,34 @@ def cls_build_model(experiment_config_dict, mlm_model_path, task):
         ),
     )
     return finetune_model
+
+
+def cls_load_finetuned_model(experiment_config_dict, mlm_model_path, task):
+    backbone_name = experiment_config_dict["training"].backbone_name
+    XLMRConfig = transformers.AutoConfig.from_pretrained(backbone_name)
+
+    setattr(XLMRConfig, "discriminators", experiment_config_dict["discriminators"])
+
+    finetuned_model = MultitaskModel.create_untrained(
+        backbone_name=backbone_name,
+        task_dict={
+            task: {
+                "type": transformers.XLMRobertaForSequenceClassification,
+                "config": transformers.XLMRobertaConfig.from_pretrained(
+                    finetuned_model.backbone_name,
+                    num_labels=xtreme_ds.TASK[task]["num_labels"],
+                ),
+            },
+            "disentangle": {
+                "type": XLMRobertaForDisentanglement,
+                "config": XLMRConfig,
+            },
+        },
+    )
+    import torch
+
+    finetuned_model.load_state_dict(torch.load(mlm_model_path))
+    return finetuned_model
 
 
 def cls_train(
@@ -218,9 +246,7 @@ def cls_test(
 ):
     task = cls_ds.task
     print("evaluating " + task + " with dataset:" + cls_ds.__class__.__name__)
-    test_dataloader = torch.utils.data.DataLoader(
-        cls_ds, batch_size=1, num_workers=0
-    )
+    test_dataloader = torch.utils.data.DataLoader(cls_ds, batch_size=1, num_workers=0)
     metric = xtreme_ds.METRIC_FUNCTION[task]()
     lan_metric = {}
     for lan in xtreme_ds.TASK2LANGS[task]:
@@ -261,43 +287,63 @@ if __name__ == "__main__":
             "default.json",
         ),
     )
-
+    parser.add_argument(
+        "--do_train", action="store_true", help="Whether to run training."
+    )
+    parser.add_argument(
+        "--do_test", action="store_true", help="Whether to run training."
+    )
     args = parser.parse_args()
     with open(args.config_json, "r") as outfile:
         experiment_config_dict = json.load(outfile, cls=ExperimentConfigSerializer)
     experiment_config_dict["training"].model_name = (
         os.path.abspath(args.config_json).split("/")[-1].split(".")[0]
     )
-    model = cls_build_model(
-        experiment_config_dict=experiment_config_dict,
-        mlm_model_path="/gpfs1/home/ckchan666/mlm_disentangle_experiment/model/mlm/"
-        + experiment_config_dict["training"].model_name
-        + "/pytorch_model.bin",
-        task="xnli",
-    )
-    start_time = time.time()
-    from torch.utils.tensorboard import SummaryWriter
+    if args.do_train:
+        model = cls_build_model(
+            experiment_config_dict=experiment_config_dict,
+            mlm_model_path="/gpfs1/home/ckchan666/mlm_disentangle_experiment/model/mlm/"
+            + experiment_config_dict["training"].model_name
+            + "/pytorch_model.bin",
+            task="xnli",
+        )
+        start_time = time.time()
+        from torch.utils.tensorboard import SummaryWriter
 
-    writer = SummaryWriter(
-        "/gpfs1/home/ckchan666/mlm_disentangle_experiment/tensorboard/"
-        + os.path.dirname(os.path.abspath(__file__)).split("/")[-1]
-        + "/"
-        + experiment_config_dict["training"].model_name
-    )
-    model_path = (
-        "/gpfs1/home/ckchan666/mlm_disentangle_experiment/model/"
-        + os.path.dirname(os.path.abspath(__file__)).split("/")[-1]
-        + "/"
-        + experiment_config_dict["training"].model_name
-    )
-    MLMD_ds = oscar_corpus.get_custom_corpus()
-    MLMD_ds.set_format(type="torch")
-    cls_train(
-        finetune_model=model,
-        writer=writer,
-        model_path=model_path,
-        MLMD_ds=MLMD_ds,
-        cls_ds=xtreme_ds.xnliTrainDataset(),
-    )
-    print(str(time.time() - start_time) + " seconds elapsed for training")
-    cls_test(model, cls_ds=xtreme_ds.xnliTestDataset())
+        writer = SummaryWriter(
+            "/gpfs1/home/ckchan666/mlm_disentangle_experiment/tensorboard/"
+            + os.path.dirname(os.path.abspath(__file__)).split("/")[-1]
+            + "/"
+            + experiment_config_dict["training"].model_name
+        )
+        model_path = (
+            "/gpfs1/home/ckchan666/mlm_disentangle_experiment/model/"
+            + os.path.dirname(os.path.abspath(__file__)).split("/")[-1]
+            + "/"
+            + experiment_config_dict["training"].model_name
+        )
+        MLMD_ds = oscar_corpus.get_custom_corpus()
+        MLMD_ds.set_format(type="torch")
+        cls_train(
+            finetune_model=model,
+            writer=writer,
+            model_path=model_path,
+            MLMD_ds=MLMD_ds,
+            cls_ds=xtreme_ds.xnliTrainDataset(),
+        )
+        print(str(time.time() - start_time) + " seconds elapsed for training")
+    if args.do_test:
+        ds = xtreme_ds.xnliTestDataset()
+        model = cls_load_finetuned_model(
+            experiment_config_dict=experiment_config_dict,
+            mlm_model_path="/gpfs1/home/ckchan666/mlm_disentangle_experiment/model/"
+            + ds.task
+            + "/"
+            + experiment_config_dict["training"].model_name
+            + "/pytorch_model.bin",
+            task="udpos",
+        )
+        cls_test(
+            model,
+            cls_ds=ds,
+        )
