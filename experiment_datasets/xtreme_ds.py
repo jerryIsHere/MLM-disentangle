@@ -566,7 +566,7 @@ class batcher:
         self.batch_size = batch_size
 
     def __iter__(self):
-        self.it = iter(iterableDS)
+        self.it = iter(self.iterableDS)
         return self
 
     def __next__(self):
