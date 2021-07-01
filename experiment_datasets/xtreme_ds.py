@@ -578,7 +578,7 @@ class batcher:
                 yield reducer(batch)
             except StopIteration:
                 break
-        raise StopIteration
+        raise StopIteration()()
 
 
 class udposTrainDataset(torch.utils.data.Dataset):
@@ -652,7 +652,7 @@ class udposTrainDataset(torch.utils.data.Dataset):
         try:
             return next(self.generator)
         except StopIteration:
-            raise StopIteration
+            raise StopIteration()
 
 
 class udposValidationDataset(torch.utils.data.Dataset):
@@ -707,7 +707,7 @@ class udposValidationDataset(torch.utils.data.Dataset):
         try:
             return next(self.generator)
         except StopIteration:
-            raise StopIteration
+            raise StopIteration()
 
 
 class udposTestDataset(torch.utils.data.Dataset):
@@ -770,7 +770,7 @@ class udposTestDataset(torch.utils.data.Dataset):
         try:
             return next(self.generator)
         except StopIteration:
-            raise StopIteration
+            raise StopIteration()
 
 
 class panxTrainDataset(torch.utils.data.Dataset):
@@ -844,7 +844,7 @@ class panxTrainDataset(torch.utils.data.Dataset):
         try:
             return next(self.generator)
         except StopIteration:
-            raise StopIteration
+            raise StopIteration()
 
 
 class panxValidationDataset(torch.utils.data.Dataset):
@@ -899,7 +899,7 @@ class panxValidationDataset(torch.utils.data.Dataset):
         try:
             return next(self.generator)
         except StopIteration:
-            raise StopIteration
+            raise StopIteration()
 
 
 class panxTestDataset(torch.utils.data.Dataset):
@@ -962,7 +962,7 @@ class panxTestDataset(torch.utils.data.Dataset):
         try:
             return next(self.generator)
         except StopIteration:
-            raise StopIteration
+            raise StopIteration()
 
 
 class xnliTrainDataset(torch.utils.data.Dataset):
@@ -1024,7 +1024,7 @@ class xnliValidationDataset(torch.utils.data.Dataset):
                     ).long(),
                 }
             global_id -= length
-        raise StopIteration
+        raise StopIteration()
 
 
 class xnliTestDataset(torch.utils.data.Dataset):
@@ -1145,7 +1145,7 @@ class pawsxTestDataset(torch.utils.data.Dataset):
                     "lan": lan,
                 }
             global_id -= length
-        raise StopIteration
+        raise StopIteration()
 
 
 def features_to_torch_example(features, lan=None):
@@ -1292,7 +1292,7 @@ class xquadTrainDataset(torch.utils.data.Dataset):
         try:
             return next(self.generator)
         except StopIteration:
-            raise StopIteration
+            raise StopIteration()
 
 
 class xquadValidationDataset(torch.utils.data.Dataset):
@@ -1313,7 +1313,7 @@ class xquadValidationDataset(torch.utils.data.Dataset):
         try:
             return next(self.generator)
         except StopIteration:
-            raise StopIteration
+            raise StopIteration()
 
 
 class xquadTestDataset(torch.utils.data.Dataset):
@@ -1337,7 +1337,7 @@ class xquadTestDataset(torch.utils.data.Dataset):
         try:
             return next(self.generator)
         except StopIteration:
-            raise StopIteration
+            raise StopIteration()
 
 
 class mlqaTestDataset(torch.utils.data.Dataset):
@@ -1361,7 +1361,7 @@ class mlqaTestDataset(torch.utils.data.Dataset):
         try:
             return next(self.generator)
         except StopIteration:
-            raise StopIteration
+            raise StopIteration()
 
 
 class tydiqaTrainDataset(torch.utils.data.Dataset):
@@ -1396,7 +1396,7 @@ class tydiqaTrainDataset(torch.utils.data.Dataset):
         try:
             return next(self.generator)
         except StopIteration:
-            raise StopIteration
+            raise StopIteration()
 
 
 LANG2ISO = {
@@ -1432,7 +1432,7 @@ class tydiqaTestDataset(torch.utils.data.Dataset):
         try:
             return next(self.generator)
         except StopIteration:
-            raise StopIteration
+            raise StopIteration()
 
 
 class bucc2018Dataset(torch.utils.data.Dataset):
@@ -1470,7 +1470,7 @@ class bucc2018Dataset(torch.utils.data.Dataset):
                     "lan": lan,
                 }
             global_id -= length
-        raise StopIteration
+        raise StopIteration()
 
 
 class tatoebaDataset(torch.utils.data.Dataset):
@@ -1508,4 +1508,4 @@ class tatoebaDataset(torch.utils.data.Dataset):
                     "lan": lan,
                 }
             global_id -= length
-        raise StopIteration
+        raise StopIteration()
