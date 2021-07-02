@@ -85,7 +85,7 @@ def qa_load_finetuned_model(experiment_config_dict, mlm_model_path, task):
             task: {
                 "type": transformers.XLMRobertaForQuestionAnswering,
                 "config": transformers.XLMRobertaConfig.from_pretrained(
-                    finetuned_model.backbone_name
+                    backbone_name
                 ),
             },
             "disentangle": {
@@ -402,7 +402,7 @@ if __name__ == "__main__":
             + "/"
             + experiment_config_dict["training"].model_name
             + "/pytorch_model.bin",
-            task="udpos",
+            task=ds.task,
         )
         mlqa_ds = xtreme_ds.mlqaTestDataset()
         qa_test(model, qa_ds=mlqa_ds)

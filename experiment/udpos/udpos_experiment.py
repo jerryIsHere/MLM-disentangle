@@ -56,7 +56,7 @@ def tag_load_finetuned_model(experiment_config_dict, mlm_model_path, task):
             task: {
                 "type": transformers.XLMRobertaForTokenClassification,
                 "config": transformers.XLMRobertaConfig.from_pretrained(
-                    finetuned_model.backbone_name,
+                    backbone_name,
                     num_labels=xtreme_ds.TASK[task]["num_labels"],
                 ),
             },
@@ -340,7 +340,7 @@ if __name__ == "__main__":
             + "/"
             + experiment_config_dict["training"].model_name
             + "/pytorch_model.bin",
-            task="udpos",
+            task=ds.task,
         )
         tag_test(
             model,

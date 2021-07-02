@@ -84,7 +84,7 @@ if __name__ == "__main__":
             + "/"
             + experiment_config_dict["training"].model_name
             + "/pytorch_model.bin",
-            task="udpos",
+            task=ds.task,
         )
         cls_test(
             model,
