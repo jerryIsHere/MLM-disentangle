@@ -1462,6 +1462,8 @@ class bucc2018Dataset(torch.utils.data.Dataset):
                 return {
                     "source_tokens": torch.tensor(source_encodings.input_ids).long(),
                     "target_tokens": torch.tensor(target_encodings.input_ids).long(),
+                    "source_id": features["source_lang"],
+                    "target_id": features["target_lang"],
                     "lan": lan,
                 }
             global_id -= length
@@ -1500,6 +1502,8 @@ class tatoebaDataset(torch.utils.data.Dataset):
                 return {
                     "source_tokens": torch.tensor(source_encodings.input_ids).long(),
                     "target_tokens": torch.tensor(target_encodings.input_ids).long(),
+                    "source_id": lan + "-" + str(dataset_id),
+                    "target_id": "en" + "-" + str(global_id),
                     "lan": lan,
                 }
             global_id -= length
