@@ -359,6 +359,7 @@ if __name__ == "__main__":
     experiment_config_dict["training"].model_name = (
         os.path.abspath(args.config_json).split("/")[-1].split(".")[0]
     )
+    print("model configuration name: " + experiment_config_dict["training"].model_name)
     if args.do_train:
         model = qa_build_model(
             experiment_config_dict=experiment_config_dict,
