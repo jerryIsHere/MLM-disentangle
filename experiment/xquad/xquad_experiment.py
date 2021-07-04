@@ -280,7 +280,9 @@ def qa_test(finetune_model, qa_ds):
             start_predictions = torch.argmax(Output["start_logits"], dim=1)
             end_predictions = torch.argmax(Output["end_logits"], dim=1)
             for i, lan in enumerate(batch["lan"]):
-                question_id = lan + "-" + batch["features"]["id"][i]
+                ds = qa_ds[lan] if isinstance(qa_ds, dict) else qa_ds
+                feature = next(f for f in ds if f["id"] == batch["id"])
+                question_id = lan + "-" + feature["id"][i]
                 reply_ids = batch["tokens"][i][
                     start_predictions[i] : end_predictions[i]
                 ]
@@ -292,12 +294,8 @@ def qa_test(finetune_model, qa_ds):
                     reference={
                         "id": question_id,
                         "answers": {
-                            "text": [
-                                ans for ans in batch["features"]["answers"]["text"][i]
-                            ],
-                            "answer_start": batch["features"]["answers"][
-                                "answer_start"
-                            ][i],
+                            "text": [ans for ans in feature["answers"]["text"][i]],
+                            "answer_start": feature["answers"]["answer_start"][i],
                         },
                     },
                 )
@@ -309,12 +307,8 @@ def qa_test(finetune_model, qa_ds):
                     reference={
                         "id": question_id,
                         "answers": {
-                            "text": [
-                                ans for ans in batch["features"]["answers"]["text"][i]
-                            ],
-                            "answer_start": batch["features"]["answers"][
-                                "answer_start"
-                            ][i],
+                            "text": [ans for ans in feature["answers"]["text"][i]],
+                            "answer_start": feature["answers"]["answer_start"][i],
                         },
                     },
                 )
