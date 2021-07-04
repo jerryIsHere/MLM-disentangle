@@ -293,7 +293,9 @@ def qa_test(finetune_model, qa_ds):
                     if isinstance(qa_ds.dataset, dict)
                     else feature_dict[batch["id"][i]]
                 )
-                question_id = lan + "-" + feature["id"][i]
+                question_id = (
+                    lan + "-" + batch["id"][i]
+                )  # some datasets have duplicated id across language, this affect the average metrics
                 reply_ids = batch["tokens"][i][
                     start_predictions[i] : end_predictions[i]
                 ]
@@ -305,8 +307,8 @@ def qa_test(finetune_model, qa_ds):
                     reference={
                         "id": question_id,
                         "answers": {
-                            "text": [ans for ans in feature["answers"]["text"][i]],
-                            "answer_start": feature["answers"]["answer_start"][i],
+                            "text": [ans for ans in feature["answers"]["text"]],
+                            "answer_start": feature["answers"]["answer_start"],
                         },
                     },
                 )
@@ -318,8 +320,8 @@ def qa_test(finetune_model, qa_ds):
                     reference={
                         "id": question_id,
                         "answers": {
-                            "text": [ans for ans in feature["answers"]["text"][i]],
-                            "answer_start": feature["answers"]["answer_start"][i],
+                            "text": [ans for ans in feature["answers"]["text"]],
+                            "answer_start": feature["answers"]["answer_start"],
                         },
                     },
                 )
