@@ -110,11 +110,16 @@ def tag_train(
     disentangle_dataloader = torch.utils.data.DataLoader(
         MLMD_ds,
         batch_size=xtreme_ds.TASK[task]["batch_size"],
-        num_workers=0,
+        num_workers=2,
         shuffle=True,
     )
     disentangle_iter = iter(xtreme_ds.loop_iter(disentangle_dataloader))
-    tag_ds_dataloader = xtreme_ds.batcher(tag_ds, batch_size=2)
+    tag_ds_dataloader = torch.utils.data.DataLoader(
+        tag_ds,
+        batch_size=xtreme_ds.TASK[task]["batch_size"],
+        num_workers=2,
+        shuffle=True,
+    )
     gradient_acc_size = xtreme_ds.TASK[task]["gradient_acc_size"]
     batch_size = xtreme_ds.TASK[task]["batch_size"]
     scheduler = transformers.get_linear_schedule_with_warmup(
@@ -242,7 +247,7 @@ def tag_train(
 def tag_test(finetune_model, tag_ds):
     task = tag_ds.task
     print("evaluating " + task + " with dataset:" + tag_ds.__class__.__name__)
-    test_dataloader = xtreme_ds.batcher(tag_ds, batch_size=1)
+    test_dataloader = torch.utils.data.DataLoader(tag_ds, batch_size=1)
     metric = xtreme_ds.METRIC_FUNCTION[task]()
     lan_metric = {}
     for lan in xtreme_ds.TASK2LANGS[task]:

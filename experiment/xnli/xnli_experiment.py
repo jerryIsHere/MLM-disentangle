@@ -110,12 +110,15 @@ def cls_train(
     disentangle_dataloader = torch.utils.data.DataLoader(
         MLMD_ds,
         batch_size=xtreme_ds.TASK[task]["batch_size"],
-        num_workers=0,
+        num_workers=2,
         shuffle=True,
     )
     disentangle_iter = iter(xtreme_ds.loop_iter(disentangle_dataloader))
     xnli_ds_dataloader = torch.utils.data.DataLoader(
-        cls_ds, batch_size=2, num_workers=0, shuffle=True
+        cls_ds,
+        batch_size=xtreme_ds.TASK[task]["batch_size"],
+        num_workers=2,
+        shuffle=True,
     )
     gradient_acc_size = xtreme_ds.TASK[task]["gradient_acc_size"]
     batch_size = xtreme_ds.TASK[task]["batch_size"]

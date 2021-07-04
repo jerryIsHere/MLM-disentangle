@@ -84,9 +84,7 @@ def qa_load_finetuned_model(experiment_config_dict, mlm_model_path, task):
         task_dict={
             task: {
                 "type": transformers.XLMRobertaForQuestionAnswering,
-                "config": transformers.XLMRobertaConfig.from_pretrained(
-                    backbone_name
-                ),
+                "config": transformers.XLMRobertaConfig.from_pretrained(backbone_name),
             },
             "disentangle": {
                 "type": XLMRobertaForDisentanglement,
@@ -138,11 +136,16 @@ def qa_train(
     disentangle_dataloader = torch.utils.data.DataLoader(
         MLMD_ds,
         batch_size=xtreme_ds.TASK[task]["batch_size"],
-        num_workers=0,
+        num_workers=2,
         shuffle=True,
     )
     disentangle_iter = iter(xtreme_ds.loop_iter(disentangle_dataloader))
-    qa_ds_dataloader = xtreme_ds.batcher(qa_ds, batch_size=2)
+    qa_ds_dataloader = torch.utils.data.DataLoader(
+        qa_ds,
+        batch_size=xtreme_ds.TASK[task]["batch_size"],
+        num_workers=2,
+        shuffle=True,
+    )
     gradient_acc_size = xtreme_ds.TASK[task]["gradient_acc_size"]
     batch_size = xtreme_ds.TASK[task]["batch_size"]
     scheduler = transformers.get_linear_schedule_with_warmup(
@@ -271,7 +274,7 @@ def qa_train(
 def qa_test(finetune_model, qa_ds):
     task = qa_ds.task
     print("evaluating " + task + " with dataset:" + qa_ds.__class__.__name__)
-    test_dataloader = xtreme_ds.batcher(qa_ds, batch_size=1)
+    test_dataloader = torch.utils.data.DataLoader(qa_ds, batch_size=1)
     metric = xtreme_ds.METRIC_FUNCTION[task]()
     lan_metric = {}
     for lan in xtreme_ds.TASK2LANGS[task]:

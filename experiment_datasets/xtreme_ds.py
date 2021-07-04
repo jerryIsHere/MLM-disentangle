@@ -530,23 +530,20 @@ tokenizer = XLMRobertaTokenizerFast.from_pretrained(
 import numpy as np
 import torch
 
-# import random
+class loop_iter:
+    def __init__(self, iter_class):
+        self.source = iter_class
 
+    def __iter__(self):
+        self.iterator = iter(self.source)
+        return self
 
-# class loop_iter:
-#     def __init__(self, iter_class):
-#         self.source = iter_class
-
-#     def __iter__(self):
-#         self.iterator = iter(self.source)
-#         return self
-
-#     def __next__(self):
-#         try:
-#             return next(self.iterator)
-#         except StopIteration:
-#             self.iterator = iter(self.source)
-#             return next(self.iterator)
+    def __next__(self):
+        try:
+            return next(self.iterator)
+        except StopIteration:
+            self.iterator = iter(self.source)
+            return next(self.iterator)
 
 
 # def reducer(source):
@@ -743,7 +740,7 @@ class udposTestDataset(torch.utils.data.Dataset):
             if global_id < length:
                 for key in self.sparse_feature_len:
                     lengthy_instance_id = int(key)
-                    length = self.sparse_feature_len[lengthy_instance_id]
+                    length = self.sparse_feature_len[lan][lengthy_instance_id]
                     if global_id <= lengthy_instance_id:
                         dataset_id = global_id
                         block_id = 0
@@ -902,7 +899,7 @@ class panxTestDataset(torch.utils.data.Dataset):
             if global_id < length:
                 for key in self.sparse_feature_len:
                     lengthy_instance_id = int(key)
-                    length = self.sparse_feature_len[lengthy_instance_id]
+                    length = self.sparse_feature_len[lan][lengthy_instance_id]
                     if global_id <= lengthy_instance_id:
                         dataset_id = global_id
                         block_id = 0
@@ -1269,7 +1266,7 @@ class xquadTestDataset(torch.utils.data.Dataset):
         for lan in self.dataset:
             length = len(self.dataset[lan])
             if global_id < length:
-                features = self.dataset[global_id]
+                features = self.dataset[lan][global_id]
                 return qa_features_to_torch_example(
                     features, TASK["xquad"]["max seq length"], lan
                 )
@@ -1292,7 +1289,7 @@ class mlqaTestDataset(torch.utils.data.Dataset):
         for lan in self.dataset:
             length = len(self.dataset[lan])
             if global_id < length:
-                features = self.dataset[global_id]
+                features = self.dataset[lan][global_id]
                 return qa_features_to_torch_example(
                     features, TASK["xquad"]["max seq length"], lan
                 )
