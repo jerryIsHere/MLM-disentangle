@@ -530,6 +530,7 @@ tokenizer = XLMRobertaTokenizerFast.from_pretrained(
 import numpy as np
 import torch
 
+
 class loop_iter:
     def __init__(self, iter_class):
         self.source = iter_class
@@ -572,7 +573,7 @@ class loop_iter:
 #         for i in range(max(1, self.batch_size)):
 #             batch.append(next(self.it))
 #         return reducer(batch)
-def token_feature_to_torch_example(features, block_id, block_size):
+def token_feature_to_torch_example(features, block_id, block_size, lan=None):
     txt = features["tokens"]
     for i, each in enumerate(txt):
         txt[i] = tokenizer._tokenizer.normalizer.normalize_str(txt[i])
@@ -585,21 +586,33 @@ def token_feature_to_torch_example(features, block_id, block_size):
     ids = np.array(train_encodings.input_ids)
     arr_offset = np.array(train_encodings.offset_mapping)
     label_index = (arr_offset[:, 0] == 0) & (arr_offset[:, 1] != 0) & (ids[:] != 6)
-    labels[label_index] = features["pos_tags"][: np.count_nonzero(label_index)]
+    labels[label_index] = features["tags"][: np.count_nonzero(label_index)]
     ids_block = np.ones(block_size, dtype=int) * tokenizer.pad_token_id
     chosen_ids = ids[block_id * block_size : (block_id + 1) * block_size]
     ids_block[: len(chosen_ids)] = chosen_ids
     labels_block = np.ones(block_size, dtype=int) * -100
     chosen_label = labels[block_id * block_size : (block_id + 1) * block_size]
     labels_block[: len(chosen_label)] = chosen_label
-    return {
-        "features": features,
-        "offset": len(
-            labels[: block_id * block_size][labels[: block_id * block_size] != -100]
-        ),
-        "tokens": torch.from_numpy(ids_block).long(),
-        "tags": torch.from_numpy(labels_block).long(),
-    }
+    return (
+        {
+            "features": features,
+            "offset": len(
+                labels[: block_id * block_size][labels[: block_id * block_size] != -100]
+            ),
+            "tokens": torch.from_numpy(ids_block).long(),
+            "tags": torch.from_numpy(labels_block).long(),
+        }
+        if lan is None
+        else {
+            "features": features,
+            "offset": len(
+                labels[: block_id * block_size][labels[: block_id * block_size] != -100]
+            ),
+            "tokens": torch.from_numpy(ids_block).long(),
+            "tags": torch.from_numpy(labels_block).long(),
+            "lan": lan,
+        }
+    )
 
 
 class udposTrainDataset(torch.utils.data.Dataset):
@@ -643,6 +656,7 @@ class udposTrainDataset(torch.utils.data.Dataset):
             dataset_id = global_id
             block_id = 0
         features = self.dataset[dataset_id]
+        features["tags"] = features["pos_tags"]
         return token_feature_to_torch_example(
             features, block_id, TASK["udpos"]["max seq length"]
         )
@@ -689,6 +703,7 @@ class udposValidationDataset(torch.utils.data.Dataset):
             dataset_id = global_id
             block_id = 0
         features = self.dataset[dataset_id]
+        features["tags"] = features["pos_tags"]
         return token_feature_to_torch_example(
             features, block_id, TASK["udpos"]["max seq length"]
         )
@@ -754,8 +769,9 @@ class udposTestDataset(torch.utils.data.Dataset):
                     dataset_id = global_id
                     block_id = 0
                 features = self.dataset[lan][dataset_id]
+                features["tags"] = features["pos_tags"]
                 return token_feature_to_torch_example(
-                    features, block_id, TASK["udpos"]["max seq length"]
+                    features, block_id, TASK["udpos"]["max seq length"], lan
                 )
             global_id -= length
 
@@ -803,6 +819,7 @@ class panxTrainDataset(torch.utils.data.Dataset):
             dataset_id = global_id
             block_id = 0
         features = self.dataset[dataset_id]
+        features["tags"] = features["ner_tags"]
         return token_feature_to_torch_example(
             features, block_id, TASK["panx"]["max seq length"]
         )
@@ -849,6 +866,7 @@ class panxValidationDataset(torch.utils.data.Dataset):
             dataset_id = global_id
             block_id = 0
         features = self.dataset[dataset_id]
+        features["tags"] = features["ner_tags"]
         return token_feature_to_torch_example(
             features, block_id, TASK["panx"]["max seq length"]
         )
@@ -913,8 +931,9 @@ class panxTestDataset(torch.utils.data.Dataset):
                     dataset_id = global_id
                     block_id = 0
                 features = self.dataset[lan][dataset_id]
+                features["tags"] = features["ner_tags"]
                 return token_feature_to_torch_example(
-                    features, block_id, TASK["panx"]["max seq length"]
+                    features, block_id, TASK["panx"]["max seq length"], lan
                 )
             global_id -= length
 
