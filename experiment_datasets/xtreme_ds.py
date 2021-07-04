@@ -876,6 +876,7 @@ class panxTestDataset(torch.utils.data.Dataset):
     def __init__(self):
         self.task = "panx"
         self.dataset = {}
+        self.sparse_feature_len = {}
         for lan in TASK["panx"]["test"]:
             set_name, subset_name, split = TASK["panx"]["test"][lan]
             self.dataset[lan] = get_dataset(set_name, subset_name)[split]
