@@ -762,7 +762,7 @@ class udposTestDataset(torch.utils.data.Dataset):
                 )
             global_id -= length
 
-    raise StopIteration()
+        raise StopIteration()
 
 
 class panxTrainDataset(torch.utils.data.Dataset):
@@ -921,7 +921,7 @@ class panxTestDataset(torch.utils.data.Dataset):
                 )
             global_id -= length
 
-    raise StopIteration()
+        raise StopIteration()
 
 
 class xnliTrainDataset(torch.utils.data.Dataset):

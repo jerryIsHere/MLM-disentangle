@@ -74,16 +74,14 @@ assert (
     i
     == sum(
         map(
-            lambda features: 1
-            + (
-                len(
-                    xtreme_ds.tokenizer(
-                        features["tokens"], is_split_into_words=True
-                    ).input_ids,
+            lambda lan: len(ds.dataset[lan])
+            + sum(
+                map(
+                    lambda length: length - 1,
+                    ds.sparse_feature_len[lan].values(),
                 )
-                // xtreme_ds.TASK["udpos"]["max seq length"]
             ),
-            ds.dataset,
+            ds.dataset.keys(),
         )
     )
     - 1
@@ -163,20 +161,19 @@ assert (
     i
     == sum(
         map(
-            lambda features: 1
-            + (
-                len(
-                    xtreme_ds.tokenizer(
-                        features["tokens"], is_split_into_words=True
-                    ).input_ids,
+            lambda lan: len(ds.dataset[lan])
+            + sum(
+                map(
+                    lambda length: length - 1,
+                    ds.sparse_feature_len[lan].values(),
                 )
-                // xtreme_ds.TASK["panx"]["max seq length"]
             ),
-            ds.dataset,
+            ds.dataset.keys(),
         )
     )
     - 1
 )
+
 
 
 ds = xtreme_ds.xnliTrainDataset()
