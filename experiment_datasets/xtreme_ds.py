@@ -595,7 +595,7 @@ def token_feature_to_torch_example(features, block_id, block_size, lan=None):
     labels_block[: len(chosen_label)] = chosen_label
     return (
         {
-            #"features": features,
+            "features": features,
             "offset": len(
                 labels[: block_id * block_size][labels[: block_id * block_size] != -100]
             ),
@@ -604,7 +604,7 @@ def token_feature_to_torch_example(features, block_id, block_size, lan=None):
         }
         if lan is None
         else {
-            #"features": features,
+            "features": features,
             "offset": len(
                 labels[: block_id * block_size][labels[: block_id * block_size] != -100]
             ),
