@@ -529,7 +529,7 @@ tokenizer = XLMRobertaTokenizerFast.from_pretrained(
 )
 import numpy as np
 import torch
-
+from collections import namedtuple
 
 class loop_iter:
     def __init__(self, iter_class):
