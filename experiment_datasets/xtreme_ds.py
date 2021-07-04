@@ -602,13 +602,13 @@ def token_feature_to_torch_example(features, block_id, block_size, lan=None):
     ).int()
     return (
         {
-            "features": features,
+            #"features": features,
             "tokens": torch.from_numpy(ids_block).long(),
             "tags": torch.from_numpy(labels_block).long(),
         }
         if lan is None
         else {
-            "features": features,
+            #"features": features,
             "tokens": torch.from_numpy(ids_block).long(),
             "tags": torch.from_numpy(labels_block).long(),
             "lan": lan,
