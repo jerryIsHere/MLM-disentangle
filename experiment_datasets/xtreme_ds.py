@@ -529,7 +529,15 @@ tokenizer = XLMRobertaTokenizerFast.from_pretrained(
 )
 import numpy as np
 import torch
-from collections import namedtuple
+
+
+class features:
+    def __init__(self, dict):
+        self.dict = dict
+
+    def __getitem__(self, key):
+        return self.dict[key]
+
 
 class loop_iter:
     def __init__(self, iter_class):
@@ -595,7 +603,7 @@ def token_feature_to_torch_example(features, block_id, block_size, lan=None):
     labels_block[: len(chosen_label)] = chosen_label
     return (
         {
-            "features": namedtuple(features, features.keys())(*features.values()),
+            "features": features(features),
             "offset": len(
                 labels[: block_id * block_size][labels[: block_id * block_size] != -100]
             ),
@@ -604,7 +612,7 @@ def token_feature_to_torch_example(features, block_id, block_size, lan=None):
         }
         if lan is None
         else {
-            "features": namedtuple(features, features.keys())(*features.values()),
+            "features": features(features),
             "offset": len(
                 labels[: block_id * block_size][labels[: block_id * block_size] != -100]
             ),
@@ -1228,7 +1236,7 @@ def qa_features_to_torch_example(features, block_size, lan=None):
                         "start_positions": torch.tensor(s_p).long(),
                         "end_positions": torch.tensor(e_p).long(),
                         "answer_offset": i,
-                        "features": namedtuple(features, features.keys())(*features.values()),
+                        "features": features(features),
                     }
                     if lan is None
                     else {
@@ -1236,7 +1244,7 @@ def qa_features_to_torch_example(features, block_size, lan=None):
                         "start_positions": torch.tensor(s_p).long(),
                         "end_positions": torch.tensor(e_p).long(),
                         "answer_offset": i,
-                        "features": namedtuple(features, features.keys())(*features.values()),
+                        "features": features(features),
                         "lan": lan,
                     }
                 )
