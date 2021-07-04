@@ -531,7 +531,7 @@ import numpy as np
 import torch
 
 
-class features:
+class Features:
     def __init__(self, dict):
         self.dict = dict
 
@@ -603,7 +603,7 @@ def token_feature_to_torch_example(features, block_id, block_size, lan=None):
     labels_block[: len(chosen_label)] = chosen_label
     return (
         {
-            "features": features(features),
+            "features": Features(features),
             "offset": len(
                 labels[: block_id * block_size][labels[: block_id * block_size] != -100]
             ),
@@ -612,7 +612,7 @@ def token_feature_to_torch_example(features, block_id, block_size, lan=None):
         }
         if lan is None
         else {
-            "features": features(features),
+            "features": Features(features),
             "offset": len(
                 labels[: block_id * block_size][labels[: block_id * block_size] != -100]
             ),
@@ -1236,7 +1236,7 @@ def qa_features_to_torch_example(features, block_size, lan=None):
                         "start_positions": torch.tensor(s_p).long(),
                         "end_positions": torch.tensor(e_p).long(),
                         "answer_offset": i,
-                        "features": features(features),
+                        "features": Features(features),
                     }
                     if lan is None
                     else {
@@ -1244,7 +1244,7 @@ def qa_features_to_torch_example(features, block_size, lan=None):
                         "start_positions": torch.tensor(s_p).long(),
                         "end_positions": torch.tensor(e_p).long(),
                         "answer_offset": i,
-                        "features": features(features),
+                        "features": Features(features),
                         "lan": lan,
                     }
                 )
