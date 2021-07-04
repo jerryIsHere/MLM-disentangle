@@ -738,7 +738,7 @@ class udposTestDataset(torch.utils.data.Dataset):
                 )
             )
             if global_id < length:
-                for key in self.sparse_feature_len:
+                for key in self.sparse_feature_len[lan]:
                     lengthy_instance_id = int(key)
                     length = self.sparse_feature_len[lan][lengthy_instance_id]
                     if global_id <= lengthy_instance_id:
@@ -897,7 +897,7 @@ class panxTestDataset(torch.utils.data.Dataset):
                 )
             )
             if global_id < length:
-                for key in self.sparse_feature_len:
+                for key in self.sparse_feature_len[lan]:
                     lengthy_instance_id = int(key)
                     length = self.sparse_feature_len[lan][lengthy_instance_id]
                     if global_id <= lengthy_instance_id:
