@@ -134,8 +134,7 @@ def cls_train(
     )
     import gc
 
-    for task in finetune_model.taskmodels_dict:
-        finetune_model.taskmodels_dict[task].cpu()
+    finetune_model.cuda()
     xnliLoss = 0.0
     disentangleLoss = 0.0
     gradient_step_counter = 0
@@ -161,12 +160,8 @@ def cls_train(
             )
             Output["loss"].backward()
 
-            #  model & input to cpu
+            #  acc loss
             xnliLoss = xnliLoss + Output["loss"].item()
-            finetune_model.taskmodels_dict[task].cpu()
-            del Output
-            batch.clear()
-            del batch
 
             batch = next(disentangle_iter)
             # disentangle input to gpu
@@ -189,17 +184,8 @@ def cls_train(
             )
             disentangleOutput["loss"].backward()
 
-            # disentangle model & input to cpu
+            #  acc loss
             disentangleLoss = disentangleLoss + disentangleOutput["loss"].item()
-            finetune_model.taskmodels_dict["disentangle"].cpu()
-            for output in disentangleOutput:
-                if disentangleOutput[output] == None:
-                    continue
-                if output == "logits":
-                    disentangleOutput[output].clear()
-            del disentangleOutput
-            batch.clear()
-            del batch
 
             if (i + 1) % (gradient_acc_size / batch_size) == 0:
                 torch.nn.utils.clip_grad_norm_(finetune_model.parameters(), 1.0)
