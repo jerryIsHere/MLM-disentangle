@@ -194,8 +194,14 @@ def cls_train(
                 finetune_model.zero_grad()
                 gradient_step_counter += 1
                 if gradient_step_counter % log_step_size == 0:
-                    writer.add_scalar("lr", scheduler.get_lr()[0], i)
-                    writer.add_scalar("disentangle lr", scheduler.get_lr()[0], i)
+                    writer.add_scalar(
+                        writer.filename_suffix + "lr", scheduler.get_lr()[0], i
+                    )
+                    writer.add_scalar(
+                        writer.filename_suffix + "disentangle lr",
+                        scheduler.get_lr()[0],
+                        i,
+                    )
                     print(
                         " loss ("
                         + str(gradient_step_counter)
@@ -209,12 +215,12 @@ def cls_train(
                         + str(disentangleLoss / (log_step_size * gradient_acc_size))
                     )
                     writer.add_scalar(
-                        " loss",
+                        writer.filename_suffix + " loss",
                         xnliLoss / (log_step_size * gradient_acc_size),
                         gradient_step_counter,
                     )
                     writer.add_scalar(
-                        "disentangle loss",
+                        writer.filename_suffix + "disentangle loss",
                         disentangleLoss / (log_step_size * gradient_acc_size),
                         gradient_step_counter,
                     )
@@ -301,11 +307,16 @@ if __name__ == "__main__":
         start_time = time.time()
         from torch.utils.tensorboard import SummaryWriter
 
+        ds = xtreme_ds.xnliTrainDataset()
         writer = SummaryWriter(
             "/gpfs1/home/ckchan666/mlm_disentangle_experiment/tensorboard/"
             + os.path.dirname(os.path.abspath(__file__)).split("/")[-1]
             + "/"
-            + experiment_config_dict["training"].model_name
+            + experiment_config_dict["training"].model_name,
+            filename_suffix="."
+            + ds.task
+            + "."
+            + experiment_config_dict["training"].model_name,
         )
         model_path = (
             "/gpfs1/home/ckchan666/mlm_disentangle_experiment/model/"
@@ -320,7 +331,7 @@ if __name__ == "__main__":
             writer=writer,
             model_path=model_path,
             MLMD_ds=MLMD_ds,
-            cls_ds=xtreme_ds.xnliTrainDataset(),
+            cls_ds=ds,
         )
         print(str(time.time() - start_time) + " seconds elapsed for training")
     if args.do_test:

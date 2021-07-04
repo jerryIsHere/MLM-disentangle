@@ -54,11 +54,16 @@ if __name__ == "__main__":
         start_time = time.time()
         from torch.utils.tensorboard import SummaryWriter
 
+        ds = xtreme_ds.pawsxTrainDataset()
         writer = SummaryWriter(
             "/gpfs1/home/ckchan666/mlm_disentangle_experiment/tensorboard/"
             + os.path.dirname(os.path.abspath(__file__)).split("/")[-1]
             + "/"
-            + experiment_config_dict["training"].model_name
+            + experiment_config_dict["training"].model_name,
+            filename_suffix="."
+            + ds.task
+            + "."
+            + experiment_config_dict["training"].model_name,
         )
         model_path = (
             "/gpfs1/home/ckchan666/mlm_disentangle_experiment/model/"
@@ -73,7 +78,7 @@ if __name__ == "__main__":
             writer=writer,
             model_path=model_path,
             MLMD_ds=MLMD_ds,
-            cls_ds=xtreme_ds.pawsxTrainDataset(),
+            cls_ds=ds,
         )
         print(str(time.time() - start_time) + " seconds elapsed for training")
     if args.do_test:
