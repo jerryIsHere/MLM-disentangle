@@ -529,51 +529,80 @@ tokenizer = XLMRobertaTokenizerFast.from_pretrained(
 )
 import numpy as np
 import torch
-import random
+
+# import random
 
 
-class loop_iter:
-    def __init__(self, iter_class):
-        self.source = iter_class
+# class loop_iter:
+#     def __init__(self, iter_class):
+#         self.source = iter_class
 
-    def __iter__(self):
-        self.iterator = iter(self.source)
-        return self
+#     def __iter__(self):
+#         self.iterator = iter(self.source)
+#         return self
 
-    def __next__(self):
-        try:
-            return next(self.iterator)
-        except StopIteration:
-            self.iterator = iter(self.source)
-            return next(self.iterator)
-
-
-def reducer(source):
-    if isinstance(source[0], dict):
-        target = {}
-        for key in source[0]:
-            target[key] = reducer([each[key] for each in source])
-        return target
-    elif isinstance(source[0], torch.Tensor):
-        return torch.stack(source)
-    else:
-        return source
+#     def __next__(self):
+#         try:
+#             return next(self.iterator)
+#         except StopIteration:
+#             self.iterator = iter(self.source)
+#             return next(self.iterator)
 
 
-class batcher:
-    def __init__(self, iterableDS, batch_size):
-        self.iterableDS = iterableDS
-        self.batch_size = batch_size
+# def reducer(source):
+#     if isinstance(source[0], dict):
+#         target = {}
+#         for key in source[0]:
+#             target[key] = reducer([each[key] for each in source])
+#         return target
+#     elif isinstance(source[0], torch.Tensor):
+#         return torch.stack(source)
+#     else:
+#         return source
 
-    def __iter__(self):
-        self.it = iter(self.iterableDS)
-        return self
 
-    def __next__(self):
-        batch = list()
-        for i in range(max(1, self.batch_size)):
-            batch.append(next(self.it))
-        return reducer(batch)
+# class batcher:
+#     def __init__(self, iterableDS, batch_size):
+#         self.iterableDS = iterableDS
+#         self.batch_size = batch_size
+
+#     def __iter__(self):
+#         self.it = iter(self.iterableDS)
+#         return self
+
+#     def __next__(self):
+#         batch = list()
+#         for i in range(max(1, self.batch_size)):
+#             batch.append(next(self.it))
+#         return reducer(batch)
+def token_feature_to_torch_example(features, block_id, block_size):
+    txt = features["tokens"]
+    for i, each in enumerate(txt):
+        txt[i] = tokenizer._tokenizer.normalizer.normalize_str(txt[i])
+    train_encodings = tokenizer(
+        txt,
+        is_split_into_words=True,
+        return_offsets_mapping=True,
+    )
+    labels = np.ones(len(train_encodings.input_ids), dtype=int) * -100
+    ids = np.array(train_encodings.input_ids)
+    arr_offset = np.array(train_encodings.offset_mapping)
+    label_index = (arr_offset[:, 0] == 0) & (arr_offset[:, 1] != 0) & (ids[:] != 6)
+    labels[label_index] = features["pos_tags"][: np.count_nonzero(label_index)]
+    ids_block = np.ones(block_size, dtype=int) * tokenizer.pad_token_id
+    chosen_ids = ids[block_id * block_size : (block_id + 1) * block_size]
+    ids_block[: len(chosen_ids)] = chosen_ids
+    labels_block = np.ones(block_size, dtype=int) * -100
+    chosen_label = labels[block_id * block_size : (block_id + 1) * block_size]
+    labels_block[: len(chosen_label)] = chosen_label
+    return {
+        "features": features,
+        "offset": len(
+            labels[: block_id * block_size][labels[: block_id * block_size] != -100]
+        ),
+        "tokens": torch.from_numpy(ids_block).long(),
+        "tags": torch.from_numpy(labels_block).long(),
+    }
 
 
 class udposTrainDataset(torch.utils.data.Dataset):
@@ -581,73 +610,45 @@ class udposTrainDataset(torch.utils.data.Dataset):
         self.task = "udpos"
         set_name, subset_name, split = TASK["udpos"]["train"]
         self.dataset = get_dataset(set_name, subset_name)[split]
-        self.dataset_features = [features for features in self.dataset]
+        self.sparse_feature_len = {}
+        for i, features in enumerate(self.dataset):
+            size = (
+                len(
+                    tokenizer(features["tokens"], is_split_into_words=True).input_ids,
+                )
+                // TASK["udpos"]["max seq length"]
+            )
+            if size > 0:
+                self.sparse_feature_len[i] = 1 + size
 
     def __len__(self):
-        return sum(
+        return len(self.dataset) + sum(
             map(
-                lambda features: 1
-                + (
-                    len(
-                        tokenizer(
-                            features["tokens"], is_split_into_words=True
-                        ).input_ids,
-                    )
-                    // TASK["udpos"]["max seq length"]
-                ),
-                self.dataset,
+                lambda length: length - 1,
+                self.sparse_feature_len.values(),
             )
         )
 
-    def __iter__(self):
-        self.generator = self.__generator__()
-        return self
-
-    def __generator__(self):
-        for features in random.sample(
-            self.dataset_features, len(self.dataset_features)
-        ):
-            txt = features["tokens"]
-            for i, each in enumerate(txt):
-                txt[i] = tokenizer._tokenizer.normalizer.normalize_str(txt[i])
-            train_encodings = tokenizer(
-                txt,
-                is_split_into_words=True,
-                return_offsets_mapping=True,
-            )
-            labels = np.ones(len(train_encodings.input_ids), dtype=int) * -100
-            ids = np.array(train_encodings.input_ids)
-            arr_offset = np.array(train_encodings.offset_mapping)
-            label_index = (
-                (arr_offset[:, 0] == 0) & (arr_offset[:, 1] != 0) & (ids[:] != 6)
-            )
-            labels[label_index] = features["pos_tags"][: np.count_nonzero(label_index)]
-            block_size = TASK["udpos"]["max seq length"]
-            for block_id in range(1 + (len(ids) // block_size)):
-                ids_block = np.ones(block_size, dtype=int) * tokenizer.pad_token_id
-                chosen_ids = ids[block_id * block_size : (block_id + 1) * block_size]
-                ids_block[: len(chosen_ids)] = chosen_ids
-                labels_block = np.ones(block_size, dtype=int) * -100
-                chosen_label = labels[
-                    block_id * block_size : (block_id + 1) * block_size
-                ]
-                labels_block[: len(chosen_label)] = chosen_label
-                yield {
-                    "features": features,
-                    "offset": len(
-                        labels[: block_id * block_size][
-                            labels[: block_id * block_size] != -100
-                        ]
-                    ),
-                    "tokens": torch.from_numpy(ids_block).long(),
-                    "tags": torch.from_numpy(labels_block).long(),
-                }
-
-    def __next__(self):
-        try:
-            return next(self.generator)
-        except StopIteration:
-            raise StopIteration()
+    def __getitem__(self, global_id):
+        for key in self.sparse_feature_len:
+            lengthy_instance_id = int(key)
+            length = self.sparse_feature_len[lengthy_instance_id]
+            if global_id <= lengthy_instance_id:
+                dataset_id = global_id
+                block_id = 0
+                break
+            if global_id < lengthy_instance_id + length:
+                dataset_id = lengthy_instance_id
+                block_id = global_id - dataset_id
+                break
+            global_id -= length - 1
+        else:
+            dataset_id = global_id
+            block_id = 0
+        features = self.dataset[dataset_id]
+        return token_feature_to_torch_example(
+            features, block_id, TASK["udpos"]["max seq length"]
+        )
 
 
 class udposValidationDataset(torch.utils.data.Dataset):
@@ -655,117 +656,113 @@ class udposValidationDataset(torch.utils.data.Dataset):
         self.task = "udpos"
         set_name, subset_name, split = TASK["udpos"]["validation"]
         self.dataset = get_dataset(set_name, subset_name)[split]
-
-    def __iter__(self):
-        self.generator = self.__generator__()
-        return self
-
-    def __generator__(self):
-        for features in self.dataset:
-            txt = features["tokens"]
-            for i, each in enumerate(txt):
-                txt[i] = tokenizer._tokenizer.normalizer.normalize_str(txt[i])
-            train_encodings = tokenizer(
-                txt,
-                is_split_into_words=True,
-                return_offsets_mapping=True,
+        self.sparse_feature_len = {}
+        for i, features in enumerate(self.dataset):
+            size = (
+                len(
+                    tokenizer(features["tokens"], is_split_into_words=True).input_ids,
+                )
+                // TASK["udpos"]["max seq length"]
             )
-            labels = np.ones(len(train_encodings.input_ids), dtype=int) * -100
-            ids = np.array(train_encodings.input_ids)
-            arr_offset = np.array(train_encodings.offset_mapping)
-            label_index = (
-                (arr_offset[:, 0] == 0) & (arr_offset[:, 1] != 0) & (ids[:] != 6)
-            )
-            labels[label_index] = features["pos_tags"][: np.count_nonzero(label_index)]
-            block_size = TASK["udpos"]["max seq length"]
-            for block_id in range(1 + (len(ids) // block_size)):
-                ids_block = np.ones(block_size, dtype=int) * tokenizer.pad_token_id
-                chosen_ids = ids[block_id * block_size : (block_id + 1) * block_size]
-                ids_block[: len(chosen_ids)] = chosen_ids
-                labels_block = np.ones(block_size, dtype=int) * -100
-                chosen_label = labels[
-                    block_id * block_size : (block_id + 1) * block_size
-                ]
-                labels_block[: len(chosen_label)] = chosen_label
-                yield {
-                    "features": features,
-                    "offset": len(
-                        labels[: block_id * block_size][
-                            labels[: block_id * block_size] != -100
-                        ]
-                    ),
-                    "tokens": torch.from_numpy(ids_block).long(),
-                    "tags": torch.from_numpy(labels_block).long(),
-                }
+            if size > 0:
+                self.sparse_feature_len[i] = 1 + size
 
-    def __next__(self):
-        try:
-            return next(self.generator)
-        except StopIteration:
-            raise StopIteration()
+    def __len__(self):
+        return len(self.dataset) + sum(
+            map(
+                lambda length: length - 1,
+                self.sparse_feature_len.values(),
+            )
+        )
+
+    def __getitem__(self, global_id):
+        for key in self.sparse_feature_len:
+            lengthy_instance_id = int(key)
+            length = self.sparse_feature_len[lengthy_instance_id]
+            if global_id <= lengthy_instance_id:
+                dataset_id = global_id
+                block_id = 0
+                break
+            if global_id < lengthy_instance_id + length:
+                dataset_id = lengthy_instance_id
+                block_id = global_id - dataset_id
+                break
+            global_id -= length - 1
+        else:
+            dataset_id = global_id
+            block_id = 0
+        features = self.dataset[dataset_id]
+        return token_feature_to_torch_example(
+            features, block_id, TASK["udpos"]["max seq length"]
+        )
 
 
 class udposTestDataset(torch.utils.data.Dataset):
     def __init__(self):
         self.task = "udpos"
         self.dataset = {}
+        self.sparse_feature_len = {}
         for lan in TASK["udpos"]["test"]:
             set_name, subset_name, split = TASK["udpos"]["test"][lan]
             self.dataset[lan] = get_dataset(set_name, subset_name)[split]
+            self.sparse_feature_len[lan] = {}
+            for i, features in enumerate(self.dataset[lan]):
+                size = (
+                    len(
+                        tokenizer(
+                            features["tokens"], is_split_into_words=True
+                        ).input_ids,
+                    )
+                    // TASK["udpos"]["max seq length"]
+                )
+                if size > 0:
+                    self.sparse_feature_len[lan][i] = 1 + size
 
-    def __iter__(self):
-        self.generator = self.__generator__()
-        return self
+    def __len__(self):
+        return sum(
+            map(
+                lambda lan: len(self.dataset[lan])
+                + sum(
+                    map(
+                        lambda length: length - 1,
+                        self.sparse_feature_len[lan].values(),
+                    )
+                ),
+                self.dataset.keys(),
+            )
+        )
 
-    def __generator__(self):
+    def __getitem__(self, global_id):
         for lan in self.dataset:
-            for features in self.dataset[lan]:
-                txt = features["tokens"]
-                for i, each in enumerate(txt):
-                    txt[i] = tokenizer._tokenizer.normalizer.normalize_str(txt[i])
-                train_encodings = tokenizer(
-                    txt,
-                    is_split_into_words=True,
-                    return_offsets_mapping=True,
+            length = len(self.dataset[lan]) + sum(
+                map(
+                    lambda length: length - 1,
+                    self.sparse_feature_len[lan].values(),
                 )
-                labels = np.ones(len(train_encodings.input_ids), dtype=int) * -100
-                ids = np.array(train_encodings.input_ids)
-                arr_offset = np.array(train_encodings.offset_mapping)
-                label_index = (
-                    (arr_offset[:, 0] == 0) & (arr_offset[:, 1] != 0) & (ids[:] != 6)
+            )
+            if global_id < length:
+                for key in self.sparse_feature_len:
+                    lengthy_instance_id = int(key)
+                    length = self.sparse_feature_len[lengthy_instance_id]
+                    if global_id <= lengthy_instance_id:
+                        dataset_id = global_id
+                        block_id = 0
+                        break
+                    if global_id < lengthy_instance_id + length:
+                        dataset_id = lengthy_instance_id
+                        block_id = global_id - dataset_id
+                        break
+                    global_id -= length - 1
+                else:
+                    dataset_id = global_id
+                    block_id = 0
+                features = self.dataset[lan][dataset_id]
+                return token_feature_to_torch_example(
+                    features, block_id, TASK["udpos"]["max seq length"]
                 )
-                labels[label_index] = features["pos_tags"][
-                    : np.count_nonzero(label_index)
-                ]
-                block_size = TASK["udpos"]["max seq length"]
-                for block_id in range(1 + (len(ids) // block_size)):
-                    ids_block = np.ones(block_size, dtype=int) * tokenizer.pad_token_id
-                    chosen_ids = ids[
-                        block_id * block_size : (block_id + 1) * block_size
-                    ]
-                    ids_block[: len(chosen_ids)] = chosen_ids
-                    labels_block = np.ones(block_size, dtype=int) * -100
-                    chosen_label = labels[
-                        block_id * block_size : (block_id + 1) * block_size
-                    ]
-                    labels_block[: len(chosen_label)] = chosen_label
-                    yield {
-                        "features": features,
-                        "offset": len(
-                            labels[: block_id * block_size][
-                                labels[: block_id * block_size] != -100
-                            ]
-                        ),
-                        "tokens": torch.from_numpy(ids_block).long(),
-                        "tags": torch.from_numpy(labels_block).long(),
-                        "lan": lan,
-                    }
+            global_id -= length
 
-    def __next__(self):
-        try:
-            return next(self.generator)
-        except StopIteration:
-            raise StopIteration()
+    raise StopIteration()
 
 
 class panxTrainDataset(torch.utils.data.Dataset):
@@ -773,73 +770,45 @@ class panxTrainDataset(torch.utils.data.Dataset):
         self.task = "panx"
         set_name, subset_name, split = TASK["panx"]["train"]
         self.dataset = get_dataset(set_name, subset_name)[split]
-        self.dataset_features = [features for features in self.dataset]
+        self.sparse_feature_len = {}
+        for i, features in enumerate(self.dataset):
+            size = (
+                len(
+                    tokenizer(features["tokens"], is_split_into_words=True).input_ids,
+                )
+                // TASK["panx"]["max seq length"]
+            )
+            if size > 0:
+                self.sparse_feature_len[i] = 1 + size
 
     def __len__(self):
-        return sum(
+        return len(self.dataset) + sum(
             map(
-                lambda features: 1
-                + (
-                    len(
-                        tokenizer(
-                            features["tokens"], is_split_into_words=True
-                        ).input_ids
-                    )
-                    // TASK["panx"]["max seq length"]
-                ),
-                self.dataset,
+                lambda length: length - 1,
+                self.sparse_feature_len.values(),
             )
         )
 
-    def __iter__(self):
-        self.generator = self.__generator__()
-        return self
-
-    def __generator__(self):
-        for features in random.sample(
-            self.dataset_features, len(self.dataset_features)
-        ):
-            txt = features["tokens"]
-            for i, each in enumerate(txt):
-                txt[i] = tokenizer._tokenizer.normalizer.normalize_str(txt[i])
-            train_encodings = tokenizer(
-                txt,
-                is_split_into_words=True,
-                return_offsets_mapping=True,
-            )
-            labels = np.ones(len(train_encodings.input_ids), dtype=int) * -100
-            ids = np.array(train_encodings.input_ids)
-            arr_offset = np.array(train_encodings.offset_mapping)
-            label_index = (
-                (arr_offset[:, 0] == 0) & (arr_offset[:, 1] != 0) & (ids[:] != 6)
-            )
-            labels[label_index] = features["ner_tags"][: np.count_nonzero(label_index)]
-            block_size = TASK["panx"]["max seq length"]
-            for block_id in range(1 + (len(ids) // block_size)):
-                ids_block = np.ones(block_size, dtype=int) * tokenizer.pad_token_id
-                chosen_ids = ids[block_id * block_size : (block_id + 1) * block_size]
-                ids_block[: len(chosen_ids)] = chosen_ids
-                labels_block = np.ones(block_size, dtype=int) * -100
-                chosen_label = labels[
-                    block_id * block_size : (block_id + 1) * block_size
-                ]
-                labels_block[: len(chosen_label)] = chosen_label
-                yield {
-                    "features": features,
-                    "offset": len(
-                        labels[: block_id * block_size][
-                            labels[: block_id * block_size] != -100
-                        ]
-                    ),
-                    "tokens": torch.from_numpy(ids_block).long(),
-                    "tags": torch.from_numpy(labels_block).long(),
-                }
-
-    def __next__(self):
-        try:
-            return next(self.generator)
-        except StopIteration:
-            raise StopIteration()
+    def __getitem__(self, global_id):
+        for key in self.sparse_feature_len:
+            lengthy_instance_id = int(key)
+            length = self.sparse_feature_len[lengthy_instance_id]
+            if global_id <= lengthy_instance_id:
+                dataset_id = global_id
+                block_id = 0
+                break
+            if global_id < lengthy_instance_id + length:
+                dataset_id = lengthy_instance_id
+                block_id = global_id - dataset_id
+                break
+            global_id -= length - 1
+        else:
+            dataset_id = global_id
+            block_id = 0
+        features = self.dataset[dataset_id]
+        return token_feature_to_torch_example(
+            features, block_id, TASK["panx"]["max seq length"]
+        )
 
 
 class panxValidationDataset(torch.utils.data.Dataset):
@@ -847,54 +816,45 @@ class panxValidationDataset(torch.utils.data.Dataset):
         self.task = "panx"
         set_name, subset_name, split = TASK["panx"]["validation"]
         self.dataset = get_dataset(set_name, subset_name)[split]
-
-    def __iter__(self):
-        self.generator = self.__generator__()
-        return self
-
-    def __generator__(self):
-        for features in self.dataset:
-            txt = features["tokens"]
-            for i, each in enumerate(txt):
-                txt[i] = tokenizer._tokenizer.normalizer.normalize_str(txt[i])
-            train_encodings = tokenizer(
-                txt,
-                is_split_into_words=True,
-                return_offsets_mapping=True,
+        self.sparse_feature_len = {}
+        for i, features in enumerate(self.dataset):
+            size = (
+                len(
+                    tokenizer(features["tokens"], is_split_into_words=True).input_ids,
+                )
+                // TASK["panx"]["max seq length"]
             )
-            labels = np.ones(len(train_encodings.input_ids), dtype=int) * -100
-            ids = np.array(train_encodings.input_ids)
-            arr_offset = np.array(train_encodings.offset_mapping)
-            label_index = (
-                (arr_offset[:, 0] == 0) & (arr_offset[:, 1] != 0) & (ids[:] != 6)
-            )
-            labels[label_index] = features["ner_tags"][: np.count_nonzero(label_index)]
-            block_size = TASK["panx"]["max seq length"]
-            for block_id in range(1 + (len(ids) // block_size)):
-                ids_block = np.ones(block_size, dtype=int) * tokenizer.pad_token_id
-                chosen_ids = ids[block_id * block_size : (block_id + 1) * block_size]
-                ids_block[: len(chosen_ids)] = chosen_ids
-                labels_block = np.ones(block_size, dtype=int) * -100
-                chosen_label = labels[
-                    block_id * block_size : (block_id + 1) * block_size
-                ]
-                labels_block[: len(chosen_label)] = chosen_label
-                yield {
-                    "features": features,
-                    "offset": len(
-                        labels[: block_id * block_size][
-                            labels[: block_id * block_size] != -100
-                        ]
-                    ),
-                    "tokens": torch.from_numpy(ids_block).long(),
-                    "tags": torch.from_numpy(labels_block).long(),
-                }
+            if size > 0:
+                self.sparse_feature_len[i] = 1 + size
 
-    def __next__(self):
-        try:
-            return next(self.generator)
-        except StopIteration:
-            raise StopIteration()
+    def __len__(self):
+        return len(self.dataset) + sum(
+            map(
+                lambda length: length - 1,
+                self.sparse_feature_len.values(),
+            )
+        )
+
+    def __getitem__(self, global_id):
+        for key in self.sparse_feature_len:
+            lengthy_instance_id = int(key)
+            length = self.sparse_feature_len[lengthy_instance_id]
+            if global_id <= lengthy_instance_id:
+                dataset_id = global_id
+                block_id = 0
+                break
+            if global_id < lengthy_instance_id + length:
+                dataset_id = lengthy_instance_id
+                block_id = global_id - dataset_id
+                break
+            global_id -= length - 1
+        else:
+            dataset_id = global_id
+            block_id = 0
+        features = self.dataset[dataset_id]
+        return token_feature_to_torch_example(
+            features, block_id, TASK["panx"]["max seq length"]
+        )
 
 
 class panxTestDataset(torch.utils.data.Dataset):
@@ -904,60 +864,64 @@ class panxTestDataset(torch.utils.data.Dataset):
         for lan in TASK["panx"]["test"]:
             set_name, subset_name, split = TASK["panx"]["test"][lan]
             self.dataset[lan] = get_dataset(set_name, subset_name)[split]
+            self.sparse_feature_len[lan] = {}
+            for i, features in enumerate(self.dataset[lan]):
+                size = (
+                    len(
+                        tokenizer(
+                            features["tokens"], is_split_into_words=True
+                        ).input_ids,
+                    )
+                    // TASK["panx"]["max seq length"]
+                )
+                if size > 0:
+                    self.sparse_feature_len[lan][i] = 1 + size
 
-    def __iter__(self):
-        self.generator = self.__generator__()
-        return self
+    def __len__(self):
+        return sum(
+            map(
+                lambda lan: len(self.dataset[lan])
+                + sum(
+                    map(
+                        lambda length: length - 1,
+                        self.sparse_feature_len[lan].values(),
+                    )
+                ),
+                self.dataset.keys(),
+            )
+        )
 
-    def __generator__(self):
+    def __getitem__(self, global_id):
         for lan in self.dataset:
-            for features in self.dataset[lan]:
-                txt = features["tokens"]
-                for i, each in enumerate(txt):
-                    txt[i] = tokenizer._tokenizer.normalizer.normalize_str(txt[i])
-                train_encodings = tokenizer(
-                    txt,
-                    is_split_into_words=True,
-                    return_offsets_mapping=True,
+            length = len(self.dataset[lan]) + sum(
+                map(
+                    lambda length: length - 1,
+                    self.sparse_feature_len[lan].values(),
                 )
-                labels = np.ones(len(train_encodings.input_ids), dtype=int) * -100
-                ids = np.array(train_encodings.input_ids)
-                arr_offset = np.array(train_encodings.offset_mapping)
-                label_index = (
-                    (arr_offset[:, 0] == 0) & (arr_offset[:, 1] != 0) & (ids[:] != 6)
+            )
+            if global_id < length:
+                for key in self.sparse_feature_len:
+                    lengthy_instance_id = int(key)
+                    length = self.sparse_feature_len[lengthy_instance_id]
+                    if global_id <= lengthy_instance_id:
+                        dataset_id = global_id
+                        block_id = 0
+                        break
+                    if global_id < lengthy_instance_id + length:
+                        dataset_id = lengthy_instance_id
+                        block_id = global_id - dataset_id
+                        break
+                    global_id -= length - 1
+                else:
+                    dataset_id = global_id
+                    block_id = 0
+                features = self.dataset[lan][dataset_id]
+                return token_feature_to_torch_example(
+                    features, block_id, TASK["panx"]["max seq length"]
                 )
-                labels[label_index] = features["ner_tags"][
-                    : np.count_nonzero(label_index)
-                ]
-                block_size = TASK["panx"]["max seq length"]
-                for block_id in range(1 + (len(ids) // block_size)):
-                    ids_block = np.ones(block_size, dtype=int) * tokenizer.pad_token_id
-                    chosen_ids = ids[
-                        block_id * block_size : (block_id + 1) * block_size
-                    ]
-                    ids_block[: len(chosen_ids)] = chosen_ids
-                    labels_block = np.ones(block_size, dtype=int) * -100
-                    chosen_label = labels[
-                        block_id * block_size : (block_id + 1) * block_size
-                    ]
-                    labels_block[: len(chosen_label)] = chosen_label
-                    yield {
-                        "features": features,
-                        "offset": len(
-                            labels[: block_id * block_size][
-                                labels[: block_id * block_size] != -100
-                            ]
-                        ),
-                        "tokens": torch.from_numpy(ids_block).long(),
-                        "tags": torch.from_numpy(labels_block).long(),
-                        "lan": lan,
-                    }
+            global_id -= length
 
-    def __next__(self):
-        try:
-            return next(self.generator)
-        except StopIteration:
-            raise StopIteration()
+    raise StopIteration()
 
 
 class xnliTrainDataset(torch.utils.data.Dataset):
@@ -1143,7 +1107,7 @@ class pawsxTestDataset(torch.utils.data.Dataset):
         raise StopIteration()
 
 
-def features_to_torch_example(features, lan=None):
+def qa_features_to_torch_example(features, block_size, lan=None):
     context_encodings = tokenizer(
         features["context"],
     )
@@ -1200,7 +1164,6 @@ def features_to_torch_example(features, lan=None):
                     endposition[i] += 1
                 break
             endposition[i] += 1
-    block_size = TASK["xquad"]["max seq length"]
     question_size = len(question_encodings.input_ids)
     max_context_size = block_size - question_size
     for block_id in range(1 + (len(context_encodings.input_ids) // max_context_size)):
@@ -1268,26 +1231,13 @@ class xquadTrainDataset(torch.utils.data.Dataset):
         self.task = "xquad"
         set_name, subset_name, split = TASK["xquad"]["train"]
         self.dataset = get_dataset(set_name, subset_name)[split]
-        self.dataset_features = [features for features in self.dataset]
 
     def __len__(self):
         return len(self.dataset)
 
-    def __iter__(self):
-        self.generator = self.__generator__()
-        return self
-
-    def __generator__(self):
-        for features in random.sample(
-            self.dataset_features, len(self.dataset_features)
-        ):
-            yield features_to_torch_example(features)
-
-    def __next__(self):
-        try:
-            return next(self.generator)
-        except StopIteration:
-            raise StopIteration()
+    def __getitem__(self, global_id):
+        features = self.dataset[global_id]
+        return qa_features_to_torch_example(features, TASK["xquad"]["max seq length"])
 
 
 class xquadValidationDataset(torch.utils.data.Dataset):
@@ -1296,19 +1246,12 @@ class xquadValidationDataset(torch.utils.data.Dataset):
         set_name, subset_name, split = TASK["xquad"]["validation"]
         self.dataset = get_dataset(set_name, subset_name)[split]
 
-    def __iter__(self):
-        self.generator = self.__generator__()
-        return self
+    def __len__(self):
+        return len(self.dataset)
 
-    def __generator__(self):
-        for features in self.dataset:
-            yield features_to_torch_example(features)
-
-    def __next__(self):
-        try:
-            return next(self.generator)
-        except StopIteration:
-            raise StopIteration()
+    def __getitem__(self, global_id):
+        features = self.dataset[global_id]
+        return qa_features_to_torch_example(features, TASK["xquad"]["max seq length"])
 
 
 class xquadTestDataset(torch.utils.data.Dataset):
@@ -1319,20 +1262,19 @@ class xquadTestDataset(torch.utils.data.Dataset):
             set_name, subset_name, split = TASK["xquad"]["test"][lan]
             self.dataset[lan] = get_dataset(set_name, subset_name)[split]
 
-    def __iter__(self):
-        self.generator = self.__generator__()
-        return self
+    def __len__(self):
+        return sum(map(len, self.dataset.values()))
 
-    def __generator__(self):
+    def __getitem__(self, global_id):
         for lan in self.dataset:
-            for features in self.dataset[lan]:
-                yield features_to_torch_example(features, lan)
-
-    def __next__(self):
-        try:
-            return next(self.generator)
-        except StopIteration:
-            raise StopIteration()
+            length = len(self.dataset[lan])
+            if global_id < length:
+                features = self.dataset[global_id]
+                return qa_features_to_torch_example(
+                    features, TASK["xquad"]["max seq length"], lan
+                )
+            global_id -= length
+        raise StopIteration()
 
 
 class mlqaTestDataset(torch.utils.data.Dataset):
@@ -1343,20 +1285,19 @@ class mlqaTestDataset(torch.utils.data.Dataset):
             set_name, subset_name, split = TASK["mlqa"]["test"][lan]
             self.dataset[lan] = get_dataset(set_name, subset_name)[split]
 
-    def __iter__(self):
-        self.generator = self.__generator__()
-        return self
+    def __len__(self):
+        return sum(map(len, self.dataset.values()))
 
-    def __generator__(self):
+    def __getitem__(self, global_id):
         for lan in self.dataset:
-            for features in self.dataset[lan]:
-                yield features_to_torch_example(features, lan)
-
-    def __next__(self):
-        try:
-            return next(self.generator)
-        except StopIteration:
-            raise StopIteration()
+            length = len(self.dataset[lan])
+            if global_id < length:
+                features = self.dataset[global_id]
+                return qa_features_to_torch_example(
+                    features, TASK["xquad"]["max seq length"], lan
+                )
+            global_id -= length
+        raise StopIteration()
 
 
 class tydiqaTrainDataset(torch.utils.data.Dataset):
@@ -1364,34 +1305,18 @@ class tydiqaTrainDataset(torch.utils.data.Dataset):
         self.task = "tydiqa"
         set_name, subset_name, split = TASK["tydiqa"]["train"]
         self.dataset = get_dataset(set_name, subset_name)[split]
-        self.dataset_features = [features for features in self.dataset]
+        self.dataset_features = [
+            features
+            for features in self.dataset
+            if LANG2ISO[features["id"].split("-")[0]] == "en"
+        ]
 
     def __len__(self):
-        return len(
-            [
-                instance
-                for instance in self.dataset
-                if LANG2ISO[instance["id"].split("-")[0]] == "en"
-            ]
-        )
+        return len(self.dataset_features)
 
-    def __iter__(self):
-        self.generator = self.__generator__()
-        return self
-
-    def __generator__(self):
-        for features in random.sample(
-            self.dataset_features, len(self.dataset_features)
-        ):
-            if LANG2ISO[features["id"].split("-")[0]] != "en":
-                continue
-            yield features_to_torch_example(features)
-
-    def __next__(self):
-        try:
-            return next(self.generator)
-        except StopIteration:
-            raise StopIteration()
+    def __getitem__(self, global_id):
+        features = self.dataset_features[global_id]
+        return qa_features_to_torch_example(features, TASK["xquad"]["max seq length"])
 
 
 LANG2ISO = {
@@ -1413,21 +1338,16 @@ class tydiqaTestDataset(torch.utils.data.Dataset):
         set_name, subset_name, split = TASK["tydiqa"]["test"]
         self.dataset = get_dataset(set_name, subset_name)[split]
 
-    def __iter__(self):
-        self.generator = self.__generator__()
-        return self
+    def __len__(self):
+        return len(self.dataset)
 
-    def __generator__(self):
-        for features in self.dataset:
-            yield features_to_torch_example(
-                features, LANG2ISO[features["id"].split("-")[0]]
-            )
-
-    def __next__(self):
-        try:
-            return next(self.generator)
-        except StopIteration:
-            raise StopIteration()
+    def __getitem__(self, global_id):
+        features = self.dataset[global_id]
+        return qa_features_to_torch_example(
+            features,
+            TASK["xquad"]["max seq length"],
+            LANG2ISO[features["id"].split("-")[0]],
+        )
 
 
 class bucc2018Dataset(torch.utils.data.Dataset):

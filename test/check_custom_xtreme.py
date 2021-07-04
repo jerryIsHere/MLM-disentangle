@@ -12,6 +12,24 @@ for i, each in enumerate(ds):
         )
     ).all()
 assert i == len(ds) - 1
+assert (
+    i
+    == sum(
+        map(
+            lambda features: 1
+            + (
+                len(
+                    xtreme_ds.tokenizer(
+                        features["tokens"], is_split_into_words=True
+                    ).input_ids,
+                )
+                // xtreme_ds.TASK["udpos"]["max seq length"]
+            ),
+            ds.dataset,
+        )
+    )
+    - 1
+)
 ds = xtreme_ds.udposValidationDataset()
 for i, each in enumerate(ds):
     tags = each["tags"].numpy()
@@ -22,7 +40,25 @@ for i, each in enumerate(ds):
             each["features"]["pos_tags"][each["offset"] : each["offset"] + len(tags)]
         )
     ).all()
-assert i >= len(ds.dataset) - 1
+assert i == len(ds) - 1
+assert (
+    i
+    == sum(
+        map(
+            lambda features: 1
+            + (
+                len(
+                    xtreme_ds.tokenizer(
+                        features["tokens"], is_split_into_words=True
+                    ).input_ids,
+                )
+                // xtreme_ds.TASK["udpos"]["max seq length"]
+            ),
+            ds.dataset,
+        )
+    )
+    - 1
+)
 ds = xtreme_ds.udposTestDataset()
 for i, each in enumerate(ds):
     tags = each["tags"].numpy()
@@ -33,7 +69,25 @@ for i, each in enumerate(ds):
             each["features"]["pos_tags"][each["offset"] : each["offset"] + len(tags)]
         )
     ).all()
-assert i >= sum(map(len, ds.dataset.values())) - 1
+assert i == len(ds) - 1
+assert (
+    i
+    == sum(
+        map(
+            lambda features: 1
+            + (
+                len(
+                    xtreme_ds.tokenizer(
+                        features["tokens"], is_split_into_words=True
+                    ).input_ids,
+                )
+                // xtreme_ds.TASK["udpos"]["max seq length"]
+            ),
+            ds.dataset,
+        )
+    )
+    - 1
+)
 
 
 ds = xtreme_ds.panxTrainDataset()
@@ -47,6 +101,24 @@ for i, each in enumerate(ds):
         )
     ).all()
 assert i == len(ds) - 1
+assert (
+    i
+    == sum(
+        map(
+            lambda features: 1
+            + (
+                len(
+                    xtreme_ds.tokenizer(
+                        features["tokens"], is_split_into_words=True
+                    ).input_ids,
+                )
+                // xtreme_ds.TASK["panx"]["max seq length"]
+            ),
+            ds.dataset,
+        )
+    )
+    - 1
+)
 ds = xtreme_ds.panxValidationDataset()
 for i, each in enumerate(ds):
     tags = each["tags"].numpy()
@@ -57,7 +129,25 @@ for i, each in enumerate(ds):
             each["features"]["ner_tags"][each["offset"] : each["offset"] + len(tags)]
         )
     ).all()
-assert i >= len(ds.dataset) - 1
+assert i == len(ds) - 1
+assert (
+    i
+    == sum(
+        map(
+            lambda features: 1
+            + (
+                len(
+                    xtreme_ds.tokenizer(
+                        features["tokens"], is_split_into_words=True
+                    ).input_ids,
+                )
+                // xtreme_ds.TASK["panx"]["max seq length"]
+            ),
+            ds.dataset,
+        )
+    )
+    - 1
+)
 ds = xtreme_ds.panxTestDataset()
 for i, each in enumerate(ds):
     tags = each["tags"].numpy()
@@ -68,7 +158,25 @@ for i, each in enumerate(ds):
             each["features"]["ner_tags"][each["offset"] : each["offset"] + len(tags)]
         )
     ).all()
-assert i >= sum(map(len, ds.dataset.values())) - 1
+assert i == len(ds) - 1
+assert (
+    i
+    == sum(
+        map(
+            lambda features: 1
+            + (
+                len(
+                    xtreme_ds.tokenizer(
+                        features["tokens"], is_split_into_words=True
+                    ).input_ids,
+                )
+                // xtreme_ds.TASK["panx"]["max seq length"]
+            ),
+            ds.dataset,
+        )
+    )
+    - 1
+)
 
 
 ds = xtreme_ds.xnliTrainDataset()

@@ -395,7 +395,6 @@ if __name__ == "__main__":
         print(str(time.time() - start_time) + " seconds elapsed for training")
     if args.do_test:
         xquad_ds = xtreme_ds.xquadTestDataset()
-        qa_test(model, qa_ds=xquad_ds)
         model = qa_load_finetuned_model(
             experiment_config_dict=experiment_config_dict,
             mlm_model_path="/gpfs1/home/ckchan666/mlm_disentangle_experiment/model/"
@@ -403,7 +402,10 @@ if __name__ == "__main__":
             + "/"
             + experiment_config_dict["training"].model_name
             + "/pytorch_model.bin",
-            task=ds.task,
+            task=xquad_ds.task,
         )
+        qa_test(model, qa_ds=xquad_ds)
         mlqa_ds = xtreme_ds.mlqaTestDataset()
+        model.taskmodels_dict[mlqa_ds.task] = model.taskmodels_dict[xquad_ds.task]
+        model.taskmodels_dict.pop(xquad_ds.task)
         qa_test(model, qa_ds=mlqa_ds)
