@@ -593,9 +593,9 @@ def token_feature_to_torch_example(features, block_id, block_size, lan=None):
     labels_block = np.ones(block_size, dtype=int) * -100
     chosen_label = labels[block_id * block_size : (block_id + 1) * block_size]
     labels_block[: len(chosen_label)] = chosen_label
-    features["offset"] = len(
-        labels[: block_id * block_size][labels[: block_id * block_size] != -100]
-    )
+    features["offset"] = torch.from_numpy(
+        len(labels[: block_id * block_size][labels[: block_id * block_size] != -100])
+    ).int()
     return (
         {
             "features": features,

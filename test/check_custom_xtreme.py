@@ -8,7 +8,9 @@ for i, each in enumerate(ds):
     assert (
         tags
         == np.array(
-            each["features"]["pos_tags"][each["offset"] : each["offset"] + len(tags)]
+            each["features"]["pos_tags"][
+                each["features"]["offset"] : each["features"]["offset"] + len(tags)
+            ]
         )
     ).all()
 assert i == len(ds) - 1
@@ -37,7 +39,9 @@ for i, each in enumerate(ds):
     assert (
         tags
         == np.array(
-            each["features"]["pos_tags"][each["offset"] : each["offset"] + len(tags)]
+            each["features"]["pos_tags"][
+                each["features"]["offset"] : each["features"]["offset"] + len(tags)
+            ]
         )
     ).all()
 assert i == len(ds) - 1
@@ -66,7 +70,9 @@ for i, each in enumerate(ds):
     assert (
         tags
         == np.array(
-            each["features"]["pos_tags"][each["offset"] : each["offset"] + len(tags)]
+            each["features"]["pos_tags"][
+                each["features"]["offset"] : each["features"]["offset"] + len(tags)
+            ]
         )
     ).all()
 assert i == len(ds) - 1
@@ -95,7 +101,9 @@ for i, each in enumerate(ds):
     assert (
         tags
         == np.array(
-            each["features"]["ner_tags"][each["offset"] : each["offset"] + len(tags)]
+            each["features"]["ner_tags"][
+                each["features"]["offset"] : each["features"]["offset"] + len(tags)
+            ]
         )
     ).all()
 assert i == len(ds) - 1
@@ -124,7 +132,9 @@ for i, each in enumerate(ds):
     assert (
         tags
         == np.array(
-            each["features"]["ner_tags"][each["offset"] : each["offset"] + len(tags)]
+            each["features"]["ner_tags"][
+                each["features"]["offset"] : each["features"]["offset"] + len(tags)
+            ]
         )
     ).all()
 assert i == len(ds) - 1
@@ -153,7 +163,9 @@ for i, each in enumerate(ds):
     assert (
         tags
         == np.array(
-            each["features"]["ner_tags"][each["offset"] : each["offset"] + len(tags)]
+            each["features"]["ner_tags"][
+                each["features"]["offset"] : each["features"]["offset"] + len(tags)
+            ]
         )
     ).all()
 assert i == len(ds) - 1
@@ -173,7 +185,6 @@ assert (
     )
     - 1
 )
-
 
 
 ds = xtreme_ds.xnliTrainDataset()
