@@ -594,7 +594,11 @@ def token_feature_to_torch_example(features, block_id, block_size, lan=None):
     chosen_label = labels[block_id * block_size : (block_id + 1) * block_size]
     labels_block[: len(chosen_label)] = chosen_label
     features["offset"] = torch.from_numpy(
-        len(labels[: block_id * block_size][labels[: block_id * block_size] != -100])
+        np.array(
+            len(
+                labels[: block_id * block_size][labels[: block_id * block_size] != -100]
+            )
+        )
     ).int()
     return (
         {
