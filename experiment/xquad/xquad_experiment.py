@@ -272,6 +272,14 @@ def qa_test(finetune_model, qa_ds):
     for lan in xtreme_ds.TASK2LANGS[task]:
         lan_metric[lan] = xtreme_ds.METRIC_FUNCTION[task]()
     finetune_model.taskmodels_dict[task].cuda()
+    feature_dict = (
+        {
+            lan: {each["id"]: each for each in qa_ds.dataset[lan]}
+            for lan in qa_ds.dataset
+        }
+        if isinstance(qa_ds.dataset, dict)
+        else {each["id"]: each for each in qa_ds.dataset}
+    )
     for batch in test_dataloader:
         with torch.no_grad():
             #  input to gpu
@@ -280,8 +288,11 @@ def qa_test(finetune_model, qa_ds):
             start_predictions = torch.argmax(Output["start_logits"], dim=1)
             end_predictions = torch.argmax(Output["end_logits"], dim=1)
             for i, lan in enumerate(batch["lan"]):
-                ds = qa_ds[lan] if isinstance(qa_ds, dict) else qa_ds
-                feature = next(f for f in ds if f["id"] == batch["id"])
+                feature = (
+                    feature_dict[lan][batch["id"][i]]
+                    if isinstance(qa_ds.dataset, dict)
+                    else feature_dict[batch["id"][i]]
+                )
                 question_id = lan + "-" + feature["id"][i]
                 reply_ids = batch["tokens"][i][
                     start_predictions[i] : end_predictions[i]
