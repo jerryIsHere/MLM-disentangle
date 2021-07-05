@@ -331,9 +331,9 @@ def qa_test(finetune_model, qa_ds):
 
     for lan in lan_metric:
         print(lan)
-        print(lan_metric[lan].compute(average="micro"))
+        print(lan_metric[lan].compute())
     print("overall f1 score:")
-    print(metric.compute(average="micro"))
+    print(metric.compute())
 
 
 if __name__ == "__main__":
