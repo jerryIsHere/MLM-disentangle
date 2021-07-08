@@ -573,7 +573,7 @@ class loop_iter:
 #         for i in range(max(1, self.batch_size)):
 #             batch.append(next(self.it))
 #         return reducer(batch)
-def token_feature_to_torch_example(features, block_id, block_size, lan=None):
+def token_tagging_feature_to_torch_example(features, block_id, block_size, lan=None):
     txt = features["tokens"]
     for i, each in enumerate(txt):
         txt[i] = tokenizer._tokenizer.normalizer.normalize_str(txt[i])
@@ -655,7 +655,7 @@ class udposTrainDataset(torch.utils.data.Dataset):
             block_id = 0
         features = self.dataset[dataset_id]
         features["tags"] = features["pos_tags"]
-        return token_feature_to_torch_example(
+        return token_tagging_feature_to_torch_example(
             features, block_id, TASK["udpos"]["max seq length"]
         )
 
@@ -702,7 +702,7 @@ class udposValidationDataset(torch.utils.data.Dataset):
             block_id = 0
         features = self.dataset[dataset_id]
         features["tags"] = features["pos_tags"]
-        return token_feature_to_torch_example(
+        return token_tagging_feature_to_torch_example(
             features, block_id, TASK["udpos"]["max seq length"]
         )
 
@@ -768,7 +768,7 @@ class udposTestDataset(torch.utils.data.Dataset):
                     block_id = 0
                 features = self.dataset[lan][dataset_id]
                 features["tags"] = features["pos_tags"]
-                return token_feature_to_torch_example(
+                return token_tagging_feature_to_torch_example(
                     features, block_id, TASK["udpos"]["max seq length"], lan
                 )
             global_id -= length
@@ -818,7 +818,7 @@ class panxTrainDataset(torch.utils.data.Dataset):
             block_id = 0
         features = self.dataset[dataset_id]
         features["tags"] = features["ner_tags"]
-        return token_feature_to_torch_example(
+        return token_tagging_feature_to_torch_example(
             features, block_id, TASK["panx"]["max seq length"]
         )
 
@@ -865,7 +865,7 @@ class panxValidationDataset(torch.utils.data.Dataset):
             block_id = 0
         features = self.dataset[dataset_id]
         features["tags"] = features["ner_tags"]
-        return token_feature_to_torch_example(
+        return token_tagging_feature_to_torch_example(
             features, block_id, TASK["panx"]["max seq length"]
         )
 
@@ -931,7 +931,7 @@ class panxTestDataset(torch.utils.data.Dataset):
                     block_id = 0
                 features = self.dataset[lan][dataset_id]
                 features["tags"] = features["ner_tags"]
-                return token_feature_to_torch_example(
+                return token_tagging_feature_to_torch_example(
                     features, block_id, TASK["panx"]["max seq length"], lan
                 )
             global_id -= length
