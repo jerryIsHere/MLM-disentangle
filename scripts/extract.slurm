@@ -6,8 +6,8 @@
 #SBATCH --gres=gpu:1
 #SBATCH --mem=32GB
 #SBATCH --time=0-6:00:00
-#SBATCH --output=/gpfs1/home/ckchan666/mlm_disentangle_experiment/job/extract/task.log
-#SBATCH --error=/gpfs1/home/ckchan666/mlm_disentangle_experiment/job/extract/task.err
+#SBATCH --output=/gpfs1/home/ckchan666/job/extract/task.log
+#SBATCH --error=/gpfs1/home/ckchan666/job/extract/task.err
 
 module load python37
 source /gpfs1/home/ckchan666/mnlpEnv/bin/activate
