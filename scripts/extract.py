@@ -118,6 +118,7 @@ if not have_bucc2018_source or not have_bucc2018_target:
             if not have_bucc2018_source:
                 source_output = disentangled_model(batch["source_tokens"])
                 for i, s_id in enumerate(batch["source_id"]):
+                    lan = batch["lan"][i]
                     bucc2018_source[lan][s_id] = source_output.last_hidden_state[i][
                         batch["source_tokens"][i] != xtreme_ds.tokenizer.pad_token_id
                     ]
@@ -127,17 +128,26 @@ if not have_bucc2018_source or not have_bucc2018_target:
             if not have_bucc2018_target:
                 target_output = disentangled_model(batch["target_tokens"])
                 for i, s_id in enumerate(batch["target_id"]):
+                    lan = batch["lan"][i]
                     bucc2018_target[lan][s_id] = target_output.last_hidden_state[i][
                         batch["target_tokens"][i] != xtreme_ds.tokenizer.pad_token_id
                     ]
                     bucc2018_target[lan][s_id] = torch.mean(
                         bucc2018_target[lan][s_id], dim=0
                     )
-    filehandler = open("/gpfs1/scratch/ckchan666/pickle/bucc2018_source.pickle", "wb")
-    pickle.dump(bucc2018_source, filehandler)
-
-    filehandler = open("/gpfs1/scratch/ckchan666/pickle/bucc2018_target.pickle", "wb")
-    pickle.dump(bucc2018_target, filehandler)
+    if not have_bucc2018_source:
+        filehandler = open(
+            "/gpfs1/scratch/ckchan666/pickle/bucc2018_source.pickle", "wb"
+        )
+        pickle.dump(bucc2018_source, filehandler)
+        del bucc2018_source
+    if not have_bucc2018_target:
+        filehandler = open(
+            "/gpfs1/scratch/ckchan666/pickle/bucc2018_target.pickle", "wb"
+        )
+        pickle.dump(bucc2018_target, filehandler)
+        del bucc2018_target
+    del ds
 
 have_tatoeba_source = path.exists(
     "/gpfs1/scratch/ckchan666/pickle/tatoeba_source.pickle"
@@ -165,6 +175,7 @@ if not have_tatoeba_source or not have_tatoeba_target:
             if not have_tatoeba_source:
                 source_output = disentangled_model(batch["source_tokens"])
                 for i, s_id in enumerate(batch["source_id"]):
+                    lan = batch["lan"][i]
                     tatoeba_source[lan][s_id] = source_output.last_hidden_state[i][
                         batch["source_tokens"][i] != xtreme_ds.tokenizer.pad_token_id
                     ]
@@ -174,17 +185,26 @@ if not have_tatoeba_source or not have_tatoeba_target:
             if not have_tatoeba_target:
                 target_output = disentangled_model(batch["target_tokens"])
                 for i, s_id in enumerate(batch["target_id"]):
+                    lan = batch["lan"][i]
                     tatoeba_target[lan][s_id] = target_output.last_hidden_state[i][
                         batch["target_tokens"][i] != xtreme_ds.tokenizer.pad_token_id
                     ]
                     tatoeba_target[lan][s_id] = torch.mean(
                         tatoeba_target[lan][s_id], dim=0
                     )
-    filehandler = open("/gpfs1/scratch/ckchan666/pickle/tatoeba_source.pickle", "wb")
-    pickle.dump(tatoeba_source, filehandler)
-
-    filehandler = open("/gpfs1/scratch/ckchan666/pickle/tatoeba_target.pickle", "wb")
-    pickle.dump(tatoeba_target, filehandler)
+    if not have_tatoeba_source:
+        filehandler = open(
+            "/gpfs1/scratch/ckchan666/pickle/tatoeba_source.pickle", "wb"
+        )
+        pickle.dump(tatoeba_source, filehandler)
+        del tatoeba_source
+    if not have_tatoeba_target:
+        filehandler = open(
+            "/gpfs1/scratch/ckchan666/pickle/tatoeba_target.pickle", "wb"
+        )
+        pickle.dump(tatoeba_target, filehandler)
+        del tatoeba_target
+    del ds
 
 if not path.exists("/gpfs1/scratch/ckchan666/pickle/udpos_example.pickle"):
     ds = xtreme_ds.udposTestDataset()

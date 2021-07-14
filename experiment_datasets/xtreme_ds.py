@@ -1417,6 +1417,7 @@ class tatoebaDataset(torch.utils.data.Dataset):
         return sum(map(len, self.dataset.values()))
 
     def __getitem__(self, global_id):
+        en_id = global_id
         for lan in self.dataset:
             length = len(self.dataset[lan])
             if global_id < length:
@@ -1438,7 +1439,7 @@ class tatoebaDataset(torch.utils.data.Dataset):
                     "source_tokens": torch.tensor(source_encodings.input_ids).long(),
                     "target_tokens": torch.tensor(target_encodings.input_ids).long(),
                     "source_id": lan + "-" + str(dataset_id),
-                    "target_id": "en" + "-" + str(global_id),
+                    "target_id": "en" + "-" + str(en_id),
                     "lan": lan,
                 }
             global_id -= length
