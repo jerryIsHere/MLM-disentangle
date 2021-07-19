@@ -11,72 +11,10 @@ import time
 import os
 
 
-def tag_build_model(experiment_config_dict, mlm_model_path, task):
-    backbone_name = experiment_config_dict["training"].backbone_name
-    XLMRConfig = transformers.AutoConfig.from_pretrained(backbone_name)
-
-    setattr(XLMRConfig, "discriminators", experiment_config_dict["discriminators"])
-
-    finetune_model = MultitaskModel.create_untrained(
-        backbone_name=backbone_name,
-        task_dict={
-            "mlm": {
-                "type": transformers.XLMRobertaForMaskedLM,
-                "config": transformers.XLMRobertaConfig.from_pretrained(backbone_name),
-            },
-            "disentangle": {
-                "type": XLMRobertaForDisentanglement,
-                "config": XLMRConfig,
-            },
-        },
-    )
-    import torch
-
-    finetune_model.load_state_dict(torch.load(mlm_model_path))
-    finetune_model.taskmodels_dict.pop("mlm")
-    finetune_model.add_task(
-        task,
-        transformers.XLMRobertaForTokenClassification,
-        transformers.XLMRobertaConfig.from_pretrained(
-            finetune_model.backbone_name, num_labels=xtreme_ds.TASK[task]["num_labels"]
-        ),
-    )
-    return finetune_model
-
-
-def tag_load_finetuned_model(experiment_config_dict, mlm_model_path, task):
-    backbone_name = experiment_config_dict["training"].backbone_name
-    XLMRConfig = transformers.AutoConfig.from_pretrained(backbone_name)
-
-    setattr(XLMRConfig, "discriminators", experiment_config_dict["discriminators"])
-
-    finetuned_model = MultitaskModel.create_untrained(
-        backbone_name=backbone_name,
-        task_dict={
-            task: {
-                "type": transformers.XLMRobertaForTokenClassification,
-                "config": transformers.XLMRobertaConfig.from_pretrained(
-                    backbone_name,
-                    num_labels=xtreme_ds.TASK[task]["num_labels"],
-                ),
-            },
-            "disentangle": {
-                "type": XLMRobertaForDisentanglement,
-                "config": XLMRConfig,
-            },
-        },
-    )
-    import torch
-
-    finetuned_model.load_state_dict(torch.load(mlm_model_path))
-    return finetuned_model
-
-
 def tag_train(
     finetune_model,
     writer,
     model_path,
-    MLMD_ds,
     tag_ds,
     custom_stop_condition=lambda gradient_step: False,
 ):
@@ -106,14 +44,6 @@ def tag_train(
         lr=xtreme_ds.TASK[task]["learning_rate"],
         eps=xtreme_ds.TASK[task]["adam_epsilon"],
     )
-
-    disentangle_dataloader = torch.utils.data.DataLoader(
-        MLMD_ds,
-        batch_size=xtreme_ds.TASK[task]["batch_size"],
-        num_workers=2,
-        shuffle=True,
-    )
-    disentangle_iter = iter(xtreme_ds.loop_iter(disentangle_dataloader))
     tag_ds_dataloader = torch.utils.data.DataLoader(
         tag_ds,
         batch_size=xtreme_ds.TASK[task]["batch_size"],
@@ -136,7 +66,6 @@ def tag_train(
 
     finetune_model.cuda()
     udposLoss = 0.0
-    disentangleLoss = 0.0
     gradient_step_counter = 0
     print(
         "run for "
@@ -163,30 +92,6 @@ def tag_train(
             #  acc loss
             udposLoss = udposLoss + Output["loss"].item()
 
-            batch = next(disentangle_iter)
-            # disentangle input to gpu
-            batch["masked_tokens"] = batch["masked_tokens"].cuda()
-            batch["language_id"] = batch["language_id"].cuda()
-            batch["genus_label"] = batch["genus_label"].cuda()
-            batch["family_label"] = batch["family_label"].cuda()
-
-            # disentangle model to gpu
-            finetune_model.taskmodels_dict["disentangle"].cuda()
-            disentangleOutput = finetune_model.taskmodels_dict["disentangle"](
-                input_ids=batch["masked_tokens"][
-                    0 : xtreme_ds.TASK[task]["max seq length"]
-                ],
-                labels={
-                    "language_id": batch["language_id"],
-                    "genus_label": batch["genus_label"],
-                    "family_label": batch["family_label"],
-                },
-            )
-            disentangleOutput["loss"].backward()
-
-            #  acc loss
-            disentangleLoss = disentangleLoss + disentangleOutput["loss"].item()
-
             if (i + 1) % (gradient_acc_size / batch_size) == 0:
                 torch.nn.utils.clip_grad_norm_(finetune_model.parameters(), 1.0)
                 optimizer.step()
@@ -208,20 +113,9 @@ def tag_train(
                         + "): "
                         + str(udposLoss / (log_step_size * gradient_acc_size))
                     )
-                    print(
-                        "disentangle loss ("
-                        + str(gradient_step_counter)
-                        + "): "
-                        + str(disentangleLoss / (log_step_size * gradient_acc_size))
-                    )
                     writer.add_scalar(
                         writer.filename_suffix + " loss",
                         udposLoss / (log_step_size * gradient_acc_size),
-                        gradient_step_counter,
-                    )
-                    writer.add_scalar(
-                        writer.filename_suffix + "disentangle loss",
-                        disentangleLoss / (log_step_size * gradient_acc_size),
                         gradient_step_counter,
                     )
                     udposLoss = 0
@@ -295,57 +189,71 @@ if __name__ == "__main__":
     experiment_config_dict["training"].model_name = (
         os.path.abspath(args.config_json).split("/")[-1].split(".")[0]
     )
+    print("udpos")
     print("model configuration name: " + experiment_config_dict["training"].model_name)
-    if args.do_train:
-        model = tag_build_model(
-            experiment_config_dict=experiment_config_dict,
-            mlm_model_path="/gpfs1/home/ckchan666/mlm_disentangle_experiment/model/mlm/"
-            + experiment_config_dict["training"].model_name
-            + "/pytorch_model.bin",
-            task="udpos",
-        )
-        start_time = time.time()
-        from torch.utils.tensorboard import SummaryWriter
 
-        ds = xtreme_ds.udposTrainDataset()
-        writer = SummaryWriter(
-            "/gpfs1/home/ckchan666/mlm_disentangle_experiment/tensorboard/"
-            + os.path.dirname(os.path.abspath(__file__)).split("/")[-1]
-            + "/"
-            + experiment_config_dict["training"].model_name,
-            filename_suffix="."
-            + ds.task
-            + "."
-            + experiment_config_dict["training"].model_name,
-        )
-        model_path = (
-            "/gpfs1/home/ckchan666/mlm_disentangle_experiment/model/"
-            + os.path.dirname(os.path.abspath(__file__)).split("/")[-1]
-            + "/"
-            + experiment_config_dict["training"].model_name
-        )
-        MLMD_ds = oscar_corpus.get_custom_corpus()
-        MLMD_ds.set_format(type="torch")
-        tag_train(
-            finetune_model=model,
-            writer=writer,
-            model_path=model_path,
-            MLMD_ds=MLMD_ds,
-            tag_ds=ds,
-        )
-        print(str(time.time() - start_time) + " seconds elapsed for training")
-    if args.do_test:
-        ds = xtreme_ds.udposTestDataset()
-        model = tag_load_finetuned_model(
-            experiment_config_dict=experiment_config_dict,
-            mlm_model_path="/gpfs1/home/ckchan666/mlm_disentangle_experiment/model/"
-            + ds.task
-            + "/"
-            + experiment_config_dict["training"].model_name
-            + "/pytorch_model.bin",
-            task=ds.task,
-        )
-        tag_test(
-            model,
-            tag_ds=ds,
-        )
+    model = transformers.XLMRobertaForTokenClassification.from_pretrained(
+        experiment_config_dict["training"].backbone_name
+    )
+    start_time = time.time()
+    from torch.utils.tensorboard import SummaryWriter
+
+    ds = xtreme_ds.udposTrainDataset()
+    writer = SummaryWriter(
+        "/gpfs1/home/ckchan666/job/stru_pred_baseline/udpos",
+        filename_suffix="."
+        + ds.task
+        + "."
+        + experiment_config_dict["training"].model_name,
+    )
+    model_path = (
+        "/gpfs1/home/ckchan666/job/stru_pred_baseline/udpos"
+        + "."
+        + experiment_config_dict["training"].model_name
+    )
+    tag_train(
+        finetune_model=model,
+        writer=writer,
+        model_path=model_path,
+        tag_ds=ds,
+    )
+    print(str(time.time() - start_time) + " seconds elapsed for training")
+    ds = xtreme_ds.udposTestDataset()
+    tag_test(
+        model,
+        tag_ds=xtreme_ds.udposTestDataset(),
+    )
+    print("panx")
+    print("model configuration name: " + experiment_config_dict["training"].model_name)
+
+    model = transformers.XLMRobertaForTokenClassification.from_pretrained(
+        experiment_config_dict["training"].backbone_name
+    )
+    start_time = time.time()
+    from torch.utils.tensorboard import SummaryWriter
+
+    ds = xtreme_ds.panxTrainDataset()
+    writer = SummaryWriter(
+        "/gpfs1/home/ckchan666/job/stru_pred_baseline/panx",
+        filename_suffix="."
+        + ds.task
+        + "."
+        + experiment_config_dict["training"].model_name,
+    )
+    model_path = (
+        "/gpfs1/home/ckchan666/job/stru_pred_baseline/panx"
+        + "."
+        + experiment_config_dict["training"].model_name
+    )
+    tag_train(
+        finetune_model=model,
+        writer=writer,
+        model_path=model_path,
+        tag_ds=ds,
+    )
+    print(str(time.time() - start_time) + " seconds elapsed for training")
+    ds = xtreme_ds.panxTestDataset()
+    tag_test(
+        model,
+        tag_ds=ds,
+    )

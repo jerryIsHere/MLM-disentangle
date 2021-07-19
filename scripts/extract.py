@@ -217,8 +217,8 @@ if not path.exists("/gpfs1/scratch/ckchan666/pickle/udpos_example.pickle"):
     udpos_example = {}
     import gc
 
-    with torch.no_grad():
-        for i_batch, batch in enumerate(dataloader):
+    for i_batch, batch in enumerate(dataloader):
+        with torch.no_grad():
             output = disentangled_model(batch["tokens"])
             for i, s_id in enumerate(batch["tokens"]):
                 udpos_example[i_batch] = {
