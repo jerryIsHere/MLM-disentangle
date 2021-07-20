@@ -214,19 +214,32 @@ if not path.exists("/gpfs1/scratch/ckchan666/pickle/udpos_example.pickle"):
         num_workers=2,
         shuffle=False,
     )
-    udpos_example = {}
+    udpos_example = []
     import gc
 
+    last_lan = ""
     for i_batch, batch in enumerate(dataloader):
         with torch.no_grad():
             output = disentangled_model(batch["tokens"])
             for i, s_id in enumerate(batch["tokens"]):
-                udpos_example[i_batch] = {
-                    "vectors": output.last_hidden_state[i],
-                    "tokens": batch["tokens"][i],
-                    "tags": batch["tags"][i],
-                    "lan": batch["lan"][i],
-                    "offset": batch["offset"][i],
-                }
-    filehandler = open("/gpfs1/scratch/ckchan666/pickle/udpos_example.pickle", "wb")
-    pickle.dump(udpos_example, filehandler)
+                lan = batch["lan"][i]
+                if last_lan != lan and last_lan != "":
+                    filehandler = open(
+                        "/gpfs1/scratch/ckchan666/pickle/udpos_example_"
+                        + last_lan
+                        + ".pickle",
+                        "wb",
+                    )
+                    pickle.dump(udpos_example, filehandler)
+                    udpos_example = []
+                    gc.collect()
+                udpos_example.append(
+                    {
+                        "vectors": output.last_hidden_state[i],
+                        "tokens": batch["tokens"][i],
+                        "tags": batch["tags"][i],
+                        "lan": batch["lan"][i],
+                        "offset": batch["offset"][i],
+                    }
+                )
+                last_lan = lan
