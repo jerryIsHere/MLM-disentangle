@@ -184,7 +184,7 @@ if __name__ == "__main__":
         "--do_test", action="store_true", help="Whether to run training."
     )
     args = parser.parse_args()
-    with open(args.config_json, "r") as outfile:
+    with open("/gpfs1/home/ckchan666/MLM-disentangle/experiment/mlm/default.json", "r") as outfile:
         experiment_config_dict = json.load(outfile, cls=ExperimentConfigSerializer)
     experiment_config_dict["training"].model_name = (
         os.path.abspath(args.config_json).split("/")[-1].split(".")[0]
