@@ -82,8 +82,8 @@ def tag_train(
             batch["tags"] = batch["tags"].cuda()
 
             #  model to gpu
-            finetune_model.taskmodels_dict[task].cuda()
-            Output = finetune_model.taskmodels_dict[task](
+            finetune_model.cuda()
+            Output = finetune_model(
                 input_ids=batch["tokens"],
                 labels=batch["tags"],
             )
@@ -138,12 +138,12 @@ def tag_test(finetune_model, tag_ds):
     lan_metric = {}
     for lan in xtreme_ds.TASK2LANGS[task]:
         lan_metric[lan] = xtreme_ds.METRIC_FUNCTION[task]()
-    finetune_model.taskmodels_dict[task].cuda()
+    finetune_model.cuda()
     for batch in test_dataloader:
         with torch.no_grad():
             #  input to gpu
             batch["tokens"] = batch["tokens"].cuda()
-            Output = finetune_model.taskmodels_dict[task](input_ids=batch["tokens"])
+            Output = finetune_model(input_ids=batch["tokens"])
             predictions = torch.argmax(Output["logits"], dim=2)
             for i, lan in enumerate(batch["lan"]):
                 for j, token_pred in enumerate(predictions[i]):
@@ -184,7 +184,9 @@ if __name__ == "__main__":
         "--do_test", action="store_true", help="Whether to run training."
     )
     args = parser.parse_args()
-    with open("/gpfs1/home/ckchan666/MLM-disentangle/experiment/mlm/default.json", "r") as outfile:
+    with open(
+        "/gpfs1/home/ckchan666/MLM-disentangle/experiment/mlm/default.json", "r"
+    ) as outfile:
         experiment_config_dict = json.load(outfile, cls=ExperimentConfigSerializer)
     experiment_config_dict["training"].model_name = (
         os.path.abspath(args.config_json).split("/")[-1].split(".")[0]
