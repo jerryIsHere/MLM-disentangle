@@ -194,13 +194,14 @@ if __name__ == "__main__":
     print("udpos")
     print("model configuration name: " + experiment_config_dict["training"].model_name)
 
-    model = transformers.XLMRobertaForTokenClassification.from_pretrained(
-        experiment_config_dict["training"].backbone_name
-    )
+    
     start_time = time.time()
     from torch.utils.tensorboard import SummaryWriter
 
     ds = xtreme_ds.udposTrainDataset()
+    model = transformers.XLMRobertaForTokenClassification.from_pretrained(
+        experiment_config_dict["training"].backbone_name, num_labels=xtreme_ds.TASK[ds.task]["num_labels"]
+    )
     writer = SummaryWriter(
         "/gpfs1/home/ckchan666/job/stru_pred_baseline/udpos",
         filename_suffix="."
@@ -228,13 +229,13 @@ if __name__ == "__main__":
     print("panx")
     print("model configuration name: " + experiment_config_dict["training"].model_name)
 
-    model = transformers.XLMRobertaForTokenClassification.from_pretrained(
-        experiment_config_dict["training"].backbone_name
-    )
     start_time = time.time()
     from torch.utils.tensorboard import SummaryWriter
 
     ds = xtreme_ds.panxTrainDataset()
+    model = transformers.XLMRobertaForTokenClassification.from_pretrained(
+        experiment_config_dict["training"].backbone_name, num_labels=xtreme_ds.TASK[ds.task]["num_labels"]
+    )
     writer = SummaryWriter(
         "/gpfs1/home/ckchan666/job/stru_pred_baseline/panx",
         filename_suffix="."
