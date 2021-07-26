@@ -127,10 +127,10 @@ def tag_train(
         num_warmup_steps=xtreme_ds.TASK[task]["warmup_steps"],
         num_training_steps=len(tag_ds)
         // gradient_acc_size
-        * xtreme_ds.TASK[task]["epochs"],
+        * (xtreme_ds.TASK[task]["epochs"] * 2),
     )
     log_step_size = (
-        len(tag_ds) // gradient_acc_size * xtreme_ds.TASK[task]["epochs"] // 20
+        len(tag_ds) // gradient_acc_size * (xtreme_ds.TASK[task]["epochs"] * 2) // 20
     )
     import gc
 
@@ -140,13 +140,13 @@ def tag_train(
     gradient_step_counter = 0
     print(
         "run for "
-        + str(xtreme_ds.TASK[task]["epochs"])
+        + str((xtreme_ds.TASK[task]["epochs"] * 2))
         + " epoches with "
         + str(gradient_acc_size)
         + " gradient acc size"
     )
     i = 0
-    for _ in range(xtreme_ds.TASK[task]["epochs"] * 2):
+    for _ in range((xtreme_ds.TASK[task]["epochs"] * 2)):
         for batch in tag_ds_dataloader:
             #  input to gpu
             batch["tokens"] = batch["tokens"].cuda()
