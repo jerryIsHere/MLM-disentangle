@@ -55,11 +55,11 @@ for i_batch, batch in enumerate(dataloader):
                 }
             )
             last_lan = lan
-    filehandler = open(
-        "/gpfs1/scratch/ckchan666/pickle/control_udpos_example_" + last_lan + ".pickle",
-        "wb",
-    )
-    pickle.dump(udpos_example, filehandler)
+filehandler = open(
+    "/gpfs1/scratch/ckchan666/pickle/control_udpos_example_" + last_lan + ".pickle",
+    "wb",
+)
+pickle.dump(udpos_example, filehandler)
 
 
 exp_config = json.loads(
@@ -152,12 +152,13 @@ dataloader = torch.utils.data.DataLoader(
 )
 udpos_example = []
 import gc
+
 for i_batch, batch in enumerate(dataloader):
     with torch.no_grad():
         output = disentangled_model(batch["tokens"])
         for i, s_id in enumerate(batch["tokens"]):
             lan = batch["lan"][i]
-            if lan != 'yo':
+            if lan != "yo":
                 continue
             tags = batch["tags"][i]
             vectors = vectors[tags != -100, :]
@@ -168,9 +169,7 @@ for i_batch, batch in enumerate(dataloader):
                 }
             )
 filehandler = open(
-                        "/gpfs1/scratch/ckchan666/pickle/udpos_example_"
-                        + "yo"
-                        + ".pickle",
-                        "wb",
-                    )
+    "/gpfs1/scratch/ckchan666/pickle/udpos_example_" + "yo" + ".pickle",
+    "wb",
+)
 pickle.dump(udpos_example, filehandler)
