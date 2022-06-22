@@ -23,7 +23,7 @@ MarkupSafe==2.0.1
 -e git+https://github.com/jerryIsHere/MLM-disentangle@f6d8352d438d1a432f0b84edc50fab3be1cb7e09#egg=MLM_DISENTANGLE
 multiprocess==0.70.11.1
 murmurhash==1.0.5
-numpy==1.20.3
+numpy==1.22.0
 oauthlib==3.1.1
 packaging==20.9
 pandas==1.2.4
