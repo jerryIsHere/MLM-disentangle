@@ -17,7 +17,7 @@ huggingface-hub==0.0.8
 idna==2.10
 importlib-metadata==4.0.1
 Jinja2==3.0.1
-joblib==1.0.1
+joblib==1.2.0
 Markdown==3.3.4
 MarkupSafe==2.0.1
 -e git+https://github.com/jerryIsHere/MLM-disentangle@f6d8352d438d1a432f0b84edc50fab3be1cb7e09#egg=MLM_DISENTANGLE
